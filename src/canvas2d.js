@@ -12,4 +12,9 @@ function fillRect(top, left, width, height) {
         pixelStore[i + 2] = 0; // b
         pixelStore[i + 3] = 255; // alpha
     }
+
+    const imageData = new ImageData(pixelStore, canvas.width, canvas.height);
+    ctx.putImageData(imageData, 0, 0);
 }
+
+fillRect();
