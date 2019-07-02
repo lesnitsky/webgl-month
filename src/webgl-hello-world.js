@@ -13,3 +13,4 @@ void main() {
 `;
 
 gl.shaderSource(vertexShader, vShaderSource);
+gl.compileShader(vertexShader);
