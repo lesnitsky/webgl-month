@@ -42,4 +42,6 @@ gl.linkProgram(program);
 
 gl.useProgram(program);
 
+const positionPointer = gl.getAttribLocation(program, 'position');
+
 gl.drawArrays(gl.POINTS, 0, 1);
