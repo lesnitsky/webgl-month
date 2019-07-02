@@ -14,7 +14,7 @@ void main() {
 
 const fShaderSource = `
     void main() {
-        
+        gl_FragColor = vec4(1, 0, 0, 1);
     }
 `;
 
@@ -30,3 +30,4 @@ function compileShader(shader, source) {
 }
 
 compileShader(vertexShader, vShaderSource);
+compileShader(fragmentShader, fShaderSource);
