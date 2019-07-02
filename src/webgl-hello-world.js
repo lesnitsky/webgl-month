@@ -57,6 +57,7 @@ const nomralized = false;
 const stride = 0;
 const offset = 0;
 
+gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 
 gl.drawArrays(gl.POINTS, 0, 1);
