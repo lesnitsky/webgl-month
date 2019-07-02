@@ -51,4 +51,6 @@ const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 
+const attributeSize = 2;
+
 gl.drawArrays(gl.POINTS, 0, 1);
