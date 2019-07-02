@@ -8,6 +8,6 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
 void main() {
-    
+    gl_Position = vec4(0, 0, 0, 1);
 }
 `;
