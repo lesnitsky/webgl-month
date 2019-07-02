@@ -38,3 +38,5 @@ gl.attachShader(program, fragmentShader);
 gl.linkProgram(program);
 
 gl.useProgram(program);
+
+gl.drawArrays();
