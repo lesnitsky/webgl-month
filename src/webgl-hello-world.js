@@ -14,3 +14,5 @@ void main() {
 
 gl.shaderSource(vertexShader, vShaderSource);
 gl.compileShader(vertexShader);
+
+console.log(gl.getShaderInfoLog(vertexShader));
