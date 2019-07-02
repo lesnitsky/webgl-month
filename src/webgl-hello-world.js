@@ -49,6 +49,6 @@ const positionData = new Float32Array([0, 0]);
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, positionData);
+gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 
 gl.drawArrays(gl.POINTS, 0, 1);
