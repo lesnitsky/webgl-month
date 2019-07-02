@@ -46,4 +46,6 @@ const positionPointer = gl.getAttribLocation(program, 'position');
 
 const positionData = new Float32Array([0, 0]);
 
+const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
 gl.drawArrays(gl.POINTS, 0, 1);
