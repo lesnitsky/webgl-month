@@ -34,3 +34,5 @@ compileShader(fragmentShader, fShaderSource);
 
 gl.attachShader(program, vertexShader);
 gl.attachShader(program, fragmentShader);
+
+gl.linkProgram(program);
