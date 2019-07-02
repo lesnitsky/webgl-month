@@ -12,6 +12,12 @@ void main() {
 }
 `;
 
+const fShaderSource = `
+    void main() {
+        
+    }
+`;
+
 function compileShader(shader, source) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
