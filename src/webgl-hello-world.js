@@ -11,7 +11,7 @@ attribute vec2 position;
 
 void main() {
     gl_PointSize = 20.0;
-    gl_Position = vec4(position.x, position.y, 0, 1);
+    gl_Position = vec4(position, 0, 1);
 }
 `;
 
@@ -45,8 +45,8 @@ gl.useProgram(program);
 const positionPointer = gl.getAttribLocation(program, 'position');
 
 const positionData = new Float32Array([
-    -1.0, // point 1 x
-    -1.0, // point 1 y
+    -1.0, // top left x
+    -1.0, // top left y
 
     1.0, // point 2 x
     1.0, // point 2 y
