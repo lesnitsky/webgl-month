@@ -54,5 +54,7 @@ gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 const attributeSize = 2;
 const type = gl.FLOAT;
 const nomralized = false;
+const stride = 0;
+const offset = 0;
 
 gl.drawArrays(gl.POINTS, 0, 1);
