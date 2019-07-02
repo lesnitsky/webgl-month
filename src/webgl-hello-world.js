@@ -31,3 +31,6 @@ function compileShader(shader, source) {
 
 compileShader(vertexShader, vShaderSource);
 compileShader(fragmentShader, fShaderSource);
+
+gl.attachShader(program, vertexShader);
+gl.attachShader(program, fragmentShader);
