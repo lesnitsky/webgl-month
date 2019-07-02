@@ -12,7 +12,15 @@ void main() {
 }
 `;
 
-gl.shaderSource(vertexShader, vShaderSource);
-gl.compileShader(vertexShader);
+function compileShader(shader, source) {
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
 
-console.log(gl.getShaderInfoLog(vertexShader));
+    const log = gl.getShaderInfoLog(shader);
+
+    if (log) {
+        throw new Error(log);
+    }
+}
+
+compileShader(vertexShader, vShaderSource);
