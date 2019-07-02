@@ -39,4 +39,4 @@ gl.linkProgram(program);
 
 gl.useProgram(program);
 
-gl.drawArrays(gl.POINTS, 0);
+gl.drawArrays(gl.POINTS, 0, 1);
