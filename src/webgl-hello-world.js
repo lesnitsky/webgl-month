@@ -44,7 +44,19 @@ gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
 
-const positionData = new Float32Array([1.0, 0.0]);
+const positionData = new Float32Array([
+    -1.0, // point 1 x
+    -1.0, // point 1 y
+
+    1.0, // point 2 x
+    1.0, // point 2 y
+
+    -1.0, // point 3 x
+    1.0, // point 3 y
+
+    1.0, // point 4 x
+    -1.0, // point 4 y
+]);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
@@ -60,4 +72,4 @@ const offset = 0;
 gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 
-gl.drawArrays(gl.POINTS, 0, 1);
+gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
