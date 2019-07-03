@@ -51,18 +51,13 @@ const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
-const lines = [];
-let prevLineY = 0;
+const triangles = [
+    0, 0, // v1 (x, y)
+    canvas.width / 2, canvas.height, // v2 (x, y)
+    canvas.width, 0, // v3 (x, y)
+];
 
-for (let i = 0; i < canvas.width - 5; i += 5) {
-    lines.push(i, prevLineY);
-    const y =  Math.random() * canvas.height;
-    lines.push(i + 5, y);
-
-    prevLineY = y;
-}
-
-const positionData = new Float32Array(lines);
+const positionData = new Float32Array(triangles);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
@@ -79,4 +74,4 @@ const offset = 0;
 gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 
-gl.drawArrays(gl.LINES, 0, positionData.length / 2);
+gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
