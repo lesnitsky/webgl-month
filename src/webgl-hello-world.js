@@ -13,8 +13,9 @@ uniform float width;
 #define M_PI 3.1415926535897932384626433832795
 
 void main() {
+    float x = position.x / width * 2.0 - 1.0;
     gl_PointSize = 2.0;
-    gl_Position = vec4(position.x, cos(position.y * M_PI), 0, 1);
+    gl_Position = vec4(x, cos(x * M_PI), 0, 1);
 }
 `;
 
@@ -53,8 +54,7 @@ gl.uniform1f(widthUniformLocation, canvas.width);
 const points = [];
 
 for (let i = 0; i < canvas.width; i++) {
-    const x = i / canvas.width * 2 - 1;
-    points.push(x, x);
+    points.push(i, i);
 }
 
 const positionData = new Float32Array(points);
