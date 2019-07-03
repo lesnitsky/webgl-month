@@ -8,16 +8,23 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
 attribute vec2 position;
+uniform vec2 resolution;
+
+#define M_PI 3.1415926535897932384626433832795
 
 void main() {
-    gl_PointSize = 20.0;
-    gl_Position = vec4(position / 2.0, 0, 1);
+    vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+    gl_PointSize = 2.0;
+    gl_Position = vec4(transformedPosition, 0, 1);
 }
 `;
 
 const fShaderSource = `
+    precision mediump float;
+    uniform vec4 color;
+
     void main() {
-        gl_FragColor = vec4(1, 0, 0, 1);
+        gl_FragColor = color / 255.0;
     }
 `;
 
@@ -43,25 +50,25 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
+const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+const colorUniformLocation = gl.getUniformLocation(program, 'color');
 
-const positionData = new Float32Array([
-    -1.0, // top left x
-    -1.0, // top left y
+gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
 
-    1.0, // point 2 x
-    1.0, // point 2 y
+const triangles = [
+    0, 0, // v1 (x, y)
+    canvas.width / 2, canvas.height, // v2 (x, y)
+    canvas.width, 0, // v3 (x, y)
+];
 
-    -1.0, // point 3 x
-    1.0, // point 3 y
-
-    1.0, // point 4 x
-    -1.0, // point 4 y
-]);
+const positionData = new Float32Array(triangles);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+gl.lineWidth(10);
 
 const attributeSize = 2;
 const type = gl.FLOAT;
@@ -72,4 +79,4 @@ const offset = 0;
 gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 
-gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
+gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
