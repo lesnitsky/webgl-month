@@ -9,9 +9,11 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 const vShaderSource = `
 attribute vec2 position;
 
+#define M_PI 3.1415926535897932384626433832795
+
 void main() {
     gl_PointSize = 2.0;
-    gl_Position = vec4(position, 0, 1);
+    gl_Position = vec4(position.x, cos(position.y * M_PI), 0, 1);
 }
 `;
 
@@ -48,9 +50,7 @@ const points = [];
 
 for (let i = 0; i < canvas.width; i++) {
     const x = i / canvas.width * 2 - 1;
-    const y = Math.cos(x * Math.PI);
-
-    points.push(x, y);
+    points.push(x, x);
 }
 
 const positionData = new Float32Array(points);
