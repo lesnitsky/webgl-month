@@ -8,6 +8,7 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
 attribute vec2 position;
+uniform float width;
 
 #define M_PI 3.1415926535897932384626433832795
 
