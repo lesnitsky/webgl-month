@@ -48,6 +48,8 @@ gl.useProgram(program);
 const positionPointer = gl.getAttribLocation(program, 'position');
 const widthUniformLocation = gl.getUniformLocation(program, 'width');
 
+gl.uniform1f(widthUniformLocation, canvas.width);
+
 const points = [];
 
 for (let i = 0; i < canvas.width; i++) {
