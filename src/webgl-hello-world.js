@@ -46,6 +46,7 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
+const widthUniformLocation = gl.getUniformLocation(program, 'width');
 
 const points = [];
 
