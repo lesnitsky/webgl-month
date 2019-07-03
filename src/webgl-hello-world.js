@@ -20,8 +20,10 @@ void main() {
 `;
 
 const fShaderSource = `
+    uniform vec4 color;
+
     void main() {
-        gl_FragColor = vec4(1, 0, 0, 1);
+        gl_FragColor = color / 255.0;
     }
 `;
 
@@ -48,8 +50,10 @@ gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
 const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+const colorUniformLocation = gl.getUniformLocation(program, 'color');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
 
 const triangles = [
     0, 0, // v1 (x, y)
