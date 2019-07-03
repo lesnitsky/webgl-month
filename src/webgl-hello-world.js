@@ -51,13 +51,18 @@ const widthUniformLocation = gl.getUniformLocation(program, 'width');
 
 gl.uniform1f(widthUniformLocation, canvas.width);
 
-const points = [];
+const lines = [];
+let prevLineY = 0;
 
-for (let i = 0; i < canvas.width; i++) {
-    points.push(i, i);
+for (let i = 0; i < canvas.width - 5; i += 5) {
+    lines.push(i, prevLineY);
+    const y =  Math.random() * canvas.height;
+    lines.push(i + 5, y);
+
+    prevLineY = y;
 }
 
-const positionData = new Float32Array(points);
+const positionData = new Float32Array(lines);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
