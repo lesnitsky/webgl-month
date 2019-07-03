@@ -78,4 +78,4 @@ const offset = 0;
 gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 
-gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
+gl.drawArrays(gl.LINES, 0, positionData.length / 2);
