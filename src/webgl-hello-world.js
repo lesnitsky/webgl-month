@@ -8,14 +8,14 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
 attribute vec2 position;
-uniform float width;
+uniform vec2 resolution;
 
 #define M_PI 3.1415926535897932384626433832795
 
 void main() {
-    float x = position.x / width * 2.0 - 1.0;
+    vec2 transformedPosition = position / resolution * 2.0 - 1.0;
     gl_PointSize = 2.0;
-    gl_Position = vec4(x, cos(x * M_PI), 0, 1);
+    gl_Position = vec4(transformedPosition, 0, 1);
 }
 `;
 
@@ -47,9 +47,9 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
-const widthUniformLocation = gl.getUniformLocation(program, 'width');
+const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
-gl.uniform1f(widthUniformLocation, canvas.width);
+gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
 const lines = [];
 let prevLineY = 0;
