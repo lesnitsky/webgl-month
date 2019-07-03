@@ -48,6 +48,9 @@ const points = [];
 
 for (let i = 0; i < canvas.width; i++) {
     const x = i / canvas.width * 2 - 1;
+    const y = Math.cos(x * Math.PI);
+
+    points.push(x, y);
 }
 
 const positionData = new Float32Array(points);
