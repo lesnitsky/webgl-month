@@ -56,20 +56,16 @@ const colorUniformLocation = gl.getUniformLocation(program, 'color');
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
 
-const triangles = [
-    // first triangle
-    0, 150, // top left
-    150, 150, // top right
-    0, 0, // bottom left
-    
-    // second triangle
-    0, 0, // bottom left
-    150, 150, // top right
-    150, 0, // bottom right
-];
+const triangles = [createHexagon()];
 
-function createHexagon(center, radius, segmentsCount) {
-    
+function createHexagon(centerX, centerY, radius, segmentsCount) {
+    const vertices = [];
+
+    for (let i = 0; i < Math.PI * 2; i += Math.PI * 2 / (segmentsCount - 1)) {
+        
+    }
+
+    return vertices;
 }
 
 const positionData = new Float32Array(triangles);
