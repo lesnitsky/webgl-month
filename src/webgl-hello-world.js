@@ -56,7 +56,7 @@ const colorUniformLocation = gl.getUniformLocation(program, 'color');
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
 
-const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 6);
+const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
     const vertices = [];
