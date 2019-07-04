@@ -894,3 +894,472 @@ Hint: all you need is fill `positionData` with valid values
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 3. Shader uniforms, lines and triangles
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+[Yesterday](https://dev.to/lesnitsky/shaders-and-points-3h2c) we draw the simplies primitive possible – point. Let's first solve the "homework"
+
+
+We need to remove hardcoded points data
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const positionPointer = gl.getAttribLocation(program, 'position');
+  
+- const positionData = new Float32Array([
+-     -1.0, // top left x
+-     -1.0, // top left y
+- 
+-     1.0, // point 2 x
+-     1.0, // point 2 y
+- 
+-     -1.0, // point 3 x
+-     1.0, // point 3 y
+- 
+-     1.0, // point 4 x
+-     -1.0, // point 4 y
+- ]);
++ const points = [];
++ const positionData = new Float32Array(points);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+
+```
+Iterate over each vertical line of pixels of canvas `[0..width]`
+
+📄 src/webgl-hello-world.js
+```diff
+  const positionPointer = gl.getAttribLocation(program, 'position');
+  
+  const points = [];
++ 
++ for (let i = 0; i < canvas.width; i++) {
++ 
++ }
++ 
+  const positionData = new Float32Array(points);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+```
+Transform value from `[0..width]` to `[-1..1]` (remember webgl coordinat grid? this is left most and right most coordinates)
+
+📄 src/webgl-hello-world.js
+```diff
+  const points = [];
+  
+  for (let i = 0; i < canvas.width; i++) {
+- 
++     const x = i / canvas.width * 2 - 1;
+  }
+  
+  const positionData = new Float32Array(points);
+
+```
+Calculate `cos` and add both x and y to `points` array
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  for (let i = 0; i < canvas.width; i++) {
+      const x = i / canvas.width * 2 - 1;
++     const y = Math.cos(x * Math.PI);
++ 
++     points.push(x, y);
+  }
+  
+  const positionData = new Float32Array(points);
+
+```
+Graph looks a bit weird, let's fix our vertex shader
+
+📄 src/webgl-hello-world.js
+```diff
+  attribute vec2 position;
+  
+  void main() {
+-     gl_PointSize = 20.0;
+-     gl_Position = vec4(position / 2.0, 0, 1);
++     gl_PointSize = 2.0;
++     gl_Position = vec4(position, 0, 1);
+  }
+  `;
+  
+
+```
+Niiiice 😎 We now have fancy cos graph!
+
+![Cos graph](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/cos-graph.png)
+
+
+We calculated `cos` with JavaScript, but if we need to calculate something for a large dataset, javascript may block rendering thread. Why won't facilitate computation power of GPU (cos will be calculated for each point in parallel).
+
+GLSL doesn't have `Math` namespace, so we'll need to define `M_PI` variable
+`cos` function is there though 😏
+
+📄 src/webgl-hello-world.js
+```diff
+  const vShaderSource = `
+  attribute vec2 position;
+  
++ #define M_PI 3.1415926535897932384626433832795
++ 
+  void main() {
+      gl_PointSize = 2.0;
+-     gl_Position = vec4(position, 0, 1);
++     gl_Position = vec4(position.x, cos(position.y * M_PI), 0, 1);
+  }
+  `;
+  
+  
+  for (let i = 0; i < canvas.width; i++) {
+      const x = i / canvas.width * 2 - 1;
+-     const y = Math.cos(x * Math.PI);
+- 
+-     points.push(x, y);
++     points.push(x, x);
+  }
+  
+  const positionData = new Float32Array(points);
+
+```
+We have another JavaScript computation inside cycle where we transform pixel coordinates to `[-1..1]` range
+How do we move this to GPU?
+We've learned that we can pass some data to a shader with `attribute`, but `width` is constant, it doesn't change between points.
+
+There is a special kind of variables – `uniforms`. Treat uniform as a global variable which can be assigned only once before draw call and stays the same for all "points"
+
+
+Let's define a `uniform`
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const vShaderSource = `
+  attribute vec2 position;
++ uniform float width;
+  
+  #define M_PI 3.1415926535897932384626433832795
+  
+
+```
+To assign a value to a uniform, we'll need to do smth similar to what we did with attribute. We need to get location of the uniform.
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.useProgram(program);
+  
+  const positionPointer = gl.getAttribLocation(program, 'position');
++ const widthUniformLocation = gl.getUniformLocation(program, 'width');
+  
+  const points = [];
+  
+
+```
+There's a bunch of methods which can assign different types of values to uniforms
+
+* `gl.uniform1f` – assigns a number to a float uniform (`gl.uniform1f(0.0)`)
+* `gl.uniform1fv` – assigns an array of length 1 to a float uniform (`gl.uniform1fv([0.0])`)
+* `gl.uniform2f` - assigns two numbers to a vec2 uniform (`gl.uniform2f(0.0, 1.0)`)
+* `gl.uniform2f` - assigns an array of length 2 to a vec2 uniform (`gl.uniform2fv([0.0, 1.0])`)
+
+etc
+
+📄 src/webgl-hello-world.js
+```diff
+  const positionPointer = gl.getAttribLocation(program, 'position');
+  const widthUniformLocation = gl.getUniformLocation(program, 'width');
+  
++ gl.uniform1f(widthUniformLocation, canvas.width);
++ 
+  const points = [];
+  
+  for (let i = 0; i < canvas.width; i++) {
+
+```
+And finally let's move our js computation to a shader
+
+📄 src/webgl-hello-world.js
+```diff
+  #define M_PI 3.1415926535897932384626433832795
+  
+  void main() {
++     float x = position.x / width * 2.0 - 1.0;
+      gl_PointSize = 2.0;
+-     gl_Position = vec4(position.x, cos(position.y * M_PI), 0, 1);
++     gl_Position = vec4(x, cos(x * M_PI), 0, 1);
+  }
+  `;
+  
+  const points = [];
+  
+  for (let i = 0; i < canvas.width; i++) {
+-     const x = i / canvas.width * 2 - 1;
+-     points.push(x, x);
++     points.push(i, i);
+  }
+  
+  const positionData = new Float32Array(points);
+
+```
+### Rendering lines
+
+Now let's try to render lines
+
+We need to fill our position data with line starting and ending point coordinates
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  gl.uniform1f(widthUniformLocation, canvas.width);
+  
+- const points = [];
++ const lines = [];
++ let prevLineY = 0;
+  
+- for (let i = 0; i < canvas.width; i++) {
+-     points.push(i, i);
++ for (let i = 0; i < canvas.width - 5; i += 5) {
++     lines.push(i, prevLineY);
++     const y =  Math.random() * canvas.height;
++     lines.push(i + 5, y);
++ 
++     prevLineY = y;
+  }
+  
+- const positionData = new Float32Array(points);
++ const positionData = new Float32Array(lines);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+
+```
+We'll also need to transform `y` to a WebGL clipspace, so let's pass a resolution of canvas, not just width
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const vShaderSource = `
+  attribute vec2 position;
+- uniform float width;
++ uniform vec2 resolution;
+  
+  #define M_PI 3.1415926535897932384626433832795
+  
+  void main() {
+-     float x = position.x / width * 2.0 - 1.0;
++     vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+      gl_PointSize = 2.0;
+-     gl_Position = vec4(x, cos(x * M_PI), 0, 1);
++     gl_Position = vec4(transformedPosition, 0, 1);
+  }
+  `;
+  
+  gl.useProgram(program);
+  
+  const positionPointer = gl.getAttribLocation(program, 'position');
+- const widthUniformLocation = gl.getUniformLocation(program, 'width');
++ const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+  
+- gl.uniform1f(widthUniformLocation, canvas.width);
++ gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  
+  const lines = [];
+  let prevLineY = 0;
+
+```
+The final thing – we need to change primitive type to `gl.LINES`
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.enableVertexAttribArray(positionPointer);
+  gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
+  
+- gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
++ gl.drawArrays(gl.LINES, 0, positionData.length / 2);
+
+```
+Cool! We can render lines now 👍
+
+![Lines](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/line-graph.png)
+
+Let's try to make the line a bit thicker
+
+
+Unlike point size, line width should be set from javascript. There is a method `gl.lineWidth(width)`
+
+Let's try to use it
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
++ gl.lineWidth(10);
+  
+  const attributeSize = 2;
+  const type = gl.FLOAT;
+
+```
+Nothing changed 😢 But why??
+
+That's why 😂
+
+![Line browser support](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/line-width-support.png)
+
+Nobody cares.
+
+So if you need a fancy line with custom line cap – `gl.LINES` is not for you
+
+
+But how do we render fancy line?
+
+Turns out – everything could be rendered with help of next WebGL primitive – triangle.
+This is the last primitive which could be rendered with WebGL
+
+Building a line of custom width from triangle might seem like a tough task, but don't worry, there are a lot of packages that could help you render custom 2d shapes (and even svg)
+
+Some of these tools:
+
+- [svg-path-contours](https://github.com/mattdesl/svg-path-contours)
+- [cdt2d](https://www.npmjs.com/package/cdt2d)
+- [adaptive-bezier-curve](https://www.npmjs.com/package/adaptive-bezier-curve)
+
+and others
+
+From now on, remember: EVERYTHING, could be built with triangles and that's how rendering works
+
+1. Input – triangle vertices
+2. vertex shader – transform vertices to webgl clipspace
+3. Rasterization – calculate which pixels are inside of certain triangle
+4. Calculate color of each pixel
+
+Here's an illustration of this process from [https://opentechschool-brussels.github.io/intro-to-webGL-and-shaders/log1_graphic-pipeline](https://opentechschool-brussels.github.io/intro-to-webGL-and-shaders/log1_graphic-pipeline)
+
+![WebGL pipeline](https://opentechschool-brussels.github.io/intro-to-webGL-and-shaders/assets/log1_graphicPipeline.jpg)
+
+> Disclamer: this is a simplified version of what's going on under the hood, [read this](https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview) for more detailed explanation
+
+
+So lets finally render a triangle
+
+Again – we need to update our position data
+
+
+and change primitive type
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  
+- const lines = [];
+- let prevLineY = 0;
++ const triangles = [
++     0, 0, // v1 (x, y)
++     canvas.width / 2, canvas.height, // v2 (x, y)
++     canvas.width, 0, // v3 (x, y)
++ ];
+  
+- for (let i = 0; i < canvas.width - 5; i += 5) {
+-     lines.push(i, prevLineY);
+-     const y =  Math.random() * canvas.height;
+-     lines.push(i + 5, y);
+- 
+-     prevLineY = y;
+- }
+- 
+- const positionData = new Float32Array(lines);
++ const positionData = new Float32Array(triangles);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+  gl.enableVertexAttribArray(positionPointer);
+  gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
+  
+- gl.drawArrays(gl.LINES, 0, positionData.length / 2);
++ gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
+
+```
+And one more thing... Let's pass a color from javascript instead of hardcoding it inside fragment shader.
+
+We'll need to go through the same steps as for resolution uniform, but declare this uniform in fragment shader
+
+📄 src/webgl-hello-world.js
+```diff
+  `;
+  
+  const fShaderSource = `
++     uniform vec4 color;
++ 
+      void main() {
+-         gl_FragColor = vec4(1, 0, 0, 1);
++         gl_FragColor = color / 255.0;
+      }
+  `;
+  
+  
+  const positionPointer = gl.getAttribLocation(program, 'position');
+  const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
++ const colorUniformLocation = gl.getUniformLocation(program, 'color');
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
++ gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+  const triangles = [
+      0, 0, // v1 (x, y)
+
+```
+Wait, what? An Error 🛑 😱
+
+```
+No precision specified for (float)
+```
+
+What is that?
+
+Turns out that glsl shaders support different precision of float and you need to specify it.
+Usually `mediump` is both performant and precise, but sometimes you might want to use `lowp` or `highp`. But be careful, `highp` is not supported by some mobile GPUs and there is no guarantee you won't get any weird rendering artifacts withh high precesion
+
+📄 src/webgl-hello-world.js
+```diff
+  `;
+  
+  const fShaderSource = `
++     precision mediump float;
+      uniform vec4 color;
+  
+      void main() {
+
+```
+### Homework
+
+Render different shapes using triangles:
+
+* rectangle
+* hexagon
+* circle
+
+
+See you tomorrow 👋
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
