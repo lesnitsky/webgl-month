@@ -63,6 +63,7 @@ const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
 const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
+const colors = fillWithColors(360);
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
     const vertices = [];
@@ -78,6 +79,22 @@ function createHexagon(centerX, centerY, radius, segmentsCount) {
     }
 
     return vertices;
+}
+
+function fillWithColors(segmentsCount) {
+    const colors = [];
+
+    for (let i = 0; i < segmentsCount; i++) {
+        for (let j = 0; j < 3; j++) {
+            if (j == 0) { // vertex in center of circle
+                colors.push(0, 0, 0, 255);
+            } else {
+                colors.push(i / 360 * 255, 0, 0, 255);
+            }
+        }
+    }
+
+    return colors;
 }
 
 const positionData = new Float32Array(triangles);
