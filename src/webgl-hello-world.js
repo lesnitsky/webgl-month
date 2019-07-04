@@ -10,21 +10,26 @@ const vShaderSource = `
 attribute vec2 position;
 uniform vec2 resolution;
 
+varying vec4 vColor;
+
 #define M_PI 3.1415926535897932384626433832795
 
 void main() {
     vec2 transformedPosition = position / resolution * 2.0 - 1.0;
     gl_PointSize = 2.0;
     gl_Position = vec4(transformedPosition, 0, 1);
+
+    vColor = vec4(255, 0, 0, 255);
 }
 `;
 
 const fShaderSource = `
     precision mediump float;
-    uniform vec4 color;
+
+    varying vec4 vColor;
 
     void main() {
-        gl_FragColor = color / 255.0;
+        gl_FragColor = vColor / 255.0;
     }
 `;
 
@@ -51,10 +56,8 @@ gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
 const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
-const colorUniformLocation = gl.getUniformLocation(program, 'color');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
 
 const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 
