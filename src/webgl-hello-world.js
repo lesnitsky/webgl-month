@@ -119,4 +119,9 @@ const offset = 0;
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
 
+gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+
+gl.enableVertexAttribArray(colorLocation);
+gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
+
 gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
