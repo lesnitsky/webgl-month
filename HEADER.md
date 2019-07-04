@@ -1,3 +1,5 @@
+This is a series of blog posts related to WebGL. New post will be available every day
+
 [Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
