@@ -8,6 +8,7 @@ const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
 attribute vec2 position;
+attribute vec4 color;
 uniform vec2 resolution;
 
 varying vec4 vColor;
@@ -19,7 +20,7 @@ void main() {
     gl_PointSize = 2.0;
     gl_Position = vec4(transformedPosition, 0, 1);
 
-    vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
+    vColor = color;
 }
 `;
 
@@ -54,7 +55,9 @@ gl.linkProgram(program);
 
 gl.useProgram(program);
 
-const positionPointer = gl.getAttribLocation(program, 'position');
+const positionLocation = gl.getAttribLocation(program, 'position');
+const colorLocation = gl.getAttribLocation(program, 'color');
+
 const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
@@ -91,7 +94,7 @@ const nomralized = false;
 const stride = 0;
 const offset = 0;
 
-gl.enableVertexAttribArray(positionPointer);
-gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
+gl.enableVertexAttribArray(positionLocation);
+gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
 
 gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
