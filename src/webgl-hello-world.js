@@ -68,6 +68,10 @@ const triangles = [
     150, 0, // bottom right
 ];
 
+function createHexagon(center, radius, segmentsCount) {
+    
+}
+
 const positionData = new Float32Array(triangles);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
