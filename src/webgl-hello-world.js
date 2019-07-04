@@ -19,7 +19,7 @@ void main() {
     gl_PointSize = 2.0;
     gl_Position = vec4(transformedPosition, 0, 1);
 
-    vColor = vec4(255, 0, 0, 255);
+    vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
 }
 `;
 
