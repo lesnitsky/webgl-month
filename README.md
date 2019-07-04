@@ -1363,3 +1363,372 @@ See you tomorrow 👋
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 4. Shader varyings
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-3-shader-uniforms-lines-and-triangles-5dof) we learned how to render lines and triangles, so let's get started with the homework
+
+How do we draw a rectangle if webgl can only render triangles? We should split a rectangle into two triangles
+
+```
+-------
+|    /|
+|  /  |
+|/    |
+-------
+```
+
+Pretty simple, right?
+
+
+Let's define the coordinates of triangle vertices
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+  const triangles = [
+-     0, 0, // v1 (x, y)
+-     canvas.width / 2, canvas.height, // v2 (x, y)
+-     canvas.width, 0, // v3 (x, y)
++     // first triangle
++     0, 150, // top left
++     150, 150, // top right
++     0, 0, // bottom left
++     
++     // second triangle
++     0, 0, // bottom left
++     150, 150, // top right
++     150, 0, // bottom right
+  ];
+  
+  const positionData = new Float32Array(triangles);
+
+```
+![Rectangle](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rectangle.png)
+
+Great, we can render rectangles now!
+
+
+Now let's draw a hexagon. This is somewhat harder to draw manually, so let's create a helper function
+
+📄 src/webgl-hello-world.js
+```diff
+      150, 0, // bottom right
+  ];
+  
++ function createHexagon(center, radius, segmentsCount) {
++     
++ }
++ 
+  const positionData = new Float32Array(triangles);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+```
+We need to iterate over (360 - segment angle) degrees with a step of a signle segment angle
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+- const triangles = [
+-     // first triangle
+-     0, 150, // top left
+-     150, 150, // top right
+-     0, 0, // bottom left
+-     
+-     // second triangle
+-     0, 0, // bottom left
+-     150, 150, // top right
+-     150, 0, // bottom right
+- ];
+- 
+- function createHexagon(center, radius, segmentsCount) {
+-     
++ const triangles = [createHexagon()];
++ 
++ function createHexagon(centerX, centerY, radius, segmentsCount) {
++     const vertices = [];
++ 
++     for (let i = 0; i < Math.PI * 2; i += Math.PI * 2 / (segmentsCount - 1)) {
++         
++     }
++ 
++     return vertices;
+  }
+  
+  const positionData = new Float32Array(triangles);
+
+```
+And apply some simple school math
+
+![Hexagon](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/hexagon.png)
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+- const triangles = [createHexagon()];
++ const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 6);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertices = [];
++     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
+  
+-     for (let i = 0; i < Math.PI * 2; i += Math.PI * 2 / (segmentsCount - 1)) {
+-         
++     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
++         const from = i;
++         const to = i + segmentAngle;
++ 
++         vertices.push(centerX, centerY);
++         vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
++         vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+      }
+  
+      return vertices;
+
+```
+Now how do we render circle?
+Actually a circle can be built with the same function, we just need to increase the number of "segments"
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+- const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 6);
++ const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertices = [];
+
+```
+![Circle](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/circle.png)
+
+
+## Varyings
+
+Ok, what next? Let's add some color 🎨
+As we already know, we can pass a color to a fragment shader via `uniform`
+But that's not the only way.
+Vertex shader can pass a `varying` to a fragment shader for each vertex, and the value will be interpolated
+
+Sounds a bit complicated, let's see how it works
+
+
+We need to define a `varying` in both vertex and fragment shaders.
+Make sure type matches. If e.g. varying will be `vec3` in vertex shader and `vec4` in fragment shader – `gl.linkProgram(program)` will fail. You can check if program was successfully linked with `gl.getProgramParameter(program, gl.LINK_STATUS)` and if it is false – `gl.getProgramInfoLog(program)` to see what went wrang
+
+📄 src/webgl-hello-world.js
+```diff
+  attribute vec2 position;
+  uniform vec2 resolution;
+  
++ varying vec4 vColor;
++ 
+  #define M_PI 3.1415926535897932384626433832795
+  
+  void main() {
+      vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+      gl_PointSize = 2.0;
+      gl_Position = vec4(transformedPosition, 0, 1);
++ 
++     vColor = vec4(255, 0, 0, 255);
+  }
+  `;
+  
+  const fShaderSource = `
+      precision mediump float;
+-     uniform vec4 color;
++ 
++     varying vec4 vColor;
+  
+      void main() {
+-         gl_FragColor = color / 255.0;
++         gl_FragColor = vColor / 255.0;
+      }
+  `;
+  
+  
+  const positionPointer = gl.getAttribLocation(program, 'position');
+  const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+- const colorUniformLocation = gl.getUniformLocation(program, 'color');
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+- gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
+  
+  const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
+  
+
+```
+Now let's try to colorize our circle based on `gl_Position`
+
+📄 src/webgl-hello-world.js
+```diff
+      gl_PointSize = 2.0;
+      gl_Position = vec4(transformedPosition, 0, 1);
+  
+-     vColor = vec4(255, 0, 0, 255);
++     vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
+  }
+  `;
+  
+
+```
+![Colorized circle](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/colorized-circle.png)
+
+Looks cool, right?
+
+But how do we pass some specific colors from js?
+
+
+We need to create another attribute
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const vShaderSource = `
+  attribute vec2 position;
++ attribute vec4 color;
+  uniform vec2 resolution;
+  
+  varying vec4 vColor;
+      gl_PointSize = 2.0;
+      gl_Position = vec4(transformedPosition, 0, 1);
+  
+-     vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
++     vColor = color;
+  }
+  `;
+  
+  
+  gl.useProgram(program);
+  
+- const positionPointer = gl.getAttribLocation(program, 'position');
++ const positionLocation = gl.getAttribLocation(program, 'position');
++ const colorLocation = gl.getAttribLocation(program, 'color');
++ 
+  const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  const stride = 0;
+  const offset = 0;
+  
+- gl.enableVertexAttribArray(positionPointer);
+- gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
++ gl.enableVertexAttribArray(positionLocation);
++ gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
+  
+  gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
+
+```
+Setup buffer for this attribute
+
+📄 src/webgl-hello-world.js
+```diff
+  }
+  
+  const positionData = new Float32Array(triangles);
++ const colorData = new Float32Array(colors);
+  
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
++ const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
++ 
++ gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
++ gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+
+```
+Fill buffer with data
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  
+  const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
++ const colors = fillWithColors(360);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertices = [];
+      return vertices;
+  }
+  
++ function fillWithColors(segmentsCount) {
++     const colors = [];
++ 
++     for (let i = 0; i < segmentsCount; i++) {
++         for (let j = 0; j < 3; j++) {
++             if (j == 0) { // vertex in center of circle
++                 colors.push(0, 0, 0, 255);
++             } else {
++                 colors.push(i / 360 * 255, 0, 0, 255);
++             }
++         }
++     }
++ 
++     return colors;
++ }
++ 
+  const positionData = new Float32Array(triangles);
+  const colorData = new Float32Array(colors);
+  
+
+```
+And setup the attribute pointer (the way how attribute reads data from the buffer).
+
+📄 src/webgl-hello-world.js
+```diff
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
+  
++ gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
++ 
++ gl.enableVertexAttribArray(colorLocation);
++ gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
++ 
+  gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
+
+```
+Notice this `gl.bindBuffer` before attribute related calls. `gl.vertexAttribPointer` points attribute to a buffer which wa most recently bound, don't forget this step, this is a common mistake
+
+
+![Colored circle](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/colored-circle-2.png)
+
+### Conclusion
+
+We've learned another way to pass data to a fragment shader.
+This is useful for per vertex colors and textures (we'll work with textures later)
+
+### Homework
+
+Render a 7-gon and colorize each triangle with colors of rainbow 🌈
+
+See you tomorrow 👋
+
+---
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
