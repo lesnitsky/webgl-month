@@ -62,6 +62,16 @@ const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
+const rainbowColors = [
+    [255, 0.0, 0.0, 255], // red
+    [255, 165, 0.0, 255], // orange
+    [255, 255, 0.0, 255], // yellow
+    [0.0, 255, 0.0, 255], // green
+    [0.0, 101, 255, 255], // skyblue
+    [0.0, 0.0, 255, 255], // blue,
+    [128, 0.0, 128, 255], // purple
+];
+
 const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 const colors = fillWithColors(360);
 
