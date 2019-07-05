@@ -96,11 +96,7 @@ function fillWithColors(segmentsCount) {
 
     for (let i = 0; i < segmentsCount; i++) {
         for (let j = 0; j < 3; j++) {
-            if (j == 0) { // vertex in center of circle
-                colors.push(0, 0, 0, 255);
-            } else {
-                colors.push(i / 360 * 255, 0, 0, 255);
-            }
+            colors.push(...rainbowColors[i]);
         }
     }
 
