@@ -72,8 +72,8 @@ const rainbowColors = [
     [128, 0.0, 128, 255], // purple
 ];
 
-const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
-const colors = fillWithColors(360);
+const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
+const colors = fillWithColors(7);
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
     const vertices = [];
