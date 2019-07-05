@@ -73,22 +73,28 @@ const rainbowColors = [
 ];
 
 const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
-const colors = fillWithColors(7);
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
-    const vertices = [];
+    const vertexData = [];
     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
 
     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
         const from = i;
         const to = i + segmentAngle;
 
-        vertices.push(centerX, centerY);
-        vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
-        vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+        const color = rainbowColors[i / segmentAngle];
+
+        vertexData.push(centerX, centerY);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+        vertexData.push(...color);
     }
 
-    return vertices;
+    return vertexData;
 }
 
 function fillWithColors(segmentsCount) {
