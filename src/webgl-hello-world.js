@@ -110,13 +110,7 @@ function fillWithColors(segmentsCount) {
 }
 
 const positionData = new Float32Array(triangles);
-const colorData = new Float32Array(colors);
-
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
