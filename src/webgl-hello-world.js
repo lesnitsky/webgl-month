@@ -109,11 +109,11 @@ function fillWithColors(segmentsCount) {
     return colors;
 }
 
-const positionData = new Float32Array(triangles);
-const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+const vertexData = new Float32Array(triangles);
+const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 gl.lineWidth(10);
 
 const attributeSize = 2;
