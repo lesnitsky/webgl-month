@@ -62,23 +62,39 @@ const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
-const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
-const colors = fillWithColors(360);
+const rainbowColors = [
+    [255, 0.0, 0.0, 255], // red
+    [255, 165, 0.0, 255], // orange
+    [255, 255, 0.0, 255], // yellow
+    [0.0, 255, 0.0, 255], // green
+    [0.0, 101, 255, 255], // skyblue
+    [0.0, 0.0, 255, 255], // blue,
+    [128, 0.0, 128, 255], // purple
+];
+
+const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
-    const vertices = [];
+    const vertexData = [];
     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
 
     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
         const from = i;
         const to = i + segmentAngle;
 
-        vertices.push(centerX, centerY);
-        vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
-        vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+        const color = rainbowColors[i / segmentAngle];
+
+        vertexData.push(centerX, centerY);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+        vertexData.push(...color);
     }
 
-    return vertices;
+    return vertexData;
 }
 
 function fillWithColors(segmentsCount) {
@@ -86,42 +102,30 @@ function fillWithColors(segmentsCount) {
 
     for (let i = 0; i < segmentsCount; i++) {
         for (let j = 0; j < 3; j++) {
-            if (j == 0) { // vertex in center of circle
-                colors.push(0, 0, 0, 255);
-            } else {
-                colors.push(i / 360 * 255, 0, 0, 255);
-            }
+            colors.push(...rainbowColors[i]);
         }
     }
 
     return colors;
 }
 
-const positionData = new Float32Array(triangles);
-const colorData = new Float32Array(colors);
+const vertexData = new Float32Array(triangles);
+const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
-const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
-
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 gl.lineWidth(10);
 
 const attributeSize = 2;
 const type = gl.FLOAT;
 const nomralized = false;
-const stride = 0;
+const stride = 24;
 const offset = 0;
 
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
 gl.enableVertexAttribArray(colorLocation);
-gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
+gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 
-gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
+gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
