@@ -1805,7 +1805,7 @@ Fill colors buffer with rainbow colors
   
 
 ```
-![Rainbow] (https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rainbow.png)
+![Rainbow](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rainbow.png)
 
 Where's the red? Well, to render 7 polygons, we need 8-gon 🤦 My bad, sorry.
 
