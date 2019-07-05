@@ -119,15 +119,13 @@ gl.lineWidth(10);
 const attributeSize = 2;
 const type = gl.FLOAT;
 const nomralized = false;
-const stride = 0;
+const stride = 24;
 const offset = 0;
 
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-
 gl.enableVertexAttribArray(colorLocation);
-gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
+gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 
-gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
+gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
