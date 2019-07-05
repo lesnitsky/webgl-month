@@ -1732,3 +1732,247 @@ See you tomorrow 👋
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 5. Interleaved buffers
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+Hey 👋 Welcome to a WebGL month. [Yesterday](https://dev.to/lesnitsky/shader-varyings-2p0f) we've learned how to use varyings. Today we're going to explore one more concept, but let's solve a homework from yesterday first
+
+
+We need to define raingbow colors first
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  
++ const rainbowColors = [
++     [255, 0.0, 0.0, 255], // red
++     [255, 165, 0.0, 255], // orange
++     [255, 255, 0.0, 255], // yellow
++     [0.0, 255, 0.0, 255], // green
++     [0.0, 101, 255, 255], // skyblue
++     [0.0, 0.0, 255, 255], // blue,
++     [128, 0.0, 128, 255], // purple
++ ];
++ 
+  const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
+  const colors = fillWithColors(360);
+  
+
+```
+Render a 7-gon
+
+📄 src/webgl-hello-world.js
+```diff
+      [128, 0.0, 128, 255], // purple
+  ];
+  
+- const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
+- const colors = fillWithColors(360);
++ const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
++ const colors = fillWithColors(7);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertices = [];
+
+```
+Fill colors buffer with rainbow colors
+
+📄 src/webgl-hello-world.js
+```diff
+  
+      for (let i = 0; i < segmentsCount; i++) {
+          for (let j = 0; j < 3; j++) {
+-             if (j == 0) { // vertex in center of circle
+-                 colors.push(0, 0, 0, 255);
+-             } else {
+-                 colors.push(i / 360 * 255, 0, 0, 255);
+-             }
++             colors.push(...rainbowColors[i]);
+          }
+      }
+  
+
+```
+![Rainbow] (https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rainbow.png)
+
+Where's the red? Well, to render 7 polygons, we need 8-gon 🤦 My bad, sorry.
+
+
+Now we have a colored 8-gon and we store vertices coordinates and colors in two separate buffers.
+Having two separate buffers allows to update them separately (imagine we need to change colors, but not positions)
+
+On the other hand if both positions and colors will be the same – we can store this data in a single buffer.
+
+Let's refactor the code to acheive it
+
+
+We need to structure our buffer data by attribute.
+
+```
+x1, y1, color.r, color.g, color.b, color.a
+x2, y2, color.r, color.g, color.b, color.a
+x3, y3, color.r, color.g, color.b, color.a
+...
+```
+
+📄 src/webgl-hello-world.js
+```diff
+  ];
+  
+  const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
+- const colors = fillWithColors(7);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+-     const vertices = [];
++     const vertexData = [];
+      const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
+  
+      for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
+          const from = i;
+          const to = i + segmentAngle;
+  
+-         vertices.push(centerX, centerY);
+-         vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
+-         vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
++         const color = rainbowColors[i / segmentAngle];
++ 
++         vertexData.push(centerX, centerY);
++         vertexData.push(...color);
++ 
++         vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
++         vertexData.push(...color);
++ 
++         vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
++         vertexData.push(...color);
+      }
+  
+-     return vertices;
++     return vertexData;
+  }
+  
+  function fillWithColors(segmentsCount) {
+
+```
+We don't need color buffer anymore
+
+📄 src/webgl-hello-world.js
+```diff
+  }
+  
+  const positionData = new Float32Array(triangles);
+- const colorData = new Float32Array(colors);
+- 
+  const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+- const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+- 
+- gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+- gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+
+```
+and it also makes sense to rename `positionData` and `positionBuffer` to a `vertexData` and `vertexBuffer`
+
+📄 src/webgl-hello-world.js
+```diff
+      return colors;
+  }
+  
+- const positionData = new Float32Array(triangles);
+- const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
++ const vertexData = new Float32Array(triangles);
++ const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+- gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+- gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
++ gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
++ gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+  gl.lineWidth(10);
+  
+  const attributeSize = 2;
+
+```
+But how do we specify how this data should be read from buffer and passed to a valid shader attributes
+
+We can do this with `vertexAttribPointer`, `stride` and `offset` arguments
+
+`stride` tells how much data should be read for each vertex in bytes
+
+Each vertex contains:
+
+- position (x, y, 2 floats)
+- color (r, g, b, a, 4 floats)
+
+So we have a total of `6` floats `4` bytes each
+This means that stride is `6 * 4`
+
+
+Offset specifies how much data should be skipped in the beginning of the chunk
+
+Color data goes right after position, position is 2 floats, so offset for color is `2 * 4`
+
+📄 src/webgl-hello-world.js
+```diff
+  const attributeSize = 2;
+  const type = gl.FLOAT;
+  const nomralized = false;
+- const stride = 0;
++ const stride = 24;
+  const offset = 0;
+  
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
+  
+- gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+- 
+  gl.enableVertexAttribArray(colorLocation);
+- gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
++ gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
+  
+- gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
++ gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
+
+```
+And voila, we have the same result, but with a single buffer 🎉
+
+
+### Conclusion
+
+Let's summarize how `vertexAttribPointer(location, size, type, normalized, stride offset)` method works for a single buffer (this buffer is called interleavd)
+
+- `location`: specifies which attribute do we want to setup
+- `size`: how much data should be read for this exact attribute
+- `type`: type of data being read
+- `normalized`: whether the data should be "normalized" (clamped to `[-1..1]` for gl.BYTE and gl.SHORT, and to `[0..1]` for gl.UNSIGNED_BYTE and gl.UNSIGNED_SHORT)
+- `stride`: how much data is there for each vertex in total (in bytes)
+- `offset`: how much data should be skipped in a beginning of each chunk of data
+
+So now you can use different combinations of buffers to fill your attributes with data
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
