@@ -123,7 +123,7 @@ const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
-const indexData = new Uint6Array([
+const indexData = new Uint8Array([
     0, 1, 2, // first triangle
     1, 2, 3, // second trianlge
 ]);
@@ -147,4 +147,4 @@ gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride
 // gl.enableVertexAttribArray(colorLocation);
 // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 
-gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
+gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
