@@ -74,6 +74,15 @@ const rainbowColors = [
 
 const triangles = createRect(0, 0, canvas.height, canvas.height);
 
+function createRect(top, left, width, height) {
+    return [
+        left, top, // x1 y1
+        left + width, top, // x2 y2
+        left, top + height, // x3 y3
+        left + width, top + height, // x4 y4
+    ];
+}
+
 function createHexagon(centerX, centerY, radius, segmentsCount) {
     const vertexData = [];
     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
