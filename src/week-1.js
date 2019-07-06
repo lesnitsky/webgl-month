@@ -3,7 +3,6 @@ import fShaderSource from './shaders/fragment.glsl';
 
 import { createRect } from './shape-helpers';
 
-
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
@@ -34,35 +33,11 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const positionLocation = gl.getAttribLocation(program, 'position');
-const colorLocation = gl.getAttribLocation(program, 'color');
-
 const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 
-const rainbowColors = [
-    [255, 0.0, 0.0, 255], // red
-    [255, 165, 0.0, 255], // orange
-    [255, 255, 0.0, 255], // yellow
-    [0.0, 255, 0.0, 255], // green
-    [0.0, 101, 255, 255], // skyblue
-    [0.0, 0.0, 255, 255], // blue,
-    [128, 0.0, 128, 255], // purple
-];
-
 const triangles = createRect(0, 0, canvas.height, canvas.height);
-
-function fillWithColors(segmentsCount) {
-    const colors = [];
-
-    for (let i = 0; i < segmentsCount; i++) {
-        for (let j = 0; j < 3; j++) {
-            colors.push(...rainbowColors[i]);
-        }
-    }
-
-    return colors;
-}
 
 const vertexData = new Float32Array(triangles);
 const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
@@ -89,8 +64,5 @@ const offset = 0;
 
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-
-// gl.enableVertexAttribArray(colorLocation);
-// gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 
 gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
