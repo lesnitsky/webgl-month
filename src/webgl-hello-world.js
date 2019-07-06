@@ -121,6 +121,13 @@ function fillWithColors(segmentsCount) {
 const vertexData = new Float32Array(triangles);
 const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
+const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+const indexData = new Uint6Array([
+    0, 1, 2, // first triangle
+    1, 2, 3, // second trianlge
+]);
+
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 gl.lineWidth(10);
