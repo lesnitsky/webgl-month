@@ -10,5 +10,14 @@ module.exports = {
         filename: '[name].js',
     },
 
+    module: {
+        rules: [
+            {
+                test: /\.glsl$/,
+                use: 'raw-loader',
+            },
+        ],
+    },
+
     mode: 'development',
 };
