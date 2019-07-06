@@ -1,3 +1,6 @@
+import vShaderSource from './shaders/vertex.glsl';
+import fShaderSource from './shaders/fragment.glsl';
+
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
@@ -5,35 +8,6 @@ const program = gl.createProgram();
 
 const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-
-const vShaderSource = `
-attribute vec2 position;
-attribute vec4 color;
-uniform vec2 resolution;
-
-varying vec4 vColor;
-
-#define M_PI 3.1415926535897932384626433832795
-
-void main() {
-    vec2 transformedPosition = position / resolution * 2.0 - 1.0;
-    gl_PointSize = 2.0;
-    gl_Position = vec4(transformedPosition, 0, 1);
-
-    vColor = color;
-}
-`;
-
-const fShaderSource = `
-    precision mediump float;
-
-    varying vec4 vColor;
-
-    void main() {
-        gl_FragColor = vColor / 255.0;
-        gl_FragColor.a = 1.0;
-    }
-`;
 
 function compileShader(shader, source) {
     gl.shaderSource(shader, source);
