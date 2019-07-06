@@ -2148,3 +2148,388 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
+
+## WebGL month. Day 7. Tooling and refactor
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to the WebGL month.
+
+Since our codebase grows and will keep getting more complicated, we need some tooling and cleanup.
+
+
+We'll need webpack, so let's create `package.json` and install it
+
+📄 package.json
+```json
+{
+  "name": "webgl-month",
+  "version": "1.0.0",
+  "description": "Daily WebGL tutorials",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lesnitsky/webgl-month.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lesnitsky/webgl-month/issues"
+  },
+  "homepage": "https://github.com/lesnitsky/webgl-month#readme",
+  "devDependencies": {
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5"
+  }
+}
+
+```
+We'll need a simple webpack config
+
+📄 webpack.config.js
+```js
+const path = require('path');
+
+module.exports = {
+    entry: {
+        'week-1': './src/week-1.js',
+    },
+
+    output: {
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js',
+    },
+
+    mode: 'development',
+};
+
+```
+and update script source
+
+📄 index.html
+```diff
+    </head>
+    <body>
+      <canvas></canvas>
+-     <script src="./src/webgl-hello-world.js"></script>
++     <script src="./dist/week-1.js"></script>
+    </body>
+  </html>
+
+```
+Since shaders are raw strings, we can store shader source in separate file and use `raw-loader` for `webpack`.
+
+📄 package.json
+```diff
+    },
+    "homepage": "https://github.com/lesnitsky/webgl-month#readme",
+    "devDependencies": {
++     "raw-loader": "^3.0.0",
+      "webpack": "^4.35.2",
+      "webpack-cli": "^3.3.5"
+    }
+
+```
+📄 webpack.config.js
+```diff
+          filename: '[name].js',
+      },
+  
++     module: {
++         rules: [
++             {
++                 test: /\.glsl$/,
++                 use: 'raw-loader',
++             },
++         ],
++     },
++ 
+      mode: 'development',
+  };
+
+```
+and let's actually move shaders to separate files
+
+📄 src/shaders/fragment.glsl
+```glsl
+precision mediump float;
+
+varying vec4 vColor;
+
+void main() {
+    gl_FragColor = vColor / 255.0;
+    gl_FragColor.a = 1.0;
+}
+
+```
+📄 src/shaders/vertex.glsl
+```glsl
+attribute vec2 position;
+attribute vec4 color;
+uniform vec2 resolution;
+
+varying vec4 vColor;
+
+#define M_PI 3.1415926535897932384626433832795
+
+void main() {
+    vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+    gl_PointSize = 2.0;
+    gl_Position = vec4(transformedPosition, 0, 1);
+
+    vColor = color;
+}
+
+```
+📄 src/week-1.js
+```diff
++ import vShaderSource from './shaders/vertex.glsl';
++ import fShaderSource from './shaders/fragment.glsl';
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+  const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+- const vShaderSource = `
+- attribute vec2 position;
+- attribute vec4 color;
+- uniform vec2 resolution;
+- 
+- varying vec4 vColor;
+- 
+- #define M_PI 3.1415926535897932384626433832795
+- 
+- void main() {
+-     vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+-     gl_PointSize = 2.0;
+-     gl_Position = vec4(transformedPosition, 0, 1);
+- 
+-     vColor = color;
+- }
+- `;
+- 
+- const fShaderSource = `
+-     precision mediump float;
+- 
+-     varying vec4 vColor;
+- 
+-     void main() {
+-         gl_FragColor = vColor / 255.0;
+-         gl_FragColor.a = 1.0;
+-     }
+- `;
+- 
+  function compileShader(shader, source) {
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+
+```
+We can also move functions which create vertices positions to separate file
+
+📄 src/shape-helpers.js
+```js
+export function createRect(top, left, width, height) {
+    return [
+        left, top, // x1 y1
+        left + width, top, // x2 y2
+        left, top + height, // x3 y3
+        left + width, top + height, // x4 y4
+    ];
+}
+
+export function createHexagon(centerX, centerY, radius, segmentsCount) {
+    const vertexData = [];
+    const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
+
+    for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
+        const from = i;
+        const to = i + segmentAngle;
+
+        const color = rainbowColors[i / segmentAngle];
+
+        vertexData.push(centerX, centerY);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
+        vertexData.push(...color);
+
+        vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+        vertexData.push(...color);
+    }
+
+    return vertexData;
+}
+
+```
+📄 src/week-1.js
+```diff
+  import vShaderSource from './shaders/vertex.glsl';
+  import fShaderSource from './shaders/fragment.glsl';
+  
++ import { createRect } from './shape-helpers';
++ 
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  
+  const triangles = createRect(0, 0, canvas.height, canvas.height);
+  
+- function createRect(top, left, width, height) {
+-     return [
+-         left, top, // x1 y1
+-         left + width, top, // x2 y2
+-         left, top + height, // x3 y3
+-         left + width, top + height, // x4 y4
+-     ];
+- }
+- 
+- function createHexagon(centerX, centerY, radius, segmentsCount) {
+-     const vertexData = [];
+-     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
+- 
+-     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
+-         const from = i;
+-         const to = i + segmentAngle;
+- 
+-         const color = rainbowColors[i / segmentAngle];
+- 
+-         vertexData.push(centerX, centerY);
+-         vertexData.push(...color);
+- 
+-         vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
+-         vertexData.push(...color);
+- 
+-         vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
+-         vertexData.push(...color);
+-     }
+- 
+-     return vertexData;
+- }
+- 
+  function fillWithColors(segmentsCount) {
+      const colors = [];
+  
+
+```
+Since we're no longer using color attribute, we can drop everyhting related to it
+
+📄 src/shaders/fragment.glsl
+```diff
+  precision mediump float;
+  
+- varying vec4 vColor;
+- 
+  void main() {
+-     gl_FragColor = vColor / 255.0;
+-     gl_FragColor.a = 1.0;
++     gl_FragColor = vec4(1, 0, 0, 1);
+  }
+
+```
+📄 src/shaders/vertex.glsl
+```diff
+  attribute vec2 position;
+- attribute vec4 color;
+  uniform vec2 resolution;
+  
+- varying vec4 vColor;
+- 
+  #define M_PI 3.1415926535897932384626433832795
+  
+  void main() {
+      vec2 transformedPosition = position / resolution * 2.0 - 1.0;
+      gl_PointSize = 2.0;
+      gl_Position = vec4(transformedPosition, 0, 1);
+- 
+-     vColor = color;
+  }
+
+```
+📄 src/week-1.js
+```diff
+  
+  import { createRect } from './shape-helpers';
+  
+- 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  gl.useProgram(program);
+  
+  const positionLocation = gl.getAttribLocation(program, 'position');
+- const colorLocation = gl.getAttribLocation(program, 'color');
+- 
+  const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+  
+  gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+  
+- const rainbowColors = [
+-     [255, 0.0, 0.0, 255], // red
+-     [255, 165, 0.0, 255], // orange
+-     [255, 255, 0.0, 255], // yellow
+-     [0.0, 255, 0.0, 255], // green
+-     [0.0, 101, 255, 255], // skyblue
+-     [0.0, 0.0, 255, 255], // blue,
+-     [128, 0.0, 128, 255], // purple
+- ];
+- 
+  const triangles = createRect(0, 0, canvas.height, canvas.height);
+  
+- function fillWithColors(segmentsCount) {
+-     const colors = [];
+- 
+-     for (let i = 0; i < segmentsCount; i++) {
+-         for (let j = 0; j < 3; j++) {
+-             colors.push(...rainbowColors[i]);
+-         }
+-     }
+- 
+-     return colors;
+- }
+- 
+  const vertexData = new Float32Array(triangles);
+  const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
+  
+- // gl.enableVertexAttribArray(colorLocation);
+- // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
+- 
+  gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
+
+```
+Webpack will help us keep our codebase cleaner in the future, but we're good for now
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
