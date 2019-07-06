@@ -31,6 +31,7 @@ const fShaderSource = `
 
     void main() {
         gl_FragColor = vColor / 255.0;
+        gl_FragColor.a = 1.0;
     }
 `;
 
@@ -72,7 +73,16 @@ const rainbowColors = [
     [128, 0.0, 128, 255], // purple
 ];
 
-const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
+const triangles = createRect(0, 0, canvas.height, canvas.height);
+
+function createRect(top, left, width, height) {
+    return [
+        left, top, // x1 y1
+        left + width, top, // x2 y2
+        left, top + height, // x3 y3
+        left + width, top + height, // x4 y4
+    ];
+}
 
 function createHexagon(centerX, centerY, radius, segmentsCount) {
     const vertexData = [];
@@ -112,6 +122,16 @@ function fillWithColors(segmentsCount) {
 const vertexData = new Float32Array(triangles);
 const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
+const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+const indexData = new Uint8Array([
+    0, 1, 2, // first triangle
+    1, 2, 3, // second trianlge
+]);
+
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 gl.lineWidth(10);
@@ -119,13 +139,13 @@ gl.lineWidth(10);
 const attributeSize = 2;
 const type = gl.FLOAT;
 const nomralized = false;
-const stride = 24;
+const stride = 0;
 const offset = 0;
 
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
 
-gl.enableVertexAttribArray(colorLocation);
-gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
+// gl.enableVertexAttribArray(colorLocation);
+// gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 
-gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
+gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);

@@ -1975,3 +1975,175 @@ This is a series of blog posts related to WebGL. New post will be available ever
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 6. Index buffer
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+Hey 👋Welcome back to WebGL month. [Yesterday](https://dev.to/lesnitsky/webgl-month-day-5-interleaved-buffers-2k9a) we've learned how to use interleaved buffers. However our buffer contains a lot of duplicate data, because some polygons share the same vertices
+
+
+Let's get back to a simple example of rectangle
+
+📄 src/webgl-hello-world.js
+```diff
+      [128, 0.0, 128, 255], // purple
+  ];
+  
+- const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
++ const triangles = createRect(0, 0, canvas.height, canvas.height);
+  
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertexData = [];
+
+```
+and fill it only with unique vertex coordinates
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const triangles = createRect(0, 0, canvas.height, canvas.height);
+  
++ function createRect(top, left, width, height) {
++     return [
++         left, top, // x1 y1
++         left + width, top, // x2 y2
++         left, top + height, // x3 y3
++         left + width, top + height, // x4 y4
++     ];
++ }
++ 
+  function createHexagon(centerX, centerY, radius, segmentsCount) {
+      const vertexData = [];
+      const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
+
+```
+Let's also disable color attribute for now
+
+📄 src/webgl-hello-world.js
+```diff
+  const attributeSize = 2;
+  const type = gl.FLOAT;
+  const nomralized = false;
+- const stride = 24;
++ const stride = 0;
+  const offset = 0;
+  
+  gl.enableVertexAttribArray(positionLocation);
+  gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
+  
+- gl.enableVertexAttribArray(colorLocation);
+- gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
++ // gl.enableVertexAttribArray(colorLocation);
++ // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
+  
+  gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
+
+```
+Ok, so our buffer contains 4 vertices, but how does webgl render 2 triangles with only 4 vertices?
+THere's a special type of buffer which can specify how to fetch data from vertex buffer and build primitives (in our case triangles)
+
+
+This buffer is called `index buffer` and it contains indices of vertex data chunks in vertex buffer.
+So we need to specify indices of triangle vertices.
+
+📄 src/webgl-hello-world.js
+```diff
+  const vertexData = new Float32Array(triangles);
+  const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
++ const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
++ 
++ const indexData = new Uint6Array([
++     0, 1, 2, // first triangle
++     1, 2, 3, // second trianlge
++ ]);
++ 
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+  gl.lineWidth(10);
+
+```
+Next step – upload data to a WebGL buffer.
+To tell GPU that we're using `index buffer` we need to pass `gl.ELEMENT_ARRAY_BUFFER` as a first argument of `gl.bindBuffer` and `gl.bufferData`
+
+📄 src/webgl-hello-world.js
+```diff
+      1, 2, 3, // second trianlge
+  ]);
+  
++ gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
++ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
++ 
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
+  gl.lineWidth(10);
+
+```
+And the final step: to render indexed vertices we need to call different method – `drawElements` instead of `drawArrays`
+
+📄 src/webgl-hello-world.js
+```diff
+  
+  const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+  
+- const indexData = new Uint6Array([
++ const indexData = new Uint8Array([
+      0, 1, 2, // first triangle
+      1, 2, 3, // second trianlge
+  ]);
+  // gl.enableVertexAttribArray(colorLocation);
+  // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
+  
+- gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
++ gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
+
+```
+Wait, why is nothing rendered?
+
+
+The reason is that we've disabled color attribute, so it got filled with zeros. (0, 0, 0, 0) – transparent black.
+Let's fix that
+
+📄 src/webgl-hello-world.js
+```diff
+  
+      void main() {
+          gl_FragColor = vColor / 255.0;
++         gl_FragColor.a = 1.0;
+      }
+  `;
+  
+
+```
+### Conclusion
+
+We now know how to use index buffer to eliminate number of vertices we need to upload to gpu.
+Rectangle example is very simple (only 2 vertices are duplicated), on the other hand this is 33%, so on a larger amount of data being rendered this might be quite a performance improvement, especially if you update vertex data frequently and reupload buffer contents
+
+### Homework
+
+Render n-gon using index buffer
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
