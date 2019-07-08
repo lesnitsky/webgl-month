@@ -10,4 +10,6 @@ vec4 inverse(vec4 color) {
 void main() {
     vec2 texCoord = gl_FragCoord.xy / resolution;
     gl_FragColor = texture2D(texture, texCoord);
+
+    gl_FragColor = inverse(gl_FragColor);
 }
