@@ -3,6 +3,7 @@ const path = require('path');
 module.exports = {
     entry: {
         'week-1': './src/week-1.js',
+        'texture': './src/texture.js',
     },
 
     output: {
@@ -15,6 +16,11 @@ module.exports = {
             {
                 test: /\.glsl$/,
                 use: 'raw-loader',
+            },
+
+            {
+                test: /\.jpg$/,
+                use: 'url-loader',
             },
         ],
     },

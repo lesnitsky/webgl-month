@@ -2532,3 +2532,451 @@ This is a series of blog posts related to WebGL. New post will be available ever
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 8. Textures
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome back to WebGL month.
+
+We've already learned several ways to pass color data to shader, but there is one more and it is very powerful. Today we'll learn about textures
+
+
+Let's create simple shaders
+
+📄 src/shaders/texture.f.glsl
+```glsl
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+```
+📄 src/shaders/texture.v.glsl
+```glsl
+attribute vec2 position;
+
+void main() {
+    gl_Position = vec4(position, 0, 1);
+}
+
+```
+📄 src/texture.js
+```js
+import vShaderSource from './shaders/texture.v.glsl';
+import fShaderSource from './shaders/texture.f.glsl';
+
+```
+Get the webgl context
+
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
++ 
++ const canvas = document.querySelector('canvas');
++ const gl = canvas.getContext('webgl');
+
+```
+Create shaders
+
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
++ import { compileShader } from './gl-helpers';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
++ 
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
+
+```
+and program
+
+📄 src/texture.js
+```diff
+  
+  compileShader(gl, vShader, vShaderSource);
+  compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
+
+```
+Create a vertex position buffer and fill it with data
+
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
+  import { compileShader } from './gl-helpers';
++ import { createRect } from './shape-helpers';
++ 
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  gl.linkProgram(program);
+  gl.useProgram(program);
++ 
++ const vertexPosition = new Float32Array(createRect(-1, -1, 2, 2));
++ const vertexPositionBuffer = gl.createBuffer();
++ 
++ gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
++ gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+
+```
+Setup position attribute
+
+📄 src/texture.js
+```diff
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
++ 
++ const attributeLocations = {
++     position: gl.getAttribLocation(program, 'position'),
++ };
++ 
++ gl.enableVertexAttribArray(attributeLocations.position);
++ gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+```
+setup index buffer
+
+📄 src/texture.js
+```diff
+  
+  gl.enableVertexAttribArray(attributeLocations.position);
+  gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
++ 
++ const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
++ const indexBuffer = gl.createBuffer();
++ 
++ gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
++ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
+
+```
+and issue a draw call
+
+📄 src/texture.js
+```diff
+  
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
++ 
++ gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+So now we can proceed to textures.
+
+You can upload image to a GPU and use it to calculate pixel color. In a simple case, when canvas size is the same or at least proportional to image size, we can render image pixel by pixel reading each pixel color of image and using it as `gl_FragColor`
+
+Let's make a helper to load images
+
+📄 src/gl-helpers.js
+```diff
+          throw new Error(log);
+      }
+  }
++ 
++ export async function loadImage(src) {
++     const img = new Image();
++ 
++     let _resolve;
++     const p = new Promise((resolve) => _resolve = resolve);
++ 
++     img.onload = () => {
++         _resolve(img);
++     }
++ 
++     img.src = src;
++ 
++     return p;
++ }
+
+```
+Load image and create webgl texture
+
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
+- import { compileShader } from './gl-helpers';
++ import { compileShader, loadImage } from './gl-helpers';
+  import { createRect } from './shape-helpers';
+  
++ import textureImageSrc from '../assets/images/texture.jpg';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
+  
+- gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
++ loadImage(textureImageSrc).then((textureImg) => {
++     const texture = gl.createTexture();
++ 
++     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
++ });
+
+```
+[GTI} add image
+
+📄 assets/images/texture.jpg
+```jpg
+
+```
+we also need an appropriate webpack loader
+
+📄 package.json
+```diff
+    "homepage": "https://github.com/lesnitsky/webgl-month#readme",
+    "devDependencies": {
+      "raw-loader": "^3.0.0",
++     "url-loader": "^2.0.1",
+      "webpack": "^4.35.2",
+      "webpack-cli": "^3.3.5"
+    }
+
+```
+📄 webpack.config.js
+```diff
+                  test: /\.glsl$/,
+                  use: 'raw-loader',
+              },
++ 
++             {
++                 test: /\.jpg$/,
++                 use: 'url-loader',
++             },
+          ],
+      },
+  
+
+```
+to operate with textures we need to do the same as with buffers – bind it
+
+📄 src/texture.js
+```diff
+  loadImage(textureImageSrc).then((textureImg) => {
+      const texture = gl.createTexture();
+  
++     gl.bindTexture(gl.TEXTURE_2D, texture);
++ 
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+and upload image to a bound texture
+
+📄 src/texture.js
+```diff
+  
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+  
++     gl.texImage2D(
++         gl.TEXTURE_2D,
++     );
++ 
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+Let's ignore the 2nd argument for now, we'll speak about it later
+
+📄 src/texture.js
+```diff
+  
+      gl.texImage2D(
+          gl.TEXTURE_2D,
++         0,
+      );
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+the 3rd and the 4th argumetns specify internal texture format and source (image) format. For our image it is gl.RGBA. [Check out this page for more details about formats](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D)
+
+📄 src/texture.js
+```diff
+      gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
++         gl.RGBA,
++         gl.RGBA,
+      );
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+next argument specifies source type (0..255 is UNSIGNED_BYTE)
+
+📄 src/texture.js
+```diff
+          0,
+          gl.RGBA,
+          gl.RGBA,
++         gl.UNSIGNED_BYTE,
+      );
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+and image itself
+
+📄 src/texture.js
+```diff
+          gl.RGBA,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
++         textureImg,
+      );
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+We also need to specify different parameters of texture. We'll talk about this parameters in next tutorials.
+
+📄 src/texture.js
+```diff
+          textureImg,
+      );
+  
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
++ 
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+To be able to work with texture in shader we need to specify a uniform of `sampler2D` type
+
+📄 src/shaders/texture.f.glsl
+```diff
+  precision mediump float;
+  
++ uniform sampler2D texture;
++ 
+  void main() {
+      gl_FragColor = vec4(1, 0, 0, 1);
+  }
+
+```
+and specify the value of this uniform. There is a way to use multiple textures, we'll talk about it in next tutorials
+
+📄 src/texture.js
+```diff
+      position: gl.getAttribLocation(program, 'position'),
+  };
+  
++ const uniformLocations = {
++     texture: gl.getUniformLocation(program, 'texture'),
++ };
++ 
+  gl.enableVertexAttribArray(attributeLocations.position);
+  gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  
++     gl.activeTexture(gl.TEXTURE0);
++     gl.uniform1i(uniformLocations.texture, 0);
++ 
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+Let's also pass canvas resolution to a shader
+
+📄 src/shaders/texture.f.glsl
+```diff
+  precision mediump float;
+  
+  uniform sampler2D texture;
++ uniform vec2 resolution;
+  
+  void main() {
+      gl_FragColor = vec4(1, 0, 0, 1);
+
+```
+📄 src/texture.js
+```diff
+  
+  const uniformLocations = {
+      texture: gl.getUniformLocation(program, 'texture'),
++     resolution: gl.getUniformLocation(program, 'resolution'),
+  };
+  
+  gl.enableVertexAttribArray(attributeLocations.position);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1i(uniformLocations.texture, 0);
+  
++     gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
++ 
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+There is a special `gl_FragCoord` variable which contains coordinate of each pixel. Together with `resolution` uniform we can get a `texture coordinate` (coordinate of the pixel in image). Texture coordinates are in range `[0..1]`.
+
+📄 src/shaders/texture.f.glsl
+```diff
+  uniform vec2 resolution;
+  
+  void main() {
++     vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = vec4(1, 0, 0, 1);
+  }
+
+```
+and use `texture2D` to render the whole image.
+
+Cool 😎 We can now render images, but there is much more to learn about textures, so see you tomorrow
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+📄 src/shaders/texture.f.glsl
+```diff
+  
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+-     gl_FragColor = vec4(1, 0, 0, 1);
++     gl_FragColor = texture2D(texture, texCoord);
+  }
+
+```
