@@ -44,5 +44,7 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 loadImage(textureImageSrc).then((textureImg) => {
     const texture = gl.createTexture();
 
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });
