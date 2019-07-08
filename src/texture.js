@@ -32,6 +32,10 @@ const attributeLocations = {
     position: gl.getAttribLocation(program, 'position'),
 };
 
+const uniformLocations = {
+    texture: gl.getUniformLocation(program, 'texture'),
+};
+
 gl.enableVertexAttribArray(attributeLocations.position);
 gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
@@ -59,6 +63,9 @@ loadImage(textureImageSrc).then((textureImg) => {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1i(uniformLocations.texture, 0);
 
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });
