@@ -51,6 +51,7 @@ loadImage(textureImageSrc).then((textureImg) => {
         0,
         gl.RGBA,
         gl.RGBA,
+        gl.UNSIGNED_BYTE,
     );
 
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
