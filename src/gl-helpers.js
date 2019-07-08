@@ -8,3 +8,18 @@ export function compileShader(gl, shader, source) {
         throw new Error(log);
     }
 }
+
+export async function loadImage(src) {
+    const img = new Image();
+
+    let _resolve;
+    const p = new Promise((resolve) => _resolve = resolve);
+
+    img.onload = () => {
+        _resolve(img);
+    }
+
+    img.src = src;
+
+    return p;
+}
