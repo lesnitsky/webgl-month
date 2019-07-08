@@ -26,3 +26,10 @@ const vertexPositionBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+
+const attributeLocations = {
+    position: gl.getAttribLocation(program, 'position'),
+};
+
+gl.enableVertexAttribArray(attributeLocations.position);
+gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
