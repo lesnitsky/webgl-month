@@ -33,3 +33,9 @@ const attributeLocations = {
 
 gl.enableVertexAttribArray(attributeLocations.position);
 gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
+const indexBuffer = gl.createBuffer();
+
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
