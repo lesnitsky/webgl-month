@@ -10,3 +10,11 @@ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 compileShader(gl, vShader, vShaderSource);
 compileShader(gl, fShader, fShaderSource);
+
+const program = gl.createProgram();
+
+gl.attachShader(program, vShader);
+gl.attachShader(program, fShader);
+
+gl.linkProgram(program);
+gl.useProgram(program);
