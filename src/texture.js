@@ -1,8 +1,9 @@
 import vShaderSource from './shaders/texture.v.glsl';
 import fShaderSource from './shaders/texture.f.glsl';
-import { compileShader } from './gl-helpers';
+import { compileShader, loadImage } from './gl-helpers';
 import { createRect } from './shape-helpers';
 
+import textureImageSrc from '../assets/images/texture.jpg';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -40,4 +41,8 @@ const indexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 
-gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+loadImage(textureImageSrc).then((textureImg) => {
+    const texture = gl.createTexture();
+
+    gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+});
