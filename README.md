@@ -2956,6 +2956,16 @@ There is a special `gl_FragCoord` variable which contains coordinate of each pix
 ```
 and use `texture2D` to render the whole image.
 
+📄 src/shaders/texture.f.glsl
+```diff
+  
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+-     gl_FragColor = vec4(1, 0, 0, 1);
++     gl_FragColor = texture2D(texture, texCoord);
+  }
+
+```
 Cool 😎 We can now render images, but there is much more to learn about textures, so see you tomorrow
 
 ---
@@ -2970,13 +2980,3 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
-📄 src/shaders/texture.f.glsl
-```diff
-  
-  void main() {
-      vec2 texCoord = gl_FragCoord.xy / resolution;
--     gl_FragColor = vec4(1, 0, 0, 1);
-+     gl_FragColor = texture2D(texture, texCoord);
-  }
-
-```
