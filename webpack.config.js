@@ -17,6 +17,11 @@ module.exports = {
                 test: /\.glsl$/,
                 use: 'raw-loader',
             },
+
+            {
+                test: /\.jpg$/,
+                use: 'url-loader',
+            },
         ],
     },
 
