@@ -46,5 +46,9 @@ loadImage(textureImageSrc).then((textureImg) => {
 
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+    );
+
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });
