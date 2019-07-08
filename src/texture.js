@@ -34,6 +34,7 @@ const attributeLocations = {
 
 const uniformLocations = {
     texture: gl.getUniformLocation(program, 'texture'),
+    resolution: gl.getUniformLocation(program, 'resolution'),
 };
 
 gl.enableVertexAttribArray(attributeLocations.position);
@@ -66,6 +67,8 @@ loadImage(textureImageSrc).then((textureImg) => {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(uniformLocations.texture, 0);
+
+    gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
 
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });
