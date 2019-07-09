@@ -22,6 +22,15 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
+const texCoords = new Float32Array([
+    ...createRect(0, 0, 1, 1), // left rect
+    ...createRect(0, 0, 1, 1), // right rect
+]);
+const texCoordsBuffer = gl.createBuffer();
+
+gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+
 const vertexPosition = new Float32Array([
     ...createRect(-1, -1, 1, 2), // left rect
     ...createRect(-1, 0, 1, 2), // right rect
