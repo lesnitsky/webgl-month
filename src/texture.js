@@ -4,6 +4,7 @@ import { compileShader, loadImage } from './gl-helpers';
 import { createRect } from './shape-helpers';
 
 import textureImageSrc from '../assets/images/texture.jpg';
+import textureGreenImageSrc from '../assets/images/texture-green.jpg';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -87,7 +88,10 @@ const indexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 
-loadImage(textureImageSrc).then((textureImg) => {
+Promise.all([
+    loadImage(textureImageSrc),
+    loadImage(textureGreenImageSrc),
+]).then(([textureImg, textureGreenImg]) => {
     const texture = gl.createTexture();
 
     gl.bindTexture(gl.TEXTURE_2D, texture);
