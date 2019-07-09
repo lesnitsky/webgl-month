@@ -100,7 +100,12 @@ Promise.all([
     setImage(gl, otherTexture, textureGreenImg);
 
     gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.uniform1i(uniformLocations.texture, 0);
+
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, otherTexture);
+    gl.uniform1i(uniformLocations.otherTexture, 1);
 
     gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
 
