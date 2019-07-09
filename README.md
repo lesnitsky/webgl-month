@@ -3151,3 +3151,409 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
 
+
+## WebGL Month. Day 10. Multiple textures
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome back to WebGL month.
+We already know how to use a single image as a texture, but what if we want to render multiple images?
+
+We'll learn how to do this today.
+
+
+First we need to define another `sampler2D` in fragment shader
+
+📄 src/shaders/texture.f.glsl
+```diff
+  precision mediump float;
+  
+  uniform sampler2D texture;
++ uniform sampler2D otherTexture;
+  uniform vec2 resolution;
+  
+  vec4 inverse(vec4 color) {
+
+```
+And render 2 rectangles instead of a single one. Left rectangle will use already existing texture, right – new one.
+
+📄 src/texture.js
+```diff
+  gl.linkProgram(program);
+  gl.useProgram(program);
+  
+- const vertexPosition = new Float32Array(createRect(-1, -1, 2, 2));
++ const vertexPosition = new Float32Array([
++     ...createRect(-1, -1, 1, 2), // left rect
++     ...createRect(-1, 0, 1, 2), // right rect
++ ]);
+  const vertexPositionBuffer = gl.createBuffer();
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.enableVertexAttribArray(attributeLocations.position);
+  gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
+- const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
++ const vertexIndices = new Uint8Array([
++     // left rect
++     0, 1, 2, 
++     1, 2, 3, 
++     
++     // right rect
++     4, 5, 6, 
++     5, 6, 7,
++ ]);
+  const indexBuffer = gl.createBuffer();
+  
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+```
+We'll also need a way to specify texture coordinates for each rectangle, as we can't use `gl_FragCoord` any longer, so we need to define another attribute (`texCoord`)
+
+📄 src/shaders/texture.v.glsl
+```diff
+  attribute vec2 position;
++ attribute vec2 texCoord;
+  
+  void main() {
+      gl_Position = vec4(position, 0, 1);
+
+```
+The content of this attribute should be coordinates of 2 rectangles. Top left is `0,0`, width and height are `1.0`
+
+📄 src/texture.js
+```diff
+  gl.linkProgram(program);
+  gl.useProgram(program);
+  
++ const texCoords = new Float32Array([
++     ...createRect(0, 0, 1, 1), // left rect
++     ...createRect(0, 0, 1, 1), // right rect
++ ]);
++ const texCoordsBuffer = gl.createBuffer();
++ 
++ gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
++ gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
++ 
+  const vertexPosition = new Float32Array([
+      ...createRect(-1, -1, 1, 2), // left rect
+      ...createRect(-1, 0, 1, 2), // right rect
+
+```
+We also need to setup texCoord attribute in JS
+
+📄 src/texture.js
+```diff
+  
+  const attributeLocations = {
+      position: gl.getAttribLocation(program, 'position'),
++     texCoord: gl.getAttribLocation(program, 'texCoord'),
+  };
+  
+  const uniformLocations = {
+  gl.enableVertexAttribArray(attributeLocations.position);
+  gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
++ gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
++ 
++ gl.enableVertexAttribArray(attributeLocations.texCoord);
++ gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
++ 
+  const vertexIndices = new Uint8Array([
+      // left rect
+      0, 1, 2, 
+
+```
+and pass this data to fragment shader via varying
+
+📄 src/shaders/texture.f.glsl
+```diff
+      );
+  }
+  
++ varying vec2 vTexCoord;
++ 
+  void main() {
+-     vec2 texCoord = gl_FragCoord.xy / resolution;
++     vec2 texCoord = vTexCoord;
+      gl_FragColor = texture2D(texture, texCoord);
+  
+      gl_FragColor = sepia(gl_FragColor);
+
+```
+📄 src/shaders/texture.v.glsl
+```diff
+  attribute vec2 position;
+  attribute vec2 texCoord;
+  
++ varying vec2 vTexCoord;
++ 
+  void main() {
+      gl_Position = vec4(position, 0, 1);
++ 
++     vTexCoord = texCoord;
+  }
+
+```
+Ok, we rendered two rectangles, but they use the same texture. Let's add one more attribute which will specify which texture to use and pass this data to fragment shader via another varying
+
+📄 src/shaders/texture.v.glsl
+```diff
+  attribute vec2 position;
+  attribute vec2 texCoord;
++ attribute float texIndex;
+  
+  varying vec2 vTexCoord;
++ varying float vTexIndex;
+  
+  void main() {
+      gl_Position = vec4(position, 0, 1);
+  
+      vTexCoord = texCoord;
++     vTexIndex = texIndex;
+  }
+
+```
+So now fragment shader will know which texture to use
+
+> DISCLAMER: this is not the perfect way to use multiple textures in a fragment shader, but rather an example of how to acheive this
+
+📄 src/shaders/texture.f.glsl
+```diff
+  }
+  
+  varying vec2 vTexCoord;
++ varying float vTexIndex;
+  
+  void main() {
+      vec2 texCoord = vTexCoord;
+-     gl_FragColor = texture2D(texture, texCoord);
+  
+-     gl_FragColor = sepia(gl_FragColor);
++     if (vTexIndex == 0.0) {
++         gl_FragColor = texture2D(texture, texCoord);
++     } else {
++         gl_FragColor = texture2D(otherTexture, texCoord);
++     }
+  }
+
+```
+tex indices are 0 for the left rectangle and 1 for the right
+
+📄 src/texture.js
+```diff
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+  
++ const texIndicies = new Float32Array([
++     ...Array.from({ length: 4 }).fill(0), // left rect
++     ...Array.from({ length: 4 }).fill(1), // right rect
++ ]);
++ const texIndiciesBuffer = gl.createBuffer();
++ 
++ gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
++ gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
++ 
+  const vertexPosition = new Float32Array([
+      ...createRect(-1, -1, 1, 2), // left rect
+      ...createRect(-1, 0, 1, 2), // right rect
+
+```
+and again, we need to setup vertex attribute
+
+📄 src/texture.js
+```diff
+  const attributeLocations = {
+      position: gl.getAttribLocation(program, 'position'),
+      texCoord: gl.getAttribLocation(program, 'texCoord'),
++     texIndex: gl.getAttribLocation(program, 'texIndex'),
+  };
+  
+  const uniformLocations = {
+  gl.enableVertexAttribArray(attributeLocations.texCoord);
+  gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+  
++ gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
++ 
++ gl.enableVertexAttribArray(attributeLocations.texIndex);
++ gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
++ 
+  const vertexIndices = new Uint8Array([
+      // left rect
+      0, 1, 2, 
+
+```
+Now let's load our second texture image
+
+📄 src/texture.js
+```diff
+  import { createRect } from './shape-helpers';
+  
+  import textureImageSrc from '../assets/images/texture.jpg';
++ import textureGreenImageSrc from '../assets/images/texture-green.jpg';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
+  
+- loadImage(textureImageSrc).then((textureImg) => {
++ Promise.all([
++     loadImage(textureImageSrc),
++     loadImage(textureGreenImageSrc),
++ ]).then(([textureImg, textureGreenImg]) => {
+      const texture = gl.createTexture();
+  
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+
+```
+As we'll have to create another texture – we'll need to extract some common code to separate helper functions
+
+📄 src/gl-helpers.js
+```diff
+  
+      return p;
+  }
++ 
++ export function createTexture(gl) {
++     const texture = gl.createTexture();
++     
++     gl.bindTexture(gl.TEXTURE_2D, texture);
++     
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
++ 
++     return texture;
++ }
++ 
++ export function setImage(gl, texture, img) {
++     gl.bindTexture(gl.TEXTURE_2D, texture);
++ 
++     gl.texImage2D(
++         gl.TEXTURE_2D,
++         0,
++         gl.RGBA,
++         gl.RGBA,
++         gl.UNSIGNED_BYTE,
++         img,
++     );
++ }
+
+```
+📄 src/texture.js
+```diff
+      loadImage(textureImageSrc),
+      loadImage(textureGreenImageSrc),
+  ]).then(([textureImg, textureGreenImg]) => {
+-     const texture = gl.createTexture();
+- 
+-     gl.bindTexture(gl.TEXTURE_2D, texture);
+- 
+-     gl.texImage2D(
+-         gl.TEXTURE_2D,
+-         0,
+-         gl.RGBA,
+-         gl.RGBA,
+-         gl.UNSIGNED_BYTE,
+-         textureImg,
+-     );
+- 
+-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+-     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
++ 
+  
+      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1i(uniformLocations.texture, 0);
+
+```
+Now let's use our newely created helpers
+
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
+- import { compileShader, loadImage } from './gl-helpers';
++ import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
+  import { createRect } from './shape-helpers';
+  
+  import textureImageSrc from '../assets/images/texture.jpg';
+      loadImage(textureImageSrc),
+      loadImage(textureGreenImageSrc),
+  ]).then(([textureImg, textureGreenImg]) => {
++     const texture = createTexture(gl);
++     setImage(gl, texture, textureImg);
+  
++     const otherTexture = createTexture(gl);
++     setImage(gl, otherTexture, textureGreenImg);
+  
+      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform1i(uniformLocations.texture, 0);
+
+```
+get uniform location
+
+📄 src/texture.js
+```diff
+  
+  const uniformLocations = {
+      texture: gl.getUniformLocation(program, 'texture'),
++     otherTexture: gl.getUniformLocation(program, 'otherTexture'),
+      resolution: gl.getUniformLocation(program, 'resolution'),
+  };
+  
+
+```
+and set necessary textures to necessary uniforms
+
+to set a texture to a uniform you should specify
+
+* active texture unit in range `[gl.TEXTURE0..gl.TEXTURE31]` (number of texture units depends on GPU and can be retreived with `gl.getParameter`)
+* bind texture to a texture unit
+* set texture unit "index" to a `sampler2D` uniform
+
+📄 src/texture.js
+```diff
+      setImage(gl, otherTexture, textureGreenImg);
+  
+      gl.activeTexture(gl.TEXTURE0);
++     gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(uniformLocations.texture, 0);
+  
++     gl.activeTexture(gl.TEXTURE1);
++     gl.bindTexture(gl.TEXTURE_2D, otherTexture);
++     gl.uniform1i(uniformLocations.otherTexture, 1);
++ 
+      gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+
+```
+That's it, we can now render multiple textures
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day-9)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)

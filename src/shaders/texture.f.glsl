@@ -1,6 +1,7 @@
 precision mediump float;
 
 uniform sampler2D texture;
+uniform sampler2D otherTexture;
 uniform vec2 resolution;
 
 vec4 inverse(vec4 color) {
@@ -19,9 +20,15 @@ vec4 sepia(vec4 color) {
     );
 }
 
-void main() {
-    vec2 texCoord = gl_FragCoord.xy / resolution;
-    gl_FragColor = texture2D(texture, texCoord);
+varying vec2 vTexCoord;
+varying float vTexIndex;
 
-    gl_FragColor = sepia(gl_FragColor);
+void main() {
+    vec2 texCoord = vTexCoord;
+
+    if (vTexIndex == 0.0) {
+        gl_FragColor = texture2D(texture, texCoord);
+    } else {
+        gl_FragColor = texture2D(otherTexture, texCoord);
+    }
 }
