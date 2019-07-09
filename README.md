@@ -2966,7 +2966,6 @@ and use `texture2D` to render the whole image.
   }
 
 ```
-
 Cool 😎 We can now render images, but there is much more to learn about textures, so see you tomorrow
 
 ---
@@ -2980,3 +2979,175 @@ This is a series of blog posts related to WebGL. New post will be available ever
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+## WebGL Month. Day 9. Image filters
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+Hey 👋 Welcome back to WebGL month
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-8-textures-1mk8) we've learned how to use textures in webgl, so let's get advantage of that knowledge to build something fun.
+
+Today we're going to explore how to implement simple image filters
+
+
+### Inverse
+
+The very first and simple filter might be inverse all colors of the image.
+
+How do we inverse colors?
+
+Original values are in range `[0..1]`
+
+If we subtract from each component `1` we'll get negative values, there's an `abs` function in glsl
+
+You can also define other functions apart of `void main` in glsl pretty much like in C/C++, so let's create `inverse` function
+
+📄 src/shaders/texture.f.glsl
+```diff
+  uniform sampler2D texture;
+  uniform vec2 resolution;
+  
++ vec4 inverse(vec4 color) {
++     return abs(vec4(color.rgb - 1.0, color.a));
++ }
++ 
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = texture2D(texture, texCoord);
+
+```
+and let's actually use it
+
+📄 src/shaders/texture.f.glsl
+```diff
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = texture2D(texture, texCoord);
++ 
++     gl_FragColor = inverse(gl_FragColor);
+  }
+
+```
+Voila, we have an inverse filter with just 4 lines of code
+
+![Inverse](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/inverse-filter.png)
+
+
+### Black and White
+
+Let's think of how to implement black and white filter.
+
+White color is `vec4(1, 1, 1, 1)`
+
+Black is `vec4(0, 0, 0, 1)`
+
+What are shades of gray? Aparently we need to add the same value to each color component.
+
+So basically we need to calculate the "brightness" value of each component. In very naive implmentation we can just add all color components and divide by 3 (arithmetical mean).
+
+> Note: this is not the best approach, as different colors will give the same result (eg. vec3(0.5, 0, 0) and vec3(0, 0.5, 0), but in reality these colors have different "brightness", I'm just trying to keep these examples simple to understand)
+
+Ok, let's try to implement this
+
+📄 src/shaders/texture.f.glsl
+```diff
+      return abs(vec4(color.rgb - 1.0, color.a));
+  }
+  
++ vec4 blackAndWhite(vec4 color) {
++     return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
++ }
++ 
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = texture2D(texture, texCoord);
+  
+-     gl_FragColor = inverse(gl_FragColor);
++     gl_FragColor = blackAndWhite(gl_FragColor);
+  }
+
+```
+Whoa! Looks nice
+
+![Black and white](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/black-and-white.png)
+
+
+### Sepia
+
+Ok, one more fancy effect is a "old-fashioned" photos with sepia filter.
+
+[Sepia is reddish-brown color](https://en.wikipedia.org/wiki/Sepia_%28color%29). RGB values are `112, 66, 20`
+
+
+Let's define `sepia` function and color
+
+📄 src/shaders/texture.f.glsl
+```diff
+      return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
+  }
+  
++ vec4 sepia(vec4 color) {
++     vec3 sepiaColor = vec3(112, 66, 20) / 255.0;
++ }
++ 
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = texture2D(texture, texCoord);
+
+```
+A naive and simple implementation will be to interpolate original color with sepia color by a certain factor. There is a `mix` function for this
+
+📄 src/shaders/texture.f.glsl
+```diff
+  
+  vec4 sepia(vec4 color) {
+      vec3 sepiaColor = vec3(112, 66, 20) / 255.0;
++     return vec4(
++         mix(color.rgb, sepiaColor, 0.4),
++         color.a
++     );
+  }
+  
+  void main() {
+      vec2 texCoord = gl_FragCoord.xy / resolution;
+      gl_FragColor = texture2D(texture, texCoord);
+  
+-     gl_FragColor = blackAndWhite(gl_FragColor);
++     gl_FragColor = sepia(gl_FragColor);
+  }
+
+```
+Result:
+
+![Sepia](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/sepia.png)
+
+
+This should give you a better idea of what can be done in fragment shader.
+
+Try to implement some other filters, like saturation or vibrance
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)
+
+> Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
