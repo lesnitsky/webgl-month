@@ -58,6 +58,7 @@ const attributeLocations = {
 
 const uniformLocations = {
     texture: gl.getUniformLocation(program, 'texture'),
+    otherTexture: gl.getUniformLocation(program, 'otherTexture'),
     resolution: gl.getUniformLocation(program, 'resolution'),
 };
 
