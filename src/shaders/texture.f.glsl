@@ -1,6 +1,7 @@
 precision mediump float;
 
 uniform sampler2D texture;
+uniform sampler2D otherTexture;
 uniform vec2 resolution;
 
 vec4 inverse(vec4 color) {
