@@ -22,7 +22,10 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
-const vertexPosition = new Float32Array(createRect(-1, -1, 2, 2));
+const vertexPosition = new Float32Array([
+    ...createRect(-1, -1, 1, 2), // left rect
+    ...createRect(-1, 0, 1, 2), // right rect
+]);
 const vertexPositionBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
@@ -40,7 +43,15 @@ const uniformLocations = {
 gl.enableVertexAttribArray(attributeLocations.position);
 gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
-const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
+const vertexIndices = new Uint8Array([
+    // left rect
+    0, 1, 2, 
+    1, 2, 3, 
+    
+    // right rect
+    4, 5, 6, 
+    5, 6, 7,
+]);
 const indexBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
