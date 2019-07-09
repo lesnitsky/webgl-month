@@ -42,6 +42,7 @@ gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
 
 const attributeLocations = {
     position: gl.getAttribLocation(program, 'position'),
+    texCoord: gl.getAttribLocation(program, 'texCoord'),
 };
 
 const uniformLocations = {
@@ -51,6 +52,11 @@ const uniformLocations = {
 
 gl.enableVertexAttribArray(attributeLocations.position);
 gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+
+gl.enableVertexAttribArray(attributeLocations.texCoord);
+gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
 const vertexIndices = new Uint8Array([
     // left rect
