@@ -1,6 +1,6 @@
 import vShaderSource from './shaders/texture.v.glsl';
 import fShaderSource from './shaders/texture.f.glsl';
-import { compileShader, loadImage } from './gl-helpers';
+import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
 import { createRect } from './shape-helpers';
 
 import textureImageSrc from '../assets/images/texture.jpg';
@@ -92,7 +92,11 @@ Promise.all([
     loadImage(textureImageSrc),
     loadImage(textureGreenImageSrc),
 ]).then(([textureImg, textureGreenImg]) => {
+    const texture = createTexture(gl);
+    setImage(gl, texture, textureImg);
 
+    const otherTexture = createTexture(gl);
+    setImage(gl, otherTexture, textureGreenImg);
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(uniformLocations.texture, 0);
