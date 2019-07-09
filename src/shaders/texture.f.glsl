@@ -20,8 +20,10 @@ vec4 sepia(vec4 color) {
     );
 }
 
+varying vec2 vTexCoord;
+
 void main() {
-    vec2 texCoord = gl_FragCoord.xy / resolution;
+    vec2 texCoord = vTexCoord;
     gl_FragColor = texture2D(texture, texCoord);
 
     gl_FragColor = sepia(gl_FragColor);
