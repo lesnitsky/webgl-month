@@ -21,10 +21,14 @@ vec4 sepia(vec4 color) {
 }
 
 varying vec2 vTexCoord;
+varying float vTexIndex;
 
 void main() {
     vec2 texCoord = vTexCoord;
-    gl_FragColor = texture2D(texture, texCoord);
 
-    gl_FragColor = sepia(gl_FragColor);
+    if (vTexIndex == 0.0) {
+        gl_FragColor = texture2D(texture, texCoord);
+    } else {
+        gl_FragColor = texture2D(otherTexture, texCoord);
+    }
 }
