@@ -3557,3 +3557,451 @@ This is a series of blog posts related to WebGL. New post will be available ever
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day-9)
 
 > Built with [GitTutor](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 11. Reducing boilerplate
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-10-multiple-textures-gf3) we've learned how to use multiple textures. This required a shader modification, as well as javascript, but this changes might be partially done automatically
+
+There is a package [glsl-extract-sync](https://www.npmjs.com/package/glsl-extract-sync) which can get the info about shader attributes and uniforms
+
+
+Install this package with
+
+```sh
+npm i glsl-extract-sync
+```
+
+📄 package.json
+```diff
+      "url-loader": "^2.0.1",
+      "webpack": "^4.35.2",
+      "webpack-cli": "^3.3.5"
++   },
++   "dependencies": {
++     "glsl-extract-sync": "0.0.0"
+    }
+  }
+
+```
+Now let's create a helper function which will get all references to attributes and uniforms with help of this package
+
+📄 src/gl-helpers.js
+```diff
++ import extract from 'glsl-extract-sync';
++ 
+  export function compileShader(gl, shader, source) {
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+          img,
+      );
+  }
++ 
++ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
++ 
++ }
+
+```
+We need to extract info about both vertex and fragment shaders
+
+📄 src/gl-helpers.js
+```diff
+  }
+  
+  export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
+- 
++     const vShaderInfo = extract(vShaderSource);
++     const fShaderInfo = extract(fShaderSource);
+  }
+
+```
+📄 src/texture.js
+```diff
+  import vShaderSource from './shaders/texture.v.glsl';
+  import fShaderSource from './shaders/texture.f.glsl';
+- import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
++ import { compileShader, loadImage, createTexture, setImage, setupShaderInput } from './gl-helpers';
+  import { createRect } from './shape-helpers';
+  
+  import textureImageSrc from '../assets/images/texture.jpg';
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+  
++ console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
++ 
+  const attributeLocations = {
+      position: gl.getAttribLocation(program, 'position'),
+      texCoord: gl.getAttribLocation(program, 'texCoord'),
+
+```
+Only vertex shader might have attributes, but uniforms may be defined in both shaders
+
+📄 src/gl-helpers.js
+```diff
+  export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
+      const vShaderInfo = extract(vShaderSource);
+      const fShaderInfo = extract(fShaderSource);
++ 
++     const attributes = vShaderInfo.attributes;
++     const uniforms = [
++         ...vShaderInfo.uniforms,
++         ...fShaderInfo.uniforms,
++     ];
+  }
+
+```
+Now we can get all attribute locations
+
+📄 src/gl-helpers.js
+```diff
+          ...vShaderInfo.uniforms,
+          ...fShaderInfo.uniforms,
+      ];
++ 
++     const attributeLocations = attributes.reduce((attrsMap, attr) => {
++         attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
++         return attrsMap;
++     }, {});
+  }
+
+```
+and enable all attributes
+
+📄 src/gl-helpers.js
+```diff
+          attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
+          return attrsMap;
+      }, {});
++ 
++     attributes.forEach((attr) => {
++         gl.enableVertexAttribArray(attributeLocations[attr.name]);
++     });
+  }
+
+```
+We should also get all uniform locations
+
+📄 src/gl-helpers.js
+```diff
+      attributes.forEach((attr) => {
+          gl.enableVertexAttribArray(attributeLocations[attr.name]);
+      });
++ 
++     const uniformLocations = uniforms.reduce((uniformsMap, uniform) => {
++         uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
++         return uniformsMap;
++     }, {});
+  }
+
+```
+and finally return attribute and uniform locations
+
+📄 src/gl-helpers.js
+```diff
+          uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
+          return uniformsMap;
+      }, {});
++ 
++     return {
++         attributeLocations,
++         uniformLocations,
++     }
+  }
+
+```
+Ok, let's get advantage of our new sweet helper
+
+📄 src/texture.js
+```diff
+  gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+  
+- console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const attributeLocations = {
+-     position: gl.getAttribLocation(program, 'position'),
+-     texCoord: gl.getAttribLocation(program, 'texCoord'),
+-     texIndex: gl.getAttribLocation(program, 'texIndex'),
+- };
+- 
+- const uniformLocations = {
+-     texture: gl.getUniformLocation(program, 'texture'),
+-     otherTexture: gl.getUniformLocation(program, 'otherTexture'),
+-     resolution: gl.getUniformLocation(program, 'resolution'),
+- };
+- 
+- gl.enableVertexAttribArray(attributeLocations.position);
+- gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+- 
+- gl.enableVertexAttribArray(attributeLocations.texCoord);
+- gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
++ gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
+- 
+- gl.enableVertexAttribArray(attributeLocations.texIndex);
+- gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
++ gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
+  
+  const vertexIndices = new Uint8Array([
+      // left rect
+  
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+-     gl.uniform1i(uniformLocations.texture, 0);
++     gl.uniform1i(programInfo.uniformLocations.texture, 0);
+  
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, otherTexture);
+-     gl.uniform1i(uniformLocations.otherTexture, 1);
++     gl.uniform1i(programInfo.uniformLocations.otherTexture, 1);
+  
+-     gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
++     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+  
+      gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+Looks quite like a cleanup 😎
+
+
+One more thing that we use often are buffers.
+Let's create a helper class
+
+📄 src/GLBuffer.js
+```js
+export class GLBuffer {
+    constructor(gl, target, data) {
+
+    }
+}
+
+```
+We'll need data, buffer target and actual gl buffer, so let's assign everything passed from outside and craete a gl buffer.
+
+📄 src/GLBuffer.js
+```diff
+  export class GLBuffer {
+      constructor(gl, target, data) {
+- 
++         this.target = target;
++         this.data = data;
++         this.glBuffer = gl.createBuffer();
+      }
+  }
+
+```
+We didn't assign a `gl` to instance because it might cause a memory leak, so we'll need to pass it from outside
+
+
+Let's implement an alternative to a `gl.bindBuffer`
+
+📄 src/GLBuffer.js
+```diff
+          this.data = data;
+          this.glBuffer = gl.createBuffer();
+      }
++ 
++     bind(gl) {
++         gl.bindBuffer(this.target, this.glBuffer);
++     }
+  }
+
+```
+and a convenient way to set buffer data
+
+📄 src/GLBuffer.js
+```diff
+      bind(gl) {
+          gl.bindBuffer(this.target, this.glBuffer);
+      }
++ 
++     setData(gl, data, usage) {
++         this.data = data;
++         this.bind(gl);
++         gl.bufferData(this.target, this.data, usage);
++     }
+  }
+
+```
+Now let's make a `data` argument of constructor and add a `usage` argument to be able to do everything we need with just a constructor call
+
+📄 src/GLBuffer.js
+```diff
+  export class GLBuffer {
+-     constructor(gl, target, data) {
++     constructor(gl, target, data, usage) {
+          this.target = target;
+          this.data = data;
+          this.glBuffer = gl.createBuffer();
++ 
++         if (typeof data !== 'undefined') {
++             this.setData(gl, data, usage);
++         }
+      }
+  
+      bind(gl) {
+
+```
+Cool, now we can replace texCoords buffer with our thin wrapper
+
+📄 src/texture.js
+```diff
+  
+  import textureImageSrc from '../assets/images/texture.jpg';
+  import textureGreenImageSrc from '../assets/images/texture-green.jpg';
++ import { GLBuffer } from './GLBuffer';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.linkProgram(program);
+  gl.useProgram(program);
+  
+- const texCoords = new Float32Array([
++ const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+      ...createRect(0, 0, 1, 1), // left rect
+      ...createRect(0, 0, 1, 1), // right rect
+- ]);
+- const texCoordsBuffer = gl.createBuffer();
+- 
+- gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+- gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
++ ]), gl.STATIC_DRAW);
+  
+  const texIndicies = new Float32Array([
+      ...Array.from({ length: 4 }).fill(0), // left rect
+  
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
+- gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
++ texCoordsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+  
+  gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
+
+```
+Do the same for texIndices buffer
+
+📄 src/texture.js
+```diff
+      ...createRect(0, 0, 1, 1), // right rect
+  ]), gl.STATIC_DRAW);
+  
+- const texIndicies = new Float32Array([
++ const texIndiciesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+      ...Array.from({ length: 4 }).fill(0), // left rect
+      ...Array.from({ length: 4 }).fill(1), // right rect
+- ]);
+- const texIndiciesBuffer = gl.createBuffer();
+- 
+- gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
+- gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
++ ]), gl.STATIC_DRAW);
+  
+  const vertexPosition = new Float32Array([
+      ...createRect(-1, -1, 1, 2), // left rect
+  texCoordsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+  
+- gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
++ texIndiciesBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
+  
+  const vertexIndices = new Uint8Array([
+
+```
+vertex positions
+
+📄 src/texture.js
+```diff
+      ...Array.from({ length: 4 }).fill(1), // right rect
+  ]), gl.STATIC_DRAW);
+  
+- const vertexPosition = new Float32Array([
++ const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+      ...createRect(-1, -1, 1, 2), // left rect
+      ...createRect(-1, 0, 1, 2), // right rect
+- ]);
+- const vertexPositionBuffer = gl.createBuffer();
++ ]), gl.STATIC_DRAW);
+  
+- gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+- gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
++ vertexPositionBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+  
+  texCoordsBuffer.bind(gl);
+
+```
+and index buffer
+
+📄 src/texture.js
+```diff
+  texIndiciesBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
+  
+- const vertexIndices = new Uint8Array([
++ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
+      // left rect
+      0, 1, 2, 
+      1, 2, 3, 
+      // right rect
+      4, 5, 6, 
+      5, 6, 7,
+- ]);
+- const indexBuffer = gl.createBuffer();
+- 
+- gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+- gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
++ ]), gl.STATIC_DRAW);
+  
+  Promise.all([
+      loadImage(textureImageSrc),
+  
+      gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+  
+-     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+Now we are able to work with shaders being more productive with less code!
+
+See you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
