@@ -51,7 +51,7 @@ gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, fal
 texIndiciesBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
 
-const vertexIndices = new Uint8Array([
+const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
     // left rect
     0, 1, 2, 
     1, 2, 3, 
@@ -59,11 +59,7 @@ const vertexIndices = new Uint8Array([
     // right rect
     4, 5, 6, 
     5, 6, 7,
-]);
-const indexBuffer = gl.createBuffer();
-
-gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
+]), gl.STATIC_DRAW);
 
 Promise.all([
     loadImage(textureImageSrc),
@@ -85,5 +81,5 @@ Promise.all([
 
     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
 
-    gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 });
