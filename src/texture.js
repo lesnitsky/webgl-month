@@ -5,6 +5,7 @@ import { createRect } from './shape-helpers';
 
 import textureImageSrc from '../assets/images/texture.jpg';
 import textureGreenImageSrc from '../assets/images/texture-green.jpg';
+import { GLBuffer } from './GLBuffer';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -23,14 +24,10 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
-const texCoords = new Float32Array([
+const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(0, 0, 1, 1), // left rect
     ...createRect(0, 0, 1, 1), // right rect
-]);
-const texCoordsBuffer = gl.createBuffer();
-
-gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
+]), gl.STATIC_DRAW);
 
 const texIndicies = new Float32Array([
     ...Array.from({ length: 4 }).fill(0), // left rect
@@ -54,7 +51,7 @@ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+texCoordsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
