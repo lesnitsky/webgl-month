@@ -8,4 +8,10 @@ export class GLBuffer {
     bind(gl) {
         gl.bindBuffer(this.target, this.glBuffer);
     }
+
+    setData(gl, data, usage) {
+        this.data = data;
+        this.bind(gl);
+        gl.bufferData(this.target, this.data, usage);
+    }
 }
