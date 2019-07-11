@@ -1,6 +1,6 @@
 import vShaderSource from './shaders/texture.v.glsl';
 import fShaderSource from './shaders/texture.f.glsl';
-import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
+import { compileShader, loadImage, createTexture, setImage, setupShaderInput } from './gl-helpers';
 import { createRect } from './shape-helpers';
 
 import textureImageSrc from '../assets/images/texture.jpg';
@@ -49,6 +49,8 @@ const vertexPositionBuffer = gl.createBuffer();
 
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+
+console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
 
 const attributeLocations = {
     position: gl.getAttribLocation(program, 'position'),

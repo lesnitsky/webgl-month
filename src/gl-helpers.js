@@ -53,5 +53,6 @@ export function setImage(gl, texture, img) {
 }
 
 export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
-
+    const vShaderInfo = extract(vShaderSource);
+    const fShaderInfo = extract(fShaderSource);
 }
