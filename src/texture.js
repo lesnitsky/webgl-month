@@ -34,17 +34,15 @@ const texIndiciesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...Array.from({ length: 4 }).fill(1), // right rect
 ]), gl.STATIC_DRAW);
 
-const vertexPosition = new Float32Array([
+const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(-1, -1, 1, 2), // left rect
     ...createRect(-1, 0, 1, 2), // right rect
-]);
-const vertexPositionBuffer = gl.createBuffer();
+]), gl.STATIC_DRAW);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
+vertexPositionBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
 texCoordsBuffer.bind(gl);
