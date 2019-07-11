@@ -61,4 +61,9 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
         ...vShaderInfo.uniforms,
         ...fShaderInfo.uniforms,
     ];
+
+    const attributeLocations = attributes.reduce((attrsMap, attr) => {
+        attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
+        return attrsMap;
+    }, {});
 }
