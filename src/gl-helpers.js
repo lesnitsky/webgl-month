@@ -66,4 +66,8 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
         attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
         return attrsMap;
     }, {});
+
+    attributes.forEach((attr) => {
+        gl.enableVertexAttribArray(attributeLocations[attr.name]);
+    });
 }
