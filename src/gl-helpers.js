@@ -1,3 +1,5 @@
+import extract from 'glsl-extract-sync';
+
 export function compileShader(gl, shader, source) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -48,4 +50,8 @@ export function setImage(gl, texture, img) {
         gl.UNSIGNED_BYTE,
         img,
     );
+}
+
+export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
+
 }
