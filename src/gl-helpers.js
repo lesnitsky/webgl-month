@@ -70,4 +70,9 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
     attributes.forEach((attr) => {
         gl.enableVertexAttribArray(attributeLocations[attr.name]);
     });
+
+    const uniformLocations = uniforms.reduce((uniformsMap, uniform) => {
+        uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
+        return uniformsMap;
+    }, {});
 }
