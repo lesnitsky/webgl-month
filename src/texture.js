@@ -50,32 +50,15 @@ const vertexPositionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
 
-console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
+const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const attributeLocations = {
-    position: gl.getAttribLocation(program, 'position'),
-    texCoord: gl.getAttribLocation(program, 'texCoord'),
-    texIndex: gl.getAttribLocation(program, 'texIndex'),
-};
-
-const uniformLocations = {
-    texture: gl.getUniformLocation(program, 'texture'),
-    otherTexture: gl.getUniformLocation(program, 'otherTexture'),
-    resolution: gl.getUniformLocation(program, 'resolution'),
-};
-
-gl.enableVertexAttribArray(attributeLocations.position);
-gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
-
-gl.enableVertexAttribArray(attributeLocations.texCoord);
-gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
 gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
-
-gl.enableVertexAttribArray(attributeLocations.texIndex);
-gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
+gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
 
 const vertexIndices = new Uint8Array([
     // left rect
@@ -103,13 +86,13 @@ Promise.all([
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniformLocations.texture, 0);
+    gl.uniform1i(programInfo.uniformLocations.texture, 0);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, otherTexture);
-    gl.uniform1i(uniformLocations.otherTexture, 1);
+    gl.uniform1i(programInfo.uniformLocations.otherTexture, 1);
 
-    gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
+    gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
 
     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });
