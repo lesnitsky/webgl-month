@@ -1,8 +1,12 @@
 export class GLBuffer {
-    constructor(gl, target, data) {
+    constructor(gl, target, data, usage) {
         this.target = target;
         this.data = data;
         this.glBuffer = gl.createBuffer();
+
+        if (typeof data !== 'undefined') {
+            this.setData(gl, data, usage);
+        }
     }
 
     bind(gl) {
