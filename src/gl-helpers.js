@@ -75,4 +75,9 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
         uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
         return uniformsMap;
     }, {});
+
+    return {
+        attributeLocations,
+        uniformLocations,
+    }
 }
