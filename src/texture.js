@@ -29,14 +29,10 @@ const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(0, 0, 1, 1), // right rect
 ]), gl.STATIC_DRAW);
 
-const texIndicies = new Float32Array([
+const texIndiciesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...Array.from({ length: 4 }).fill(0), // left rect
     ...Array.from({ length: 4 }).fill(1), // right rect
-]);
-const texIndiciesBuffer = gl.createBuffer();
-
-gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
+]), gl.STATIC_DRAW);
 
 const vertexPosition = new Float32Array([
     ...createRect(-1, -1, 1, 2), // left rect
@@ -54,7 +50,7 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, fal
 texCoordsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
+texIndiciesBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
 
 const vertexIndices = new Uint8Array([
