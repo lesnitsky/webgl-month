@@ -13,8 +13,8 @@ const gl = canvas.getContext('webgl');
 const width = document.body.offsetWidth;
 const height = document.body.offsetHeight;
 
-canvas.width = width;
-canvas.height = height;
+canvas.width = width * devicePixelRatio;
+canvas.height = height * devicePixelRatio;
 
 const vShader = gl.createShader(gl.VERTEX_SHADER);
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
