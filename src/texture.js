@@ -16,6 +16,9 @@ const height = document.body.offsetHeight;
 canvas.width = width * devicePixelRatio;
 canvas.height = height * devicePixelRatio;
 
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+
 const vShader = gl.createShader(gl.VERTEX_SHADER);
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
