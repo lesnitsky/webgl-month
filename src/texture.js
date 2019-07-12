@@ -107,4 +107,6 @@ window.addEventListener('resize', () => {
     canvas.style.height = `${height}px`;
 
     gl.viewport(0, 0, canvas.width, canvas.height);
+
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 });
