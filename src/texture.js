@@ -87,5 +87,7 @@ Promise.all([
 
     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
 
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 });
