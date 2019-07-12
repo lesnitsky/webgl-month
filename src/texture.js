@@ -94,3 +94,17 @@ Promise.all([
 
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 });
+
+
+window.addEventListener('resize', () => {
+    const width = document.body.offsetWidth;
+    const height = document.body.offsetHeight;
+
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+});
