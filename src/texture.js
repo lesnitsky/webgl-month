@@ -10,6 +10,15 @@ import { GLBuffer } from './GLBuffer';
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
+const width = document.body.offsetWidth;
+const height = document.body.offsetHeight;
+
+canvas.width = width * devicePixelRatio;
+canvas.height = height * devicePixelRatio;
+
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+
 const vShader = gl.createShader(gl.VERTEX_SHADER);
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -80,6 +89,24 @@ Promise.all([
     gl.uniform1i(programInfo.uniformLocations.otherTexture, 1);
 
     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+});
+
+
+window.addEventListener('resize', () => {
+    const width = document.body.offsetWidth;
+    const height = document.body.offsetHeight;
+
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
 
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 });

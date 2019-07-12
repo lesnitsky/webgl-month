@@ -4005,3 +4005,179 @@ This is a series of blog posts related to WebGL. New post will be available ever
 Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 12. Highdpi displays and webgl viewport
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+Hey 👋 Welcome back to WebGL month
+
+All previous tutorials where done on a default size canvas, let's make the picture bigger!
+
+
+We'll need to tune a bit of css first to make body fill the screen
+
+📄 index.html
+```diff
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <title>WebGL Month</title>
++ 
++     <style>
++     html, body {
++       height: 100%;
++     }
++ 
++     body {
++       margin: 0;
++     }
++     </style>
+    </head>
+    <body>
+      <canvas></canvas>
+
+```
+Now we can read body dimensions
+
+📄 src/texture.js
+```diff
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
++ const width = document.body.offsetWidth;
++ const height = document.body.offsetHeight;
++ 
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+
+```
+And set canvas dimensions
+
+📄 src/texture.js
+```diff
+  const width = document.body.offsetWidth;
+  const height = document.body.offsetHeight;
+  
++ canvas.width = width;
++ canvas.height = height;
++ 
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+
+```
+Ok, canvas size changed, but our picture isn't full screen, why?
+
+
+Turns out that changing canvas size isn't enought, we also need to specify a viwport. Treat viewport as a rectangle which will be used as drawing area and interpolate it to `[-1...1]` clipspace
+
+📄 src/texture.js
+```diff
+  
+      gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+  
++     gl.viewport(0, 0, canvas.width, canvas.height);
++ 
+      gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+Now our picture fills the whole document, but it is a bit blurry. Obvious reason – our texture is not big enough, so it should be stretched and loses quality. That's correct, but there is another reason.
+
+
+Modern displays fit higher amount of actual pixels in a physical pixel size (apple calls it retina). There is a global variable `devicePixelRatio` which might help us.
+
+📄 src/texture.js
+```diff
+  const width = document.body.offsetWidth;
+  const height = document.body.offsetHeight;
+  
+- canvas.width = width;
+- canvas.height = height;
++ canvas.width = width * devicePixelRatio;
++ canvas.height = height * devicePixelRatio;
+  
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+```
+Ok, now our canvas has an appropriate size, but it is bigger than body on retina displays. How do we fix it?
+We can downscale canvas to a physical size with css `width` and `height` property
+
+📄 src/texture.js
+```diff
+  canvas.width = width * devicePixelRatio;
+  canvas.height = height * devicePixelRatio;
+  
++ canvas.style.width = `${width}px`;
++ canvas.style.height = `${height}px`;
++ 
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+
+```
+Just to summarize, `width` and `height` attributes of canvas specify actual size in pixels, but in order to make picture sharp on highdpi displays we need to multiply width and hegiht on `devicePixelRatio` and downscale canvas back with css
+
+
+Now we can alos make our canvas resizable
+
+📄 src/texture.js
+```diff
+  
+      gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  });
++ 
++ 
++ window.addEventListener('resize', () => {
++     const width = document.body.offsetWidth;
++     const height = document.body.offsetHeight;
++ 
++     canvas.width = width * devicePixelRatio;
++     canvas.height = height * devicePixelRatio;
++ 
++     canvas.style.width = `${width}px`;
++     canvas.style.height = `${height}px`;
++ 
++     gl.viewport(0, 0, canvas.width, canvas.height);
++ });
+
+```
+Oops, canvas clears after resize. Turns out that modification of `width` or `height` attribute forces browser to clear canvas (the same for `2d` context), so we need to issue a draw call again.
+
+📄 src/texture.js
+```diff
+      canvas.style.height = `${height}px`;
+  
+      gl.viewport(0, 0, canvas.width, canvas.height);
++ 
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  });
+
+```
+That's it for today, see you tomorrow 👋
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day12)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day12)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
