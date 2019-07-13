@@ -1,6 +1,6 @@
 import vShaderSource from './shaders/rotating-square.v.glsl';
 import fShaderSource from './shaders/rotating-square.f.glsl';
-import { compileShader } from './gl-helpers';
+import { setupShaderInput, compileShader } from './gl-helpers';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -27,3 +27,5 @@ gl.attachShader(program, fShader);
 
 gl.linkProgram(program);
 gl.useProgram(program);
+
+const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
