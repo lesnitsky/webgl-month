@@ -51,6 +51,9 @@ gl.viewport(0, 0, canvas.width, canvas.height);
 const rotationMatrix = mat2.create();
 
 function frame() {
+    gl.uniformMatrix2fv(programInfo.uniformLocations.rotationMatrix, false, rotationMatrix);
+
+    mat2.rotate(rotationMatrix, rotationMatrix, -Math.PI / 60);
 
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
     requestAnimationFrame(frame);
