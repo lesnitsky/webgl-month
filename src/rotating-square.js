@@ -60,6 +60,7 @@ function frame() {
 
     angle += Math.PI / 60;
 
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
     requestAnimationFrame(frame);
 }
 
