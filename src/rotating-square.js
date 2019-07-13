@@ -1,6 +1,8 @@
 import vShaderSource from './shaders/rotating-square.v.glsl';
 import fShaderSource from './shaders/rotating-square.f.glsl';
 import { setupShaderInput, compileShader } from './gl-helpers';
+import { createRect } from './shape-helpers';
+import { GLBuffer } from './GLBuffer';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -29,3 +31,7 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+    ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
+]), gl.STATIC_DRAW);
