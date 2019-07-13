@@ -58,6 +58,8 @@ function frame() {
         gl.STATIC_DRAW,
     );
 
+    angle += Math.PI / 60;
+
     requestAnimationFrame(frame);
 }
 
