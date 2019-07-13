@@ -42,3 +42,7 @@ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
     0, 1, 2, 
     1, 2, 3, 
 ]), gl.STATIC_DRAW);
+
+gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+
+gl.viewport(0, 0, canvas.width, canvas.height);
