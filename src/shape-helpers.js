@@ -1,9 +1,28 @@
-export function createRect(top, left, width, height) {
+const Pi_4 = Math.PI / 4;
+
+export function createRect(top, left, width, height, angle = 0) {
+    const centerX = width / 2;
+    const centerY = height / 2;
+
+    const diagonalLength = Math.sqrt(centerX ** 2 + centerY ** 2);
+
+    const x1 = centerX + diagonalLength * Math.cos(angle + Pi_4);
+    const y1 = centerY + diagonalLength * Math.sin(angle + Pi_4);
+
+    const x2 = centerX + diagonalLength * Math.cos(angle + Pi_4 * 3);
+    const y2 = centerY + diagonalLength * Math.sin(angle + Pi_4 * 3);
+
+    const x3 = centerX + diagonalLength * Math.cos(angle - Pi_4);
+    const y3 = centerY + diagonalLength * Math.sin(angle - Pi_4);
+
+    const x4 = centerX + diagonalLength * Math.cos(angle - Pi_4 * 3);
+    const y4 = centerY + diagonalLength * Math.sin(angle - Pi_4 * 3);
+
     return [
-        left, top, // x1 y1
-        left + width, top, // x2 y2
-        left, top + height, // x3 y3
-        left + width, top + height, // x4 y4
+        x1 + left, y1 + top,
+        x2 + left, y2 + top,
+        x3 + left, y3 + top,
+        x4 + left, y4 + top,
     ];
 }
 
