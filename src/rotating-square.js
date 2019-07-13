@@ -50,6 +50,14 @@ gl.viewport(0, 0, canvas.width, canvas.height);
 let angle = 0;
 
 function frame() {
+    vertexPositionBuffer.setData(
+        gl, 
+        new Float32Array(
+            createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
+        ), 
+        gl.STATIC_DRAW,
+    );
+
     requestAnimationFrame(frame);
 }
 
