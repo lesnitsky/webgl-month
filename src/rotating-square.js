@@ -1,5 +1,6 @@
 import vShaderSource from './shaders/rotating-square.v.glsl';
 import fShaderSource from './shaders/rotating-square.f.glsl';
+import { compileShader } from './gl-helpers';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -12,3 +13,9 @@ canvas.height = height * devicePixelRatio;
 
 canvas.style.width = `${width}px`;
 canvas.style.height = `${height}px`;
+
+const vShader = gl.createShader(gl.VERTEX_SHADER);
+const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+compileShader(gl, vShader, vShaderSource);
+compileShader(gl, fShader, fShaderSource);
