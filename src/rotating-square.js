@@ -3,6 +3,7 @@ import fShaderSource from './shaders/rotating-square.f.glsl';
 import { setupShaderInput, compileShader } from './gl-helpers';
 import { createRect } from './shape-helpers';
 import { GLBuffer } from './GLBuffer';
+import { mat2 } from 'gl-matrix';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -47,18 +48,9 @@ gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.hei
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-let angle = 0;
+const rotationMatrix = mat2.create();
 
 function frame() {
-    vertexPositionBuffer.setData(
-        gl, 
-        new Float32Array(
-            createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
-        ), 
-        gl.STATIC_DRAW,
-    );
-
-    angle += Math.PI / 60;
 
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
     requestAnimationFrame(frame);
