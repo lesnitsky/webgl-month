@@ -4,6 +4,7 @@ module.exports = {
     entry: {
         'week-1': './src/week-1.js',
         'texture': './src/texture.js',
+        'rotating-square': './src/rotating-square.js',
     },
 
     output: {

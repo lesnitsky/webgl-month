@@ -23,6 +23,7 @@
     "webpack-cli": "^3.3.5"
   },
   "dependencies": {
+    "gl-matrix": "^3.0.0",
     "glsl-extract-sync": "0.0.0"
   }
 }
