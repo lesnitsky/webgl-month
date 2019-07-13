@@ -48,3 +48,9 @@ gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.hei
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 let angle = 0;
+
+function frame() {
+    requestAnimationFrame(frame);
+}
+
+frame();
