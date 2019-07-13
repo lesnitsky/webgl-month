@@ -35,3 +35,5 @@ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
 ]), gl.STATIC_DRAW);
+
+gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
