@@ -4182,3 +4182,494 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 13. Simple animation
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+Hey 👋 Welcome to WebGL month.
+
+All previous tutorials where based on static images, let's add some motion!
+
+
+We'll need a simple vertex shader
+
+📄 src/shaders/rotating-square.v.glsl
+```glsl
+attribute vec2 position;
+uniform vec2 resolution;
+
+void main() {
+    gl_Position = vec4(position / resolution * 2.0 - 1.0, 0, 1);
+}
+
+```
+fragment shader
+
+📄 src/shaders/rotating-square.f.glsl
+```glsl
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+```
+New entry point
+
+📄 index.html
+```diff
+    </head>
+    <body>
+      <canvas></canvas>
+-     <script src="./dist/texture.js"></script>
++     <script src="./dist/rotating-square.js"></script>
+    </body>
+  </html>
+
+```
+📄 src/rotating-square.js
+```js
+import vShaderSource from './shaders/rotating-square.v.glsl';
+import fShaderSource from './shaders/rotating-square.f.glsl';
+
+```
+📄 webpack.config.js
+```diff
+      entry: {
+          'week-1': './src/week-1.js',
+          'texture': './src/texture.js',
++         'rotating-square': './src/rotating-square.js',
+      },
+  
+      output: {
+
+```
+Get WebGL context
+
+📄 src/rotating-square.js
+```diff
+  import vShaderSource from './shaders/rotating-square.v.glsl';
+  import fShaderSource from './shaders/rotating-square.f.glsl';
++ 
++ const canvas = document.querySelector('canvas');
++ const gl = canvas.getContext('webgl');
++ 
+
+```
+Make canvas fullscreen
+
+📄 src/rotating-square.js
+```diff
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
++ const width = document.body.offsetWidth;
++ const height = document.body.offsetHeight;
++ 
++ canvas.width = width * devicePixelRatio;
++ canvas.height = height * devicePixelRatio;
++ 
++ canvas.style.width = `${width}px`;
++ canvas.style.height = `${height}px`;
+
+```
+Create shaders
+
+📄 src/rotating-square.js
+```diff
+  import vShaderSource from './shaders/rotating-square.v.glsl';
+  import fShaderSource from './shaders/rotating-square.f.glsl';
++ import { compileShader } from './gl-helpers';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
++ 
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
+
+```
+Create program
+
+📄 src/rotating-square.js
+```diff
+  
+  compileShader(gl, vShader, vShaderSource);
+  compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
+
+```
+Get attribute and uniform locations
+
+📄 src/rotating-square.js
+```diff
+  import vShaderSource from './shaders/rotating-square.v.glsl';
+  import fShaderSource from './shaders/rotating-square.f.glsl';
+- import { compileShader } from './gl-helpers';
++ import { setupShaderInput, compileShader } from './gl-helpers';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  gl.linkProgram(program);
+  gl.useProgram(program);
++ 
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+```
+Create vertices to draw a square
+
+📄 src/rotating-square.js
+```diff
+  import vShaderSource from './shaders/rotating-square.v.glsl';
+  import fShaderSource from './shaders/rotating-square.f.glsl';
+  import { setupShaderInput, compileShader } from './gl-helpers';
++ import { createRect } from './shape-helpers';
++ import { GLBuffer } from './GLBuffer';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.useProgram(program);
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
++ 
++ const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
++     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
++ ]), gl.STATIC_DRAW);
+
+```
+Setup attribute pointer
+
+📄 src/rotating-square.js
+```diff
+  const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+      ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
+  ]), gl.STATIC_DRAW);
++ 
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+```
+Create index buffer
+
+📄 src/rotating-square.js
+```diff
+  ]), gl.STATIC_DRAW);
+  
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
++ 
++ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
++     0, 1, 2, 
++     1, 2, 3, 
++ ]), gl.STATIC_DRAW);
+
+```
+Pass resolution and setup viewport
+
+📄 src/rotating-square.js
+```diff
+      0, 1, 2, 
+      1, 2, 3, 
+  ]), gl.STATIC_DRAW);
++ 
++ gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
++ 
++ gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+And finally issue a draw call
+
+📄 src/rotating-square.js
+```diff
+  gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
++ gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+Now let's think of how can we rotate this square
+
+Actually we can fit in in the circle and each vertex position might be calculated with `radius`, `cos` and `sin` and all we'll need is add some delta angle to each vertex
+
+![Rotation](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotation.png)
+
+
+Let's refactor our createRect helper to take angle into account
+
+📄 src/rotating-square.js
+```diff
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+  const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
+-     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
++     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, 0),
+  ]), gl.STATIC_DRAW);
+  
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+```
+📄 src/shape-helpers.js
+```diff
+- export function createRect(top, left, width, height) {
++ const Pi_4 = Math.PI / 4;
++ 
++ export function createRect(top, left, width, height, angle = 0) {
++     const centerX = width / 2;
++     const centerY = height / 2;
++ 
++     const diagonalLength = Math.sqrt(centerX ** 2 + centerY ** 2);
++ 
++     const x1 = centerX + diagonalLength * Math.cos(angle + Pi_4);
++     const y1 = centerY + diagonalLength * Math.sin(angle + Pi_4);
++ 
++     const x2 = centerX + diagonalLength * Math.cos(angle + Pi_4 * 3);
++     const y2 = centerY + diagonalLength * Math.sin(angle + Pi_4 * 3);
++ 
++     const x3 = centerX + diagonalLength * Math.cos(angle - Pi_4);
++     const y3 = centerY + diagonalLength * Math.sin(angle - Pi_4);
++ 
++     const x4 = centerX + diagonalLength * Math.cos(angle - Pi_4 * 3);
++     const y4 = centerY + diagonalLength * Math.sin(angle - Pi_4 * 3);
++ 
+      return [
+-         left, top, // x1 y1
+-         left + width, top, // x2 y2
+-         left, top + height, // x3 y3
+-         left + width, top + height, // x4 y4
++         x1 + left, y1 + top,
++         x2 + left, y2 + top,
++         x3 + left, y3 + top,
++         x4 + left, y4 + top,
+      ];
+  }
+  
+
+```
+Now we need to define initial angle
+
+📄 src/rotating-square.js
+```diff
+  gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+- gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
++ 
++ let angle = 0;
+
+```
+and a function which will be called each frame
+
+📄 src/rotating-square.js
+```diff
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  let angle = 0;
++ 
++ function frame() {
++     requestAnimationFrame(frame);
++ }
++ 
++ frame();
+
+```
+Each frame WebGL just goes through vertex data and renders it. In order to make it render smth different we need to update this data
+
+📄 src/rotating-square.js
+```diff
+  let angle = 0;
+  
+  function frame() {
++     vertexPositionBuffer.setData(
++         gl, 
++         new Float32Array(
++             createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
++         ), 
++         gl.STATIC_DRAW,
++     );
++ 
+      requestAnimationFrame(frame);
+  }
+  
+
+```
+We also need to update rotation angle each frame
+
+📄 src/rotating-square.js
+```diff
+          gl.STATIC_DRAW,
+      );
+  
++     angle += Math.PI / 60;
++ 
+      requestAnimationFrame(frame);
+  }
+  
+
+```
+and issue a draw call
+
+📄 src/rotating-square.js
+```diff
+  
+      angle += Math.PI / 60;
+  
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+      requestAnimationFrame(frame);
+  }
+  
+
+```
+Cool! We now have a rotating square! 🎉
+
+![Rotating circle gif](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotation.gif)
+
+
+What we've just done could be simplified with [rotation matrix](https://en.wikipedia.org/wiki/Rotation_matrix)
+
+
+Don't worry if you're not fluent in linear algebra, me neither, there is a special package 😉
+
+📄 package.json
+```diff
+      "webpack-cli": "^3.3.5"
+    },
+    "dependencies": {
++     "gl-matrix": "^3.0.0",
+      "glsl-extract-sync": "0.0.0"
+    }
+  }
+
+```
+We'll need to define a rotation matrix uniform
+
+📄 src/shaders/rotating-square.v.glsl
+```diff
+  attribute vec2 position;
+  uniform vec2 resolution;
+  
++ uniform mat2 rotationMatrix;
++ 
+  void main() {
+      gl_Position = vec4(position / resolution * 2.0 - 1.0, 0, 1);
+  }
+
+```
+And multiply vertex positions
+
+📄 src/shaders/rotating-square.v.glsl
+```diff
+  uniform mat2 rotationMatrix;
+  
+  void main() {
+-     gl_Position = vec4(position / resolution * 2.0 - 1.0, 0, 1);
++     gl_Position = vec4((position / resolution * 2.0 - 1.0) * rotationMatrix, 0, 1);
+  }
+
+```
+Now we can get rid of vertex position updates
+
+📄 src/rotating-square.js
+```diff
+  import { setupShaderInput, compileShader } from './gl-helpers';
+  import { createRect } from './shape-helpers';
+  import { GLBuffer } from './GLBuffer';
++ import { mat2 } from 'gl-matrix';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- let angle = 0;
++ const rotationMatrix = mat2.create();
+  
+  function frame() {
+-     vertexPositionBuffer.setData(
+-         gl, 
+-         new Float32Array(
+-             createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
+-         ), 
+-         gl.STATIC_DRAW,
+-     );
+- 
+-     angle += Math.PI / 60;
+  
+      gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+      requestAnimationFrame(frame);
+
+```
+and use rotation matrix instead
+
+📄 src/rotating-square.js
+```diff
+  const rotationMatrix = mat2.create();
+  
+  function frame() {
++     gl.uniformMatrix2fv(programInfo.uniformLocations.rotationMatrix, false, rotationMatrix);
++ 
++     mat2.rotate(rotationMatrix, rotationMatrix, -Math.PI / 60);
+  
+      gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+      requestAnimationFrame(frame);
+
+```
+### Conclusion
+
+What seemed a complex math in our shape helper refactor turned out to be pretty easy doable with matrix math. GPU performs matrix multiplication very fast (it has special optimisations on hardware level for this kind of operations), so a lot of transformations can be made with transform matrix. This is very improtant concept, especcially in 3d rendering world.
+
+That's it for today, see you tomorrow! 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 14. Exploring more transform matrices
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
