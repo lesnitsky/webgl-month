@@ -1,29 +1,29 @@
 {
-  "name": "webgl-month",
-  "version": "1.0.0",
-  "description": "Daily WebGL tutorials",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lesnitsky/webgl-month.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/lesnitsky/webgl-month/issues"
-  },
-  "homepage": "https://github.com/lesnitsky/webgl-month#readme",
-  "devDependencies": {
-    "raw-loader": "^3.0.0",
-    "url-loader": "^2.0.1",
-    "webpack": "^4.35.2",
-    "webpack-cli": "^3.3.5"
-  },
-  "dependencies": {
-    "gl-matrix": "^3.0.0",
-    "glsl-extract-sync": "0.0.0"
-  }
+    "name": "webgl-month",
+    "version": "1.0.0",
+    "description": "Daily WebGL tutorials",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lesnitsky/webgl-month.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/lesnitsky/webgl-month/issues"
+    },
+    "homepage": "https://github.com/lesnitsky/webgl-month#readme",
+    "devDependencies": {
+        "raw-loader": "^3.0.0",
+        "url-loader": "^2.0.1",
+        "webpack": "^4.35.2",
+        "webpack-cli": "^3.3.5"
+    },
+    "dependencies": {
+        "gl-matrix": "^3.0.0",
+        "glsl-extract-sync": "0.0.0"
+    }
 }
