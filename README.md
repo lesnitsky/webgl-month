@@ -4655,3 +4655,101 @@ This is a series of blog posts related to WebGL. New post will be available ever
 Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 14. Exploring more transform matrices
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 14. Intro to 3d
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome to WebGL month. Today we're going to explore some important topics before starting to work with 3D.
+
+Let's talk about projections first. As you might know a point in 2d space has a projection on X and Y axises.
+
+In 3d space we can project a point not only on axises, but also on a plane
+
+This is how point in space will be projected on a plane
+
+![Point projection](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/projection-point.jpg)
+
+Display is also a flat plane, so basically every point in a 3d space could be projected on it.
+
+As we know, WebGL could render only triangles, so every 3d object should be built from a lot of triangles. The more triangles object consists of – the more precise object will look like.
+
+That's how a triangle in 3d space could be projected on a plane
+
+![Triangle projection](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/projection-triangle.jpg)
+
+Notice that on a plane triangle looks a bit different, because vertices of the triangle are not in the plane parallel to the one we project this triangle on (rotated).
+
+You can build 3D models in editors like [Blender](https://www.blender.org/) or [3ds Max](https://www.autodesk.com/products/3ds-max/overview). There are special file formats which describe 3d objects, so in order to render these objects we'll need to parse these files and build triangles. We'll explore how to do this in upcoming tutorilas.
+
+One more important concept of 3d is perspective. Farther objects seem smaller
+
+Imagine we're looking at some objects from the top
+
+![Perspective](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/perspective.jpg)
+
+Notice that projected faces of cubes are different in size (bottom is larger than top) because of perspective.
+
+Another variable in this complex "how to render 3d" equasion is field of view (what the max distance to the object which is visible by the camera, how wide is camera lens) and how much of objects fit the "camera lens".
+
+Taking into account all these specifics seems like a lot of work to do, but luckily this work was already done, and that's where we need linear algebra and matrix multiplication stuff. Again, if you're not fluent in linear algebra – don't worrly, there is an awesome package [gl-matrix](http://glmatrix.net/) which will help you with all this stuff.
+
+Turns out that in order to get a 2d coordinates on a screen of a point in 3d space we just need to multiply a [homogeneous coordinates](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection#Homogeneous_Coordinates) of the point and a special "projection matrix". This matrix describes the field of view, near and far bounds of [camera frustum](https://en.wikipedia.org/wiki/Viewing_frustum) (region of space in the modeled world which may appear on the screen). Perspective projection looks more realistic, because it takes into account a distance to the object, so we'll use a [mat4.perspective](http://glmatrix.net/docs/module-mat4.html#.perspective) method from `gl-matrix`.
+
+There are two more matrices which simplify life in 3d rendering world
+
+1. Model matrix – matrix containing object transforms (translation, rotation, scale). If no transforms applied – this is an identity matrix
+
+```
+1. 0, 0, 0,
+0, 1, 0, 0,
+0, 0, 1, 0,
+0, 0, 0, 1,
+```
+
+2. [View matrix](http://glmatrix.net/docs/module-mat4.html#.lookAt) – matrix describing position and direction of the "camera"
+
+There's also a [good article on MDN explaining these concepts](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_model_view_projection)
+
+---
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
