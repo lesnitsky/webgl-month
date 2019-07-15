@@ -90,6 +90,10 @@ const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
 
+mat4.lookAt(
+    viewMatrix,
+);
+
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
