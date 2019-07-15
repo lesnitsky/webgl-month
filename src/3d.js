@@ -1,3 +1,5 @@
+import { mat4 } from 'gl-matrix';
+
 import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput } from './gl-helpers';
@@ -83,6 +85,10 @@ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+const modelMatrix = mat4.create();
+const viewMatrix = mat4.create();
+const projectionMatrix = mat4.create();
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
