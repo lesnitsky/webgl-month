@@ -99,6 +99,7 @@ mat4.lookAt(
 
 mat4.perspective(
     projectionMatrix,
+    Math.PI / 360 * 90,
 );
 
 gl.viewport(0, 0, canvas.width, canvas.height);
