@@ -1,6 +1,7 @@
 import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput } from './gl-helpers';
+import { GLBuffer } from './GLBuffer';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -76,3 +77,6 @@ const indices = new Uint8Array([
     16, 17, 18, 16, 18, 19, // right
     20, 21, 22, 20, 22, 23, // left
 ]);
+
+const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
