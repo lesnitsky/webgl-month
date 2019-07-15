@@ -85,3 +85,5 @@ vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
+
+gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
