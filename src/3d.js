@@ -29,3 +29,11 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+const cubeVertices = new Float32Array([
+    // Front face
+    -1.0, -1.0, 1.0,
+    1.0, -1.0, 1.0,
+    1.0, 1.0, 1.0,
+    -1.0, 1.0, 1.0,
+]);
