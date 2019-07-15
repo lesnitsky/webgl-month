@@ -101,6 +101,8 @@ mat4.perspective(
     projectionMatrix,
     Math.PI / 360 * 90,
     canvas.width / canvas.height,
+    0.01,
+    100,
 );
 
 gl.viewport(0, 0, canvas.width, canvas.height);
