@@ -97,6 +97,10 @@ mat4.lookAt(
     [0, 1, 0],
 );
 
+mat4.perspective(
+    projectionMatrix,
+);
+
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
