@@ -93,6 +93,7 @@ const projectionMatrix = mat4.create();
 mat4.lookAt(
     viewMatrix,
     [0, 7, -7],
+    [0, 0, 0],
 );
 
 gl.viewport(0, 0, canvas.width, canvas.height);
