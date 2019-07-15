@@ -105,6 +105,10 @@ mat4.perspective(
     100,
 );
 
+gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
