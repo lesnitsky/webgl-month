@@ -117,6 +117,7 @@ function frame() {
     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
 
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
     requestAnimationFrame(frame);
 }
