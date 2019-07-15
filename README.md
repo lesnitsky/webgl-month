@@ -4739,3 +4739,532 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 15. Rendring a cube
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome to WebGL month.
+[Yesterday] we've explored some concepts required for 3d rendering, so let's finally render something 💪
+
+
+We'll need a new entry point
+
+📄 index.html
+```diff
+      </head>
+      <body>
+          <canvas></canvas>
+-         <script src="./dist/rotating-square.js"></script>
++         <script src="./dist/3d.js"></script>
+      </body>
+  </html>
+
+```
+📄 src/3d.js
+```js
+console.log('Hello 3d!');
+
+```
+📄 webpack.config.js
+```diff
+          'week-1': './src/week-1.js',
+          texture: './src/texture.js',
+          'rotating-square': './src/rotating-square.js',
++         '3d': './src/3d.js',
+      },
+  
+      output: {
+
+```
+Simple vertex and fragment shaders. Notice that we use `vec3` for position now as we'll work in 3-dimensional clipsace.
+
+📄 src/shaders/3d.f.glsl
+```glsl
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+```
+📄 src/shaders/3d.v.glsl
+```glsl
+attribute vec3 position;
+
+void main() {
+    gl_Position = vec4(position, 1.0);
+}
+
+```
+We'll also need a familiar from previous tutorials boilerplate for our WebGL program
+
+📄 src/3d.js
+```diff
+- console.log('Hello 3d!');
++ import vShaderSource from './shaders/3d.v.glsl';
++ import fShaderSource from './shaders/3d.f.glsl';
++ import { compileShader, setupShaderInput } from './gl-helpers';
++ 
++ const canvas = document.querySelector('canvas');
++ const gl = canvas.getContext('webgl');
++ 
++ const width = document.body.offsetWidth;
++ const height = document.body.offsetHeight;
++ 
++ canvas.width = width * devicePixelRatio;
++ canvas.height = height * devicePixelRatio;
++ 
++ canvas.style.width = `${width}px`;
++ canvas.style.height = `${height}px`;
++ 
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
++ 
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+```
+Now let's define cube vertices for each face. We'll start with front face
+
+📄 src/3d.js
+```diff
+  gl.useProgram(program);
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
++ 
++ const cubeVertices = new Float32Array([
++     // Front face
++     -1.0, -1.0, 1.0,
++     1.0, -1.0, 1.0,
++     1.0, 1.0, 1.0,
++     -1.0, 1.0, 1.0,
++ ]);
+
+```
+back face
+
+📄 src/3d.js
+```diff
+      1.0, -1.0, 1.0,
+      1.0, 1.0, 1.0,
+      -1.0, 1.0, 1.0,
++ 
++     // Back face
++     -1.0, -1.0, -1.0,
++     -1.0, 1.0, -1.0,
++     1.0, 1.0, -1.0,
++     1.0, -1.0, -1.0,
+  ]);
+
+```
+top face
+
+📄 src/3d.js
+```diff
+      -1.0, 1.0, -1.0,
+      1.0, 1.0, -1.0,
+      1.0, -1.0, -1.0,
++ 
++     // Top face
++     -1.0, 1.0, -1.0,
++     -1.0, 1.0, 1.0,
++     1.0, 1.0, 1.0,
++     1.0, 1.0, -1.0,
+  ]);
+
+```
+bottom face
+
+📄 src/3d.js
+```diff
+      -1.0, 1.0, 1.0,
+      1.0, 1.0, 1.0,
+      1.0, 1.0, -1.0,
++ 
++     // Bottom face
++     -1.0, -1.0, -1.0,
++     1.0, -1.0, -1.0,
++     1.0, -1.0, 1.0,
++     -1.0, -1.0, 1.0,
+  ]);
+
+```
+right face
+
+📄 src/3d.js
+```diff
+      1.0, -1.0, -1.0,
+      1.0, -1.0, 1.0,
+      -1.0, -1.0, 1.0,
++ 
++     // Right face
++     1.0, -1.0, -1.0,
++     1.0, 1.0, -1.0,
++     1.0, 1.0, 1.0,
++     1.0, -1.0, 1.0,
+  ]);
+
+```
+left face
+
+📄 src/3d.js
+```diff
+      1.0, 1.0, -1.0,
+      1.0, 1.0, 1.0,
+      1.0, -1.0, 1.0,
++ 
++     // Left face
++     -1.0, -1.0, -1.0,
++     -1.0, -1.0, 1.0,
++     -1.0, 1.0, 1.0,
++     -1.0, 1.0, -1.0,
+  ]);
+
+```
+Now we need to define vertex indices
+
+📄 src/3d.js
+```diff
+      -1.0, 1.0, 1.0,
+      -1.0, 1.0, -1.0,
+  ]);
++ 
++ const indices = new Uint8Array([
++     0, 1, 2, 0, 2, 3,       // front
++     4, 5, 6, 4, 6, 7,       // back
++     8, 9, 10, 8, 10, 11,    // top
++     12, 13, 14, 12, 14, 15, // bottom
++     16, 17, 18, 16, 18, 19, // right
++     20, 21, 22, 20, 22, 23, // left
++ ]);
+
+```
+and create gl buffers
+
+📄 src/3d.js
+```diff
+  import vShaderSource from './shaders/3d.v.glsl';
+  import fShaderSource from './shaders/3d.f.glsl';
+  import { compileShader, setupShaderInput } from './gl-helpers';
++ import { GLBuffer } from './GLBuffer';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+      16, 17, 18, 16, 18, 19, // right
+      20, 21, 22, 20, 22, 23, // left
+  ]);
++ 
++ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
++ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+```
+Setup vertex attribute pointer
+
+📄 src/3d.js
+```diff
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+  const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
++ 
++ vertexBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+```
+setup viewport
+
+📄 src/3d.js
+```diff
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
++ 
++ gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+and issue a draw call
+
+📄 src/3d.js
+```diff
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
++ 
++ gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+Ok, we did everything right, but we just see a red canvas? That's expected result, because every face of cube has a length of `2` with left-most vertices at `-1` and right-most at `1`, so we need to add some matrix magic from yesterday.
+
+
+Let's define uniforms for each matrix
+
+📄 src/shaders/3d.v.glsl
+```diff
+  attribute vec3 position;
+  
++ uniform mat4 modelMatrix;
++ uniform mat4 viewMatrix;
++ uniform mat4 projectionMatrix;
++ 
+  void main() {
+      gl_Position = vec4(position, 1.0);
+  }
+
+```
+and multiply every matrix.
+
+📄 src/shaders/3d.v.glsl
+```diff
+  uniform mat4 projectionMatrix;
+  
+  void main() {
+-     gl_Position = vec4(position, 1.0);
++     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  }
+
+```
+Now we need to define JS representations of the same matrices
+
+📄 src/3d.js
+```diff
++ import { mat4 } from 'gl-matrix';
++ 
+  import vShaderSource from './shaders/3d.v.glsl';
+  import fShaderSource from './shaders/3d.f.glsl';
+  import { compileShader, setupShaderInput } from './gl-helpers';
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
++ const modelMatrix = mat4.create();
++ const viewMatrix = mat4.create();
++ const projectionMatrix = mat4.create();
++ 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+We'll leave model matrix as-is (mat4.create returns an identity matrix), meaning cube won't have any transforms (no translation, no rotation, no scale).
+
+
+We'll use `lookAt` method to setup `viewMatrix`
+
+📄 src/3d.js
+```diff
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+  
++ mat4.lookAt(
++     viewMatrix,
++ );
++ 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+The 2nd argument is a position of a viewer. Let's place this point on top and in front of the cube
+
+📄 src/3d.js
+```diff
+  
+  mat4.lookAt(
+      viewMatrix,
++     [0, 7, -7],
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+The 3rd argument is a point where we want to look at. Coordinate of our cube is (0, 0, 0), that's exactly what we want to look at
+
+📄 src/3d.js
+```diff
+  mat4.lookAt(
+      viewMatrix,
+      [0, 7, -7],
++     [0, 0, 0],
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+The last argument is up vector. We can setup a view matrix in a way that any vector will be treated as pointing to the top of our world, so let's make y axis pointing to the top
+
+📄 src/3d.js
+```diff
+      viewMatrix,
+      [0, 7, -7],
+      [0, 0, 0],
++     [0, 1, 0],
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+To setup projection matrix we'll use perspective method
+
+📄 src/3d.js
+```diff
+      [0, 1, 0],
+  );
+  
++ mat4.perspective(
++     projectionMatrix,
++ );
++ 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+View and perspective matrices together are kind of a "camera" parameters.
+We already have a position and direction of a camera, let's setup other parameters.
+
+The 2nd argument of `perspective` method is a `field of view` (how wide is camera lens). Wider the angle – more objecs will fit the screen (you surely heard of a "wide angle" camera in recent years phones, that's about the same).
+
+📄 src/3d.js
+```diff
+  
+  mat4.perspective(
+      projectionMatrix,
++     Math.PI / 360 * 90,
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+Next argument is aspect ration of a canvas. It could be calculated by a simple division
+
+📄 src/3d.js
+```diff
+  mat4.perspective(
+      projectionMatrix,
+      Math.PI / 360 * 90,
++     canvas.width / canvas.height,
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+The 4th and 5th argumnts setup a distance to objects which are visible by camera. Some objects might be too close, others too far, so they shouldn't be rendered. The 4th argument – distance to the closest object to render, the 5th – to the farthest
+
+📄 src/3d.js
+```diff
+      projectionMatrix,
+      Math.PI / 360 * 90,
+      canvas.width / canvas.height,
++     0.01,
++     100,
+  );
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+and finally we need to pass matrices to shader
+
+📄 src/3d.js
+```diff
+      100,
+  );
+  
++ gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
++ gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
++ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
++ 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
+```
+Looks quite like a cube 🎉
+
+![Cube](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/cube.jpg)
+
+
+Now let's implement a rotation animation with help of model matrix and rotate method from gl-matrix
+
+📄 src/3d.js
+```diff
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
++ 
++ function frame() {
++     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
++ 
++     requestAnimationFrame(frame);
++ }
++ 
++ frame();
+
+```
+We also need to update a uniform
+
+📄 src/3d.js
+```diff
+  function frame() {
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+  
++     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
++ 
+      requestAnimationFrame(frame);
+  }
+  
+
+```
+and issue a draw call
+
+📄 src/3d.js
+```diff
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+  
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+Cool! We have a rotation 🎉
+
+![Rotating cube](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotating-cube.gif)
+
+That's it for today, see you tomorrow 👋
+
+---
+
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
