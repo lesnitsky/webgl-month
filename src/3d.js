@@ -89,6 +89,19 @@ const faceColors = [
     [1.0, 0.0, 1.0, 1.0], // Left face: purple
 ];
 
+const colors = [];
+
+for (var j = 0; j < faceColors.length; ++j) {
+    const c = faceColors[j];
+    colors.push(
+        ...c, // vertex 1
+        ...c, // vertex 2
+        ...c, // vertex 3
+        ...c, // vertex 4
+    );
+}
+
+
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
