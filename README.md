@@ -3563,8 +3563,8 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -3995,8 +3995,8 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4011,8 +4011,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4187,8 +4187,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4646,8 +4646,8 @@ That's it for today, see you tomorrow! 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4662,8 +4662,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4728,8 +4728,8 @@ There's also a [good article on MDN explaining these concepts](https://developer
 
 ---
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4744,8 +4744,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5257,8 +5257,8 @@ That's it for today, see you tomorrow 👋
 
 ---
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5268,3 +5268,290 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 16. Colorizing cube and exploring depth buffer
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+Hey 👋
+
+Welcome to [WebGL month](https://github.com/lesnitsky/webgl-month)
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-15-rendering-a-3d-cube-190f) we've rendered a cube, but all faces are of the same color, let's change this.
+
+
+Let's define face colors
+
+📄 src/3d.js
+```diff
+      20, 21, 22, 20, 22, 23, // left
+  ]);
+  
++ const faceColors = [
++     [1.0, 1.0, 1.0, 1.0], // Front face: white
++     [1.0, 0.0, 0.0, 1.0], // Back face: red
++     [0.0, 1.0, 0.0, 1.0], // Top face: green
++     [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
++     [1.0, 1.0, 0.0, 1.0], // Right face: yellow
++     [1.0, 0.0, 1.0, 1.0], // Left face: purple
++ ];
++ 
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+  const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+
+```
+Now we need to repeat face colors for each face vertex
+
+📄 src/3d.js
+```diff
+      [1.0, 0.0, 1.0, 1.0], // Left face: purple
+  ];
+  
++ const colors = [];
++ 
++ for (var j = 0; j < faceColors.length; ++j) {
++     const c = faceColors[j];
++     colors.push(
++         ...c, // vertex 1
++         ...c, // vertex 2
++         ...c, // vertex 3
++         ...c, // vertex 4
++     );
++ }
++ 
++ 
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+  const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+
+```
+and create a webgl buffer
+
+📄 src/3d.js
+```diff
+  
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
++ const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+  vertexBuffer.bind(gl);
+
+```
+Next we need to define an attribute to pass color from js to vertex shader, and varying to pass it from vertex to fragment shader
+
+📄 src/shaders/3d.v.glsl
+```diff
+  attribute vec3 position;
++ attribute vec4 color;
+  
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+  
++ varying vec4 vColor;
++ 
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
++     vColor = color;
+  }
+
+```
+and use it instead of hardcoded red in fragment shader
+
+📄 src/shaders/3d.f.glsl
+```diff
+  precision mediump float;
+  
++ varying vec4 vColor;
++ 
+  void main() {
+-     gl_FragColor = vec4(1, 0, 0, 1);
++     gl_FragColor = vColor;
+  }
+
+```
+and finally setup vertex attribute in js
+
+📄 src/3d.js
+```diff
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
++ colorsBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.color, 4, gl.FLOAT, false, 0, 0);
++ 
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+
+```
+Ok, colors are there, but something is wrong
+
+![Rotating colors cube](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotating-colors-cube.gif)
+
+
+Let's see what is going on in more details by rendering faces incrementally
+
+```javascript
+let count = 3;
+
+function frame() {
+    if (count <= index.data.length) {
+        gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_BYTE, 0);
+        count += 3;
+
+        setTimeout(frame, 500);
+    }
+}
+```
+
+![Incremental rendering](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/incremental-rendering.gif)
+
+
+Seems like triangles which rendered later overlap the ones which are actually closer to the viewer 😕
+How do we fix it?
+
+📄 src/3d.js
+```diff
+  gl.linkProgram(program);
+  gl.useProgram(program);
+  
++ gl.enable(gl.DEPTH_TEST);
++ 
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+  const cubeVertices = new Float32Array([
+
+```
+After vertices are assembled into primitives (triangles) fragment shader paints each pixel inside of triangle, but before calculation of a color fragment passes some "tests". One of those tests is depth and we need to manually enable it.
+
+Other types of tests are:
+
+* `gl.SCISSORS_TEST` - whether a fragment inside of a certain triangle (don't confuse this with viewport, there is a special scissor[https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/scissor] method)
+* `gl.STENCIL_TEST` – similar to a depth, but we can manually define a "mask" and discard some pixels (we'll work with stencil buffer in next tutorials)
+* pixel ownership test – some pixels on screen might belong to other OpenGL contexts (imagine your browser is overlapped by other window), so this pixels get discarded (not painted)
+
+
+Cool, we now have a working 3d cube, but we're duplicating a lot of colors to fill vertex buffer, can we do it better?
+We're using a fixed color palette (6 colors), so we can pass these colors to a shader and use just index of that color.
+
+Let's drop color attrbiute and introduce a colorIndex instead
+
+📄 src/shaders/3d.v.glsl
+```diff
+  attribute vec3 position;
+- attribute vec4 color;
++ attribute float colorIndex;
+  
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+
+```
+Shaders support "arrays" of uniforms, so we can pass our color palette to this array and use index to get a color out of it
+
+📄 src/shaders/3d.v.glsl
+```diff
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
++ uniform vec4 colors[6];
+  
+  varying vec4 vColor;
+  
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+-     vColor = color;
++     vColor = colors[int(colorIndex)];
+  }
+
+```
+We need to make appropriate changes to setup color index attribute
+
+📄 src/3d.js
+```diff
+  const colors = [];
+  
+  for (var j = 0; j < faceColors.length; ++j) {
+-     const c = faceColors[j];
+-     colors.push(
+-         ...c, // vertex 1
+-         ...c, // vertex 2
+-         ...c, // vertex 3
+-         ...c, // vertex 4
+-     );
++     colors.push(j, j, j, j);
+  }
+  
+  
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
+  colorsBuffer.bind(gl);
+- gl.vertexAttribPointer(programInfo.attributeLocations.color, 4, gl.FLOAT, false, 0, 0);
++ gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
+  
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+
+```
+To fill an array uniform, we need to set each \"item\" in this array individually, like so
+
+```javascript
+gl.uniform4fv(programInfo.uniformLocations[`colors[0]`], color[0]);
+gl.uniform4fv(programInfo.uniformLocations[`colors[1]`], colors[1]);
+gl.uniform4fv(programInfo.uniformLocations[`colors[2]`], colors[2]);
+...
+```
+
+Obviously this can be done in a loop.
+
+📄 src/3d.js
+```diff
+      colors.push(j, j, j, j);
+  }
+  
++ faceColors.forEach((color, index) => {
++     gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
++ });
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+  const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+
+```
+Nice, we have the same result, but using 4 times less of data in attributes.
+
+This might seem as an unnecessary optimisation, but it might help when you have to update large buffers frequently
+
+![Rotating cube fixed](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotating-cube-fixed.gif)
+
+That's it for today!
+
+See you in next tutorials 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
