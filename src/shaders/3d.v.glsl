@@ -1,5 +1,5 @@
 attribute vec3 position;
-attribute vec4 color;
+attribute float colorIndex;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
