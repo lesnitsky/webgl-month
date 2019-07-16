@@ -31,6 +31,8 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
+gl.enable(gl.DEPTH_TEST);
+
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const cubeVertices = new Float32Array([
@@ -80,11 +82,34 @@ const indices = new Uint8Array([
     20, 21, 22, 20, 22, 23, // left
 ]);
 
+const faceColors = [
+    [1.0, 1.0, 1.0, 1.0], // Front face: white
+    [1.0, 0.0, 0.0, 1.0], // Back face: red
+    [0.0, 1.0, 0.0, 1.0], // Top face: green
+    [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+    [1.0, 1.0, 0.0, 1.0], // Right face: yellow
+    [1.0, 0.0, 1.0, 1.0], // Left face: purple
+];
+
+const colors = [];
+
+for (var j = 0; j < faceColors.length; ++j) {
+    colors.push(j, j, j, j);
+}
+
+faceColors.forEach((color, index) => {
+    gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
+});
+
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+colorsBuffer.bind(gl);
+gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
 
 const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
