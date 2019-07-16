@@ -97,6 +97,9 @@ for (var j = 0; j < faceColors.length; ++j) {
     colors.push(j, j, j, j);
 }
 
+faceColors.forEach((color, index) => {
+    gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
+});
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
