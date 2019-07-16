@@ -94,13 +94,7 @@ const faceColors = [
 const colors = [];
 
 for (var j = 0; j < faceColors.length; ++j) {
-    const c = faceColors[j];
-    colors.push(
-        ...c, // vertex 1
-        ...c, // vertex 2
-        ...c, // vertex 3
-        ...c, // vertex 4
-    );
+    colors.push(j, j, j, j);
 }
 
 
@@ -112,7 +106,7 @@ vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
 
 colorsBuffer.bind(gl);
-gl.vertexAttribPointer(programInfo.attributeLocations.color, 4, gl.FLOAT, false, 0, 0);
+gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
 
 const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
