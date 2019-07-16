@@ -31,6 +31,8 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
+gl.enable(gl.DEPTH_TEST);
+
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const cubeVertices = new Float32Array([
