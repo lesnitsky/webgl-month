@@ -106,5 +106,8 @@ export function parseObj(objSource) {
         }
     });
 
-    return { vertices, indices };
+    return { 
+        vertices: new Float32Array(vertices), 
+        indices: new Uint8Array(indices),
+    };
 }
