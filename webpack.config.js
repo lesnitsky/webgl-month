@@ -16,7 +16,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.glsl$/,
+                test: /\.(glsl|obj)$/,
                 use: 'raw-loader',
             },
 

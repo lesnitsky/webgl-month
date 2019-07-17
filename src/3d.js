@@ -4,6 +4,7 @@ import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
+import cubeObj from '../assets/objects/cube.obj';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
