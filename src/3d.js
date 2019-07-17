@@ -49,8 +49,9 @@ const faceColors = [
 
 const colors = [];
 
-for (var j = 0; j < faceColors.length; ++j) {
-    colors.push(j, j, j, j);
+for (var j = 0; j < indices.length / 3; ++j) {
+    const randomColorIndex = Math.floor(Math.random() * faceColors.length);
+    colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
 }
 
 faceColors.forEach((color, index) => {
