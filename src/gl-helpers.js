@@ -102,7 +102,7 @@ export function parseObj(objSource) {
         }
 
         if (line.startsWith('f ')) {
-            indices.push(...parseFace(line).map(face => face[0]));
+            indices.push(...parseFace(line).map(face => face[0] - 1));
         }
     });
 
