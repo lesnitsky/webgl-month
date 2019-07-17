@@ -2,8 +2,9 @@ import { mat4 } from 'gl-matrix';
 
 import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
-import { compileShader, setupShaderInput } from './gl-helpers';
+import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
+import monkeyObj from '../assets/objects/monkey.obj';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -35,52 +36,7 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const cubeVertices = new Float32Array([
-    // Front face
-    -1.0, -1.0, 1.0,
-    1.0, -1.0, 1.0,
-    1.0, 1.0, 1.0,
-    -1.0, 1.0, 1.0,
-
-    // Back face
-    -1.0, -1.0, -1.0,
-    -1.0, 1.0, -1.0,
-    1.0, 1.0, -1.0,
-    1.0, -1.0, -1.0,
-
-    // Top face
-    -1.0, 1.0, -1.0,
-    -1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0,
-    1.0, 1.0, -1.0,
-
-    // Bottom face
-    -1.0, -1.0, -1.0,
-    1.0, -1.0, -1.0,
-    1.0, -1.0, 1.0,
-    -1.0, -1.0, 1.0,
-
-    // Right face
-    1.0, -1.0, -1.0,
-    1.0, 1.0, -1.0,
-    1.0, 1.0, 1.0,
-    1.0, -1.0, 1.0,
-
-    // Left face
-    -1.0, -1.0, -1.0,
-    -1.0, -1.0, 1.0,
-    -1.0, 1.0, 1.0,
-    -1.0, 1.0, -1.0,
-]);
-
-const indices = new Uint8Array([
-    0, 1, 2, 0, 2, 3,       // front
-    4, 5, 6, 4, 6, 7,       // back
-    8, 9, 10, 8, 10, 11,    // top
-    12, 13, 14, 12, 14, 15, // bottom
-    16, 17, 18, 16, 18, 19, // right
-    20, 21, 22, 20, 22, 23, // left
-]);
+const { vertices, indices } = parseObj(monkeyObj);
 
 const faceColors = [
     [1.0, 1.0, 1.0, 1.0], // Front face: white
@@ -93,15 +49,16 @@ const faceColors = [
 
 const colors = [];
 
-for (var j = 0; j < faceColors.length; ++j) {
-    colors.push(j, j, j, j);
+for (var j = 0; j < indices.length / 3; ++j) {
+    const randomColorIndex = Math.floor(Math.random() * faceColors.length);
+    colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
 }
 
 faceColors.forEach((color, index) => {
     gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
 });
 
-const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
+const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
@@ -117,7 +74,7 @@ const projectionMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
-    [0, 7, -7],
+    [0, 0, -7],
     [0, 0, 0],
     [0, 1, 0],
 );
@@ -136,13 +93,13 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
 
 function frame() {
     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
 
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
 
     requestAnimationFrame(frame);
 }

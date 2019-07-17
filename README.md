@@ -3563,8 +3563,8 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -3995,8 +3995,8 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4011,8 +4011,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4186,8 +4186,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4645,8 +4645,8 @@ That's it for today, see you tomorrow! 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4661,8 +4661,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4727,8 +4727,8 @@ There's also a [good article on MDN explaining these concepts](https://developer
 
 ---
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4743,8 +4743,8 @@ Built with
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5256,8 +5256,8 @@ That's it for today, see you tomorrow 👋
 
 ---
 
-![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day16)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day16)
+![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5543,6 +5543,434 @@ See you in next tutorials 👋
 ---
 
 This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 17. Exploring OBJ format
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month&hash=day17)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a&hash=day17)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-16-colorizing-cube-depth-buffer-and-array-uniforms-4nhc) we've fixed our cube example, but vertices of this cube were defined right in our js code. This might get more complicated when rendering more complex objects.
+
+Luckily 3D editors like [Blender](https://www.blender.org/) can export object definition in several formats.
+
+Let's export a cube from blender
+
+![Blender export screenshot](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-screenshot.jpg)
+
+
+Let's explore exported file
+
+First two lines start with `#` which is just a comment
+
+📄 assets/objects/cube.obj
+```diff
++ # Blender v2.79 (sub 0) OBJ File: ''
++ # www.blender.org
+
+```
+`mtllib` line references the file of material of the object
+We'll ignore this for now
+
+📄 assets/objects/cube.obj
+```diff
+  # Blender v2.79 (sub 0) OBJ File: ''
+  # www.blender.org
++ mtllib cube.mtl
+
+```
+`o` defines the name of the object
+
+📄 assets/objects/cube.obj
+```diff
+  # Blender v2.79 (sub 0) OBJ File: ''
+  # www.blender.org
+  mtllib cube.mtl
++ o Cube
+
+```
+Lines with `v` define vertex positions
+
+📄 assets/objects/cube.obj
+```diff
+  # www.blender.org
+  mtllib cube.mtl
+  o Cube
++ v 1.000000 -1.000000 -1.000000
++ v 1.000000 -1.000000 1.000000
++ v -1.000000 -1.000000 1.000000
++ v -1.000000 -1.000000 -1.000000
++ v 1.000000 1.000000 -0.999999
++ v 0.999999 1.000000 1.000001
++ v -1.000000 1.000000 1.000000
++ v -1.000000 1.000000 -1.000000
+
+```
+`vn` define vertex normals. In this case normals are perpendicular ot the cube facess
+
+📄 assets/objects/cube.obj
+```diff
+  v 0.999999 1.000000 1.000001
+  v -1.000000 1.000000 1.000000
+  v -1.000000 1.000000 -1.000000
++ vn 0.0000 -1.0000 0.0000
++ vn 0.0000 1.0000 0.0000
++ vn 1.0000 0.0000 0.0000
++ vn -0.0000 -0.0000 1.0000
++ vn -1.0000 -0.0000 -0.0000
++ vn 0.0000 0.0000 -1.0000
+
+```
+`usemtl` tells which material to use for the elements (faces) following this line
+
+📄 assets/objects/cube.obj
+```diff
+  vn -0.0000 -0.0000 1.0000
+  vn -1.0000 -0.0000 -0.0000
+  vn 0.0000 0.0000 -1.0000
++ usemtl Material
+
+```
+`f` lines define object faces referencing vertices and normals by indices
+
+📄 assets/objects/cube.obj
+```diff
+  vn 0.0000 0.0000 -1.0000
+  usemtl Material
+  s off
++ f 1//1 2//1 3//1 4//1
++ f 5//2 8//2 7//2 6//2
++ f 1//3 5//3 6//3 2//3
++ f 2//4 6//4 7//4 3//4
++ f 3//5 7//5 8//5 4//5
++ f 5//6 1//6 4//6 8//6
+
+```
+So in this case the first face consists of vertices `1, 2, 3 and 4`
+
+
+Other thing to mention – our face consists of 4 vertices, but webgl can render only triangles. We can break this faces to triangles in JS or do this in Blender
+
+Enter edit mode (`Tab` key), and hit `Control + T` (on macOS). That's it, cube faces are now triangulated
+
+![Triangulated cube](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-triangulated-cube.png)
+
+
+Now let's load .obj file with raw loader
+
+📄 src/3d.js
+```diff
+  import fShaderSource from './shaders/3d.f.glsl';
+  import { compileShader, setupShaderInput } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
++ import cubeObj from '../assets/objects/cube.obj';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+
+```
+📄 webpack.config.js
+```diff
+      module: {
+          rules: [
+              {
+-                 test: /\.glsl$/,
++                 test: /\.(glsl|obj)$/,
+                  use: 'raw-loader',
+              },
+  
+
+```
+and implement parser to get vertices and vertex indices
+
+📄 src/3d.js
+```diff
+  
+  import vShaderSource from './shaders/3d.v.glsl';
+  import fShaderSource from './shaders/3d.f.glsl';
+- import { compileShader, setupShaderInput } from './gl-helpers';
++ import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
+  import cubeObj from '../assets/objects/cube.obj';
+  
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const cubeVertices = new Float32Array([
+-     // Front face
+-     -1.0, -1.0, 1.0,
+-     1.0, -1.0, 1.0,
+-     1.0, 1.0, 1.0,
+-     -1.0, 1.0, 1.0,
+- 
+-     // Back face
+-     -1.0, -1.0, -1.0,
+-     -1.0, 1.0, -1.0,
+-     1.0, 1.0, -1.0,
+-     1.0, -1.0, -1.0,
+- 
+-     // Top face
+-     -1.0, 1.0, -1.0,
+-     -1.0, 1.0, 1.0,
+-     1.0, 1.0, 1.0,
+-     1.0, 1.0, -1.0,
+- 
+-     // Bottom face
+-     -1.0, -1.0, -1.0,
+-     1.0, -1.0, -1.0,
+-     1.0, -1.0, 1.0,
+-     -1.0, -1.0, 1.0,
+- 
+-     // Right face
+-     1.0, -1.0, -1.0,
+-     1.0, 1.0, -1.0,
+-     1.0, 1.0, 1.0,
+-     1.0, -1.0, 1.0,
+- 
+-     // Left face
+-     -1.0, -1.0, -1.0,
+-     -1.0, -1.0, 1.0,
+-     -1.0, 1.0, 1.0,
+-     -1.0, 1.0, -1.0,
+- ]);
+- 
+- const indices = new Uint8Array([
+-     0, 1, 2, 0, 2, 3,       // front
+-     4, 5, 6, 4, 6, 7,       // back
+-     8, 9, 10, 8, 10, 11,    // top
+-     12, 13, 14, 12, 14, 15, // bottom
+-     16, 17, 18, 16, 18, 19, // right
+-     20, 21, 22, 20, 22, 23, // left
+- ]);
++ const { vertices, indices } = parseObj(cubeObj);
+  
+  const faceColors = [
+      [1.0, 1.0, 1.0, 1.0], // Front face: white
+      gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
+  });
+  
+- const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
++ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+
+```
+📄 src/gl-helpers.js
+```diff
+          uniformLocations,
+      }
+  }
++ 
++ export function parseObj(objSource) {
++     const vertices = [];
++     const indices = [];
++ 
++     return { vertices, indices };
++ }
+
+```
+We can iterate over each line and search for those starting with `v` to get vertex coordinatess
+
+📄 src/gl-helpers.js
+```diff
+      }
+  }
+  
++ export function parseVec(string, prefix) {
++     return string.replace(prefix, '').split(' ').map(Number);
++ }
++ 
+  export function parseObj(objSource) {
+      const vertices = [];
+      const indices = [];
+  
++     objSource.split('\n').forEach(line => {
++         if (line.startsWith('v ')) {
++             vertices.push(...parseVec(line, 'v '));
++         }
++     });
++ 
+      return { vertices, indices };
+  }
+
+```
+and do the same with faces
+
+📄 src/gl-helpers.js
+```diff
+      return string.replace(prefix, '').split(' ').map(Number);
+  }
+  
++ export function parseFace(string) {
++     return string.replace('f ', '').split(' ').map(chunk => {
++         return chunk.split('/').map(Number);
++     })
++ }
++ 
+  export function parseObj(objSource) {
+      const vertices = [];
+      const indices = [];
+          if (line.startsWith('v ')) {
+              vertices.push(...parseVec(line, 'v '));
+          }
++ 
++         if (line.startsWith('f ')) {
++             indices.push(...parseFace(line).map(face => face[0]));
++         }
+      });
+  
+      return { vertices, indices };
+
+```
+Let's also return typed arrays
+
+📄 src/gl-helpers.js
+```diff
+          }
+      });
+  
+-     return { vertices, indices };
++     return { 
++         vertices: new Float32Array(vertices), 
++         indices: new Uint8Array(indices),
++     };
+  }
+
+```
+Ok, everything seem to work fine, but we have an error
+
+```
+glDrawElements: attempt to access out of range vertices in attribute 0
+```
+
+That's because indices in .obj file starts with `1`, so we need to decrement each index
+
+📄 src/gl-helpers.js
+```diff
+          }
+  
+          if (line.startsWith('f ')) {
+-             indices.push(...parseFace(line).map(face => face[0]));
++             indices.push(...parseFace(line).map(face => face[0] - 1));
+          }
+      });
+  
+
+```
+Let's also change the way we colorize our faces, just to make it possible to render any object with any amount of faces with random colors
+
+📄 src/3d.js
+```diff
+  
+  const colors = [];
+  
+- for (var j = 0; j < faceColors.length; ++j) {
+-     colors.push(j, j, j, j);
++ for (var j = 0; j < indices.length / 3; ++j) {
++     const randomColorIndex = Math.floor(Math.random() * faceColors.length);
++     colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
+  }
+  
+  faceColors.forEach((color, index) => {
+
+```
+One more issue with existing code, is that we use `gl.UNSIGNED_BYTE`, so index buffer might only of a `Uint8Array` which fits numbers up to `255`, so if object will have more than 255 vertices – it will be rendered incorrectly. Let's fix this
+
+📄 src/3d.js
+```diff
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
++ gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+  
+  function frame() {
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+  
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+-     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+📄 src/gl-helpers.js
+```diff
+  
+      return { 
+          vertices: new Float32Array(vertices), 
+-         indices: new Uint8Array(indices),
++         indices: new Uint16Array(indices),
+      };
+  }
+
+```
+Now let's render different object, for example monkey
+
+📄 src/3d.js
+```diff
+  import fShaderSource from './shaders/3d.f.glsl';
+  import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
+- import cubeObj from '../assets/objects/cube.obj';
++ import monkeyObj from '../assets/objects/monkey.obj';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const { vertices, indices } = parseObj(cubeObj);
++ const { vertices, indices } = parseObj(monkeyObj);
+  
+  const faceColors = [
+      [1.0, 1.0, 1.0, 1.0], // Front face: white
+  
+  mat4.lookAt(
+      viewMatrix,
+-     [0, 7, -7],
++     [0, 0, -7],
+      [0, 0, 0],
+      [0, 1, 0],
+  );
+
+```
+Cool! We now can render any objects exported from blender 🎉
+
+![Rotating monkey](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rotating-monkey.gif)
+
+That's it for today, see you tomorrow 👋
+
+---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
 [![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
