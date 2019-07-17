@@ -81,3 +81,10 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
         uniformLocations,
     }
 }
+
+export function parseObj(objSource) {
+    const vertices = [];
+    const indices = [];
+
+    return { vertices, indices };
+}
