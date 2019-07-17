@@ -82,9 +82,19 @@ export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
     }
 }
 
+export function parseVec(string, prefix) {
+    return string.replace(prefix, '').split(' ').map(Number);
+}
+
 export function parseObj(objSource) {
     const vertices = [];
     const indices = [];
+
+    objSource.split('\n').forEach(line => {
+        if (line.startsWith('v ')) {
+            vertices.push(...parseVec(line, 'v '));
+        }
+    });
 
     return { vertices, indices };
 }
