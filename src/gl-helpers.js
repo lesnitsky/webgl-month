@@ -86,6 +86,12 @@ export function parseVec(string, prefix) {
     return string.replace(prefix, '').split(' ').map(Number);
 }
 
+export function parseFace(string) {
+    return string.replace('f ', '').split(' ').map(chunk => {
+        return chunk.split('/').map(Number);
+    })
+}
+
 export function parseObj(objSource) {
     const vertices = [];
     const indices = [];
@@ -93,6 +99,10 @@ export function parseObj(objSource) {
     objSource.split('\n').forEach(line => {
         if (line.startsWith('v ')) {
             vertices.push(...parseVec(line, 'v '));
+        }
+
+        if (line.startsWith('f ')) {
+            indices.push(...parseFace(line).map(face => face[0]));
         }
     });
 
