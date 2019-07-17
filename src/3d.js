@@ -4,7 +4,7 @@ import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
-import cubeObj from '../assets/objects/cube.obj';
+import monkeyObj from '../assets/objects/monkey.obj';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -36,7 +36,7 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const { vertices, indices } = parseObj(cubeObj);
+const { vertices, indices } = parseObj(monkeyObj);
 
 const faceColors = [
     [1.0, 1.0, 1.0, 1.0], // Front face: white
@@ -74,7 +74,7 @@ const projectionMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
-    [0, 7, -7],
+    [0, 0, -7],
     [0, 0, 0],
     [0, 1, 0],
 );
