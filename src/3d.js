@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';
@@ -36,22 +36,16 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const { vertices, indices } = parseObj(monkeyObj);
+const { vertices, normals } = parseObj(monkeyObj);
 
 const faceColors = [
-    [1.0, 1.0, 1.0, 1.0], // Front face: white
-    [1.0, 0.0, 0.0, 1.0], // Back face: red
-    [0.0, 1.0, 0.0, 1.0], // Top face: green
-    [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
-    [1.0, 1.0, 0.0, 1.0], // Right face: yellow
-    [1.0, 0.0, 1.0, 1.0], // Left face: purple
+    [0.5, 0.5, 0.5, 1.0]
 ];
 
 const colors = [];
 
-for (var j = 0; j < indices.length / 3; ++j) {
-    const randomColorIndex = Math.floor(Math.random() * faceColors.length);
-    colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
+for (var j = 0; j < vertices.length / 3; ++j) {
+    colors.push(0, 0, 0, 0);
 }
 
 faceColors.forEach((color, index) => {
@@ -60,7 +54,7 @@ faceColors.forEach((color, index) => {
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
@@ -68,9 +62,13 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, fal
 colorsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
 
+normalsBuffer.bind(gl);
+gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
+
 const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
+const normalMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
@@ -91,15 +89,22 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
+gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
+
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
 function frame() {
     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
 
+    mat4.invert(normalMatrix, modelMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
     requestAnimationFrame(frame);
 }
