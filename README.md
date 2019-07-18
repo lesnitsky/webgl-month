@@ -5983,3 +5983,363 @@ That's it for today, see you tomorrow 👋
 Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be kept; you may remove them yourself if you want to.
+# An empty message aborts the commit.
+#
+# Date:      Wed Jul 17 23:44:41 2019 +0300
+#
+# On branch master
+# No changes
+
+
+## Day 18. Flat shading
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+Today we'll learn how to implement flat shading. But let's first talk about light itself.
+
+A typical 3d scene will contain an object, global light and some specific source of light (torch, lamp etc.)
+
+So how do we break all these down to something we can turn into a code
+
+Here's an example
+
+![Light illustration](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/light-illustration.png)
+
+Pay attention to the red arrows coming from cube faces. These arrows are "normals", and each face color will depend on the angle between a vector of light and face normal.
+
+
+Let's change the way our object is colorized and make all faces the same color to see better how light affects face colors
+
+📄 src/3d.js
+```diff
+  const { vertices, indices } = parseObj(monkeyObj);
+  
+  const faceColors = [
+-     [1.0, 1.0, 1.0, 1.0], // Front face: white
+-     [1.0, 0.0, 0.0, 1.0], // Back face: red
+-     [0.0, 1.0, 0.0, 1.0], // Top face: green
+-     [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
+-     [1.0, 1.0, 0.0, 1.0], // Right face: yellow
+-     [1.0, 0.0, 1.0, 1.0], // Left face: purple
++     [0.5, 0.5, 0.5, 1.0]
+  ];
+  
+  const colors = [];
+  
+  for (var j = 0; j < indices.length / 3; ++j) {
+-     const randomColorIndex = Math.floor(Math.random() * faceColors.length);
+-     colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
++     colors.push(0, 0, 0, 0);
+  }
+  
+  faceColors.forEach((color, index) => {
+
+```
+We'll also need to extract normals from our object and use `drawArrays` instead of `drawElements`, as each vertex can't be referenced by index, because vertex coordinates and normals have different indices
+
+📄 src/3d.js
+```diff
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const { vertices, indices } = parseObj(monkeyObj);
++ const { vertices, normals } = parseObj(monkeyObj);
+  
+  const faceColors = [
+      [0.5, 0.5, 0.5, 1.0]
+  
+  const colors = [];
+  
+- for (var j = 0; j < indices.length / 3; ++j) {
++ for (var j = 0; j < vertices.length / 3; ++j) {
+      colors.push(0, 0, 0, 0);
+  }
+  
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+- const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
++ gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+  
+  function frame() {
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+  
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+-     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
++ 
++     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+📄 src/gl-helpers.js
+```diff
+  }
+  
+  export function parseObj(objSource) {
+-     const vertices = [];
+-     const indices = [];
++     const _vertices = [];
++     const _normals = [];
++     const vertexIndices = [];
++     const normalIndices = [];
+  
+      objSource.split('\n').forEach(line => {
+          if (line.startsWith('v ')) {
+-             vertices.push(...parseVec(line, 'v '));
++             _vertices.push(parseVec(line, 'v '));
++         }
++ 
++         if (line.startsWith('vn ')) {
++             _normals.push(parseVec(line, 'vn '));
+          }
+  
+          if (line.startsWith('f ')) {
+-             indices.push(...parseFace(line).map(face => face[0] - 1));
++             const parsedFace = parseFace(line);
++ 
++             vertexIndices.push(...parsedFace.map(face => face[0] - 1));
++             normalIndices.push(...parsedFace.map(face => face[2] - 1));
+          }
+      });
+  
++     const vertices = [];
++     const normals = [];
++ 
++     for (let i = 0; i < vertexIndices.length; i++) {
++         const vertexIndex = vertexIndices[i];
++         const normalIndex = normalIndices[i];
++ 
++         const vertex = _vertices[vertexIndex];
++         const normal = _normals[normalIndex];
++ 
++         vertices.push(...vertex);
++         normals.push(...normal);
++     }
++ 
+      return { 
+          vertices: new Float32Array(vertices), 
+-         indices: new Uint16Array(indices),
++         normals: new Float32Array(normals), 
+      };
+  }
+
+```
+Define normal attribute
+
+📄 src/3d.js
+```diff
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
++ const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  colorsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
+  
++ normalsBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
++ 
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+
+```
+📄 src/shaders/3d.v.glsl
+```diff
+  attribute vec3 position;
++ attribute vec3 normal;
+  attribute float colorIndex;
+  
+  uniform mat4 modelMatrix;
+
+```
+Let's also define a position of light and pass it to shader via uniform
+
+📄 src/3d.js
+```diff
+  gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
++ gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
++ 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+
+```
+📄 src/shaders/3d.v.glsl
+```diff
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+  uniform vec4 colors[6];
++ uniform vec3 directionalLightVector;
+  
+  varying vec4 vColor;
+  
+
+```
+Now we can use normal vector and directional light vector to calculate light "intensity" and multiply initial color
+
+📄 src/shaders/3d.v.glsl
+```diff
+  
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+-     vColor = colors[int(colorIndex)];
++ 
++     float intensity = dot(normal, directionalLightVector);
++ 
++     vColor = colors[int(colorIndex)] * intensity;
+  }
+
+```
+![Lighting 1](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/lighting-1.gif)
+
+Now some faces are brighter, some are lighter, so overall approach is working, but image seem to be too bright
+
+One issue with current implementation is that we're using "non-normalized" vector for light direction
+
+📄 src/shaders/3d.v.glsl
+```diff
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  
+-     float intensity = dot(normal, directionalLightVector);
++     float intensity = dot(normal, normalize(directionalLightVector));
+  
+      vColor = colors[int(colorIndex)] * intensity;
+  }
+
+```
+![Lighting 2](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/lighting-2.gif)
+
+Looks better, but still too bright.
+
+This is because we also multiply `alpha` component of the color by our intensity, so darker faces become lighter because they have opacity close to `0`.
+
+📄 src/3d.js
+```diff
+- import { mat4 } from 'gl-matrix';
++ import { mat4, vec3 } from 'gl-matrix';
+  
+  import vShaderSource from './shaders/3d.v.glsl';
+  import fShaderSource from './shaders/3d.f.glsl';
+
+```
+📄 src/shaders/3d.v.glsl
+```diff
+  
+      float intensity = dot(normal, normalize(directionalLightVector));
+  
+-     vColor = colors[int(colorIndex)] * intensity;
++     vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
++     vColor.a = 1.0;
+  }
+
+```
+![Lighting 3](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/lighting-3.gif)
+
+Now it is too dark 😕
+
+Let's add some "global light"
+
+
+![Lighting 4](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/lighting-4.gif)
+
+Looks better, but still not perfect.
+It seems like the light source rotates together with object. This happens because we transform vertex positions, but normals stay the same. We need to transform normals as well. There is a special transformation matrix which could be calculatd as invert-transpose from model matrix.
+
+📄 src/3d.js
+```diff
+  const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
++ const normalMatrix = mat4.create();
+  
+  mat4.lookAt(
+      viewMatrix,
+  function frame() {
+      mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+  
++     mat4.invert(normalMatrix, modelMatrix);
++     mat4.transpose(normalMatrix, normalMatrix);
++ 
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
+  
+      gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+  
+
+```
+📄 src/shaders/3d.v.glsl
+```diff
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
++ uniform mat4 normalMatrix;
+  uniform vec4 colors[6];
+  uniform vec3 directionalLightVector;
+  
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  
+-     float intensity = dot(normal, normalize(directionalLightVector));
++     vec3 transformedNormal = (normalMatrix * vec4(normal, 1.0)).xyz;
++     float intensity = dot(transformedNormal, normalize(directionalLightVector));
+  
+      vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
+      vColor.a = 1.0;
+
+```
+![Lighting 5](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/lighting-5.gif)
+
+Cool, looks good enough!
+
+That's it for today.
+
+See you tomorrow 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
