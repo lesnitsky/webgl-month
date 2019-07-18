@@ -12,5 +12,8 @@ varying vec4 vColor;
 
 void main() {
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-    vColor = colors[int(colorIndex)];
+
+    float intensity = dot(normal, directionalLightVector);
+
+    vColor = colors[int(colorIndex)] * intensity;
 }
