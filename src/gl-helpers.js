@@ -93,21 +93,44 @@ export function parseFace(string) {
 }
 
 export function parseObj(objSource) {
-    const vertices = [];
-    const indices = [];
+    const _vertices = [];
+    const _normals = [];
+    const vertexIndices = [];
+    const normalIndices = [];
 
     objSource.split('\n').forEach(line => {
         if (line.startsWith('v ')) {
-            vertices.push(...parseVec(line, 'v '));
+            _vertices.push(parseVec(line, 'v '));
+        }
+
+        if (line.startsWith('vn ')) {
+            _normals.push(parseVec(line, 'vn '));
         }
 
         if (line.startsWith('f ')) {
-            indices.push(...parseFace(line).map(face => face[0] - 1));
+            const parsedFace = parseFace(line);
+
+            vertexIndices.push(...parsedFace.map(face => face[0] - 1));
+            normalIndices.push(...parsedFace.map(face => face[2] - 1));
         }
     });
 
+    const vertices = [];
+    const normals = [];
+
+    for (let i = 0; i < vertexIndices.length; i++) {
+        const vertexIndex = vertexIndices[i];
+        const normalIndex = normalIndices[i];
+
+        const vertex = _vertices[vertexIndex];
+        const normal = _normals[normalIndex];
+
+        vertices.push(...vertex);
+        normals.push(...normal);
+    }
+
     return { 
         vertices: new Float32Array(vertices), 
-        indices: new Uint16Array(indices),
+        normals: new Float32Array(normals), 
     };
 }

@@ -36,7 +36,7 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const { vertices, indices } = parseObj(monkeyObj);
+const { vertices, normals } = parseObj(monkeyObj);
 
 const faceColors = [
     [0.5, 0.5, 0.5, 1.0]
@@ -44,7 +44,7 @@ const faceColors = [
 
 const colors = [];
 
-for (var j = 0; j < indices.length / 3; ++j) {
+for (var j = 0; j < vertices.length / 3; ++j) {
     colors.push(0, 0, 0, 0);
 }
 
@@ -54,7 +54,6 @@ faceColors.forEach((color, index) => {
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
@@ -87,13 +86,14 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
 function frame() {
     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
 
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
     requestAnimationFrame(frame);
 }
