@@ -68,6 +68,7 @@ gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false
 const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
+const normalMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
@@ -97,7 +98,11 @@ gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 function frame() {
     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
 
+    mat4.invert(normalMatrix, modelMatrix);
+    mat4.transpose(normalMatrix, normalMatrix);
+
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
 
     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
