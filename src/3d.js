@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 import vShaderSource from './shaders/3d.v.glsl';
 import fShaderSource from './shaders/3d.f.glsl';

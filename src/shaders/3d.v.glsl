@@ -15,5 +15,6 @@ void main() {
 
     float intensity = dot(normal, normalize(directionalLightVector));
 
-    vColor = colors[int(colorIndex)] * intensity;
+    vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
+    vColor.a = 1.0;
 }
