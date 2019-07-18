@@ -88,6 +88,8 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
+gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
+
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);

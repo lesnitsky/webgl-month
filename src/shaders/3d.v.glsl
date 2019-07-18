@@ -6,6 +6,7 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform vec4 colors[6];
+uniform vec3 directionalLightVector;
 
 varying vec4 vColor;
 
