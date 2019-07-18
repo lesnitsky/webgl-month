@@ -39,19 +39,13 @@ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 const { vertices, indices } = parseObj(monkeyObj);
 
 const faceColors = [
-    [1.0, 1.0, 1.0, 1.0], // Front face: white
-    [1.0, 0.0, 0.0, 1.0], // Back face: red
-    [0.0, 1.0, 0.0, 1.0], // Top face: green
-    [0.0, 0.0, 1.0, 1.0], // Bottom face: blue
-    [1.0, 1.0, 0.0, 1.0], // Right face: yellow
-    [1.0, 0.0, 1.0, 1.0], // Left face: purple
+    [0.5, 0.5, 0.5, 1.0]
 ];
 
 const colors = [];
 
 for (var j = 0; j < indices.length / 3; ++j) {
-    const randomColorIndex = Math.floor(Math.random() * faceColors.length);
-    colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
+    colors.push(0, 0, 0, 0);
 }
 
 faceColors.forEach((color, index) => {
