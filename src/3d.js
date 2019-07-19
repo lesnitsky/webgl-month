@@ -44,6 +44,12 @@ const monkey = new Object3D(monkeyObj);
 const torus = new Object3D(torusObj);
 const cone = new Object3D(coneObj);
 
+const objects = [
+    monkey,
+    torus,
+    cone,
+];
+
 gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
