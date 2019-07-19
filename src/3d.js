@@ -40,9 +40,9 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const monkey = new Object3D(monkeyObj);
-const torus = new Object3D(torusObj);
-const cone = new Object3D(coneObj);
+const monkey = new Object3D(monkeyObj, [0, 0, 0]);
+const torus = new Object3D(torusObj, [-3, 0, 0]);
+const cone = new Object3D(coneObj, [3, 0, 0]);
 
 const objects = [
     monkey,

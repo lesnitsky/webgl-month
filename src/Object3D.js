@@ -2,11 +2,12 @@ import { parseObj } from "./gl-helpers";
 import { mat4 } from "gl-matrix";
 
 export class Object3D {
-    constructor(source) {
+    constructor(source, position) {
         const { vertices, normals } = parseObj(source);
 
         this.vertices = vertices;
         this.normals = normals;
+        this.position = position;
 
         this.modelMatrix = mat4.create();
         this._normalMatrix = mat4.create();
