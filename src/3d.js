@@ -93,6 +93,9 @@ function frame() {
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
 
+        vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
+        normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
+
         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
     });
 
