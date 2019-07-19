@@ -5,6 +5,7 @@ import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
 import monkeyObj from '../assets/objects/monkey.obj';
+import { Object3D } from './Object3D';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -36,12 +37,12 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const { vertices, normals } = parseObj(monkeyObj);
+const monkey = new Object3D(monkeyObj);
 
 gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
 
-const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
+const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
@@ -49,10 +50,8 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, fal
 normalsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
 
-const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
-const normalMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
@@ -69,7 +68,6 @@ mat4.perspective(
     100,
 );
 
-gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
@@ -77,16 +75,11 @@ gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-
 function frame() {
-    mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+    mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
 
-    mat4.invert(normalMatrix, modelMatrix);
-    mat4.transpose(normalMatrix, normalMatrix);
-
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
 
     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
