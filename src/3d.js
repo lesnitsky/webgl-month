@@ -87,12 +87,14 @@ gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 function frame() {
-    mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
+    objects.forEach((object) => {
+        mat4.rotateY(object.modelMatrix, object.modelMatrix, Math.PI / 180);
 
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
 
-    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+        gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+    });
 
     requestAnimationFrame(frame);
 }
