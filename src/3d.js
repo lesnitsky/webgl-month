@@ -40,17 +40,15 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const monkey = new Object3D(monkeyObj, [0, 0, 0]);
-const torus = new Object3D(torusObj, [-3, 0, 0]);
-const cone = new Object3D(coneObj, [3, 0, 0]);
+const monkey = new Object3D(monkeyObj, [0, 0, 0], [1, 0, 0]);
+const torus = new Object3D(torusObj, [-3, 0, 0], [0, 1, 0]);
+const cone = new Object3D(coneObj, [3, 0, 0], [0, 0, 1]);
 
 const objects = [
     monkey,
     torus,
     cone,
 ];
-
-gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
 const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
@@ -92,6 +90,8 @@ function frame() {
 
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
+
+        gl.uniform3fv(programInfo.uniformLocations.color, object.color);
 
         vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
         normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
