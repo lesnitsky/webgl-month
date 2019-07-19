@@ -5,6 +5,10 @@ import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
 import monkeyObj from '../assets/objects/monkey.obj';
+import torusObj from '../assets/objects/torus.obj';
+import coneObj from '../assets/objects/cone.obj';
+
+import { Object3D } from './Object3D';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -36,39 +40,27 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const { vertices, normals } = parseObj(monkeyObj);
+const monkey = new Object3D(monkeyObj, [0, 0, 0], [1, 0, 0]);
+const torus = new Object3D(torusObj, [-3, 0, 0], [0, 1, 0]);
+const cone = new Object3D(coneObj, [3, 0, 0], [0, 0, 1]);
 
-const faceColors = [
-    [0.5, 0.5, 0.5, 1.0]
+const objects = [
+    monkey,
+    torus,
+    cone,
 ];
 
-const colors = [];
-
-for (var j = 0; j < vertices.length / 3; ++j) {
-    colors.push(0, 0, 0, 0);
-}
-
-faceColors.forEach((color, index) => {
-    gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
-});
-
-const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
+const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
 
-colorsBuffer.bind(gl);
-gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
-
 normalsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
 
-const modelMatrix = mat4.create();
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
-const normalMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
@@ -85,7 +77,6 @@ mat4.perspective(
     100,
 );
 
-gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
@@ -93,18 +84,20 @@ gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-
 function frame() {
-    mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+    objects.forEach((object) => {
+        mat4.rotateY(object.modelMatrix, object.modelMatrix, Math.PI / 180);
 
-    mat4.invert(normalMatrix, modelMatrix);
-    mat4.transpose(normalMatrix, normalMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
 
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
+        gl.uniform3fv(programInfo.uniformLocations.color, object.color);
 
-    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+        vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
+        normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
+
+        gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+    });
 
     requestAnimationFrame(frame);
 }

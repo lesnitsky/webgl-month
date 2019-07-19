@@ -6332,3 +6332,430 @@ See you tomorrow 👋
 Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 19. Rendering multiple objects
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day19)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day19)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+In previous tutorials we've been rendering only a signle object, but typical 3D scene consists of a multiple objects.
+Today we're going to learn how to render many objects on scene.
+
+
+Since we're rendering objects with a solid color, let's get rid of colorIndex attribute and pass a signle color via uniform
+
+📄 src/3d.js
+```diff
+  
+  const { vertices, normals } = parseObj(monkeyObj);
+  
+- const faceColors = [
+-     [0.5, 0.5, 0.5, 1.0]
+- ];
+- 
+- const colors = [];
+- 
+- for (var j = 0; j < vertices.length / 3; ++j) {
+-     colors.push(0, 0, 0, 0);
+- }
+- 
+- faceColors.forEach((color, index) => {
+-     gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
+- });
++ gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+- const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+  const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  
+- colorsBuffer.bind(gl);
+- gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
+- 
+  normalsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
+  
+
+```
+📄 src/shaders/3d.v.glsl
+```diff
+  attribute vec3 position;
+  attribute vec3 normal;
+- attribute float colorIndex;
+  
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+  uniform mat4 normalMatrix;
+- uniform vec4 colors[6];
++ uniform vec3 color;
+  uniform vec3 directionalLightVector;
+  
+  varying vec4 vColor;
+      vec3 transformedNormal = (normalMatrix * vec4(normal, 1.0)).xyz;
+      float intensity = dot(transformedNormal, normalize(directionalLightVector));
+  
+-     vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
++     vColor.rgb = vec3(0.3, 0.3, 0.3) + color * intensity;
+      vColor.a = 1.0;
+  }
+
+```
+We'll need a helper class to store object related info
+
+📄 src/Object3D.js
+```js
+export class Object3D {
+    constructor() {
+        
+    } 
+}
+
+```
+Each object should contain it's own vertices and normals
+
+📄 src/Object3D.js
+```diff
++ import { parseObj } from "./gl-helpers";
++ 
+  export class Object3D {
+-     constructor() {
+-         
+-     } 
++     constructor(source) {
++         const { vertices, normals } = parseObj(source);
++ 
++         this.vertices = vertices;
++         this.normals = normals;
++     }
+  }
+
+```
+As well as a model matrix to store object transform
+
+📄 src/Object3D.js
+```diff
+  import { parseObj } from "./gl-helpers";
++ import { mat4 } from "gl-matrix";
+  
+  export class Object3D {
+      constructor(source) {
+  
+          this.vertices = vertices;
+          this.normals = normals;
++ 
++         this.modelMatrix = mat4.create();
+      }
+  }
+
+```
+Since normal matrix is computable from model matrix it makes sense to define a getter
+
+📄 src/Object3D.js
+```diff
+          this.normals = normals;
+  
+          this.modelMatrix = mat4.create();
++         this._normalMatrix = mat4.create();
++     }
++ 
++     get normalMatrix () {
++         mat4.invert(this._normalMatrix, this.modelMatrix);
++         mat4.transpose(this._normalMatrix, this._normalMatrix);
++ 
++         return this._normalMatrix;
+      }
+  }
+
+```
+Now we can refactor our code and use new helper class
+
+📄 src/3d.js
+```diff
+  import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
+  import monkeyObj from '../assets/objects/monkey.obj';
++ import { Object3D } from './Object3D';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const { vertices, normals } = parseObj(monkeyObj);
++ const monkey = new Object3D(monkeyObj);
+  
+  gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
+  
+- const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+- const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
++ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
++ const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+  normalsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
+  
+- const modelMatrix = mat4.create();
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+- const normalMatrix = mat4.create();
+  
+  mat4.lookAt(
+      viewMatrix,
+      100,
+  );
+  
+- gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+- 
+  function frame() {
+-     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
+- 
+-     mat4.invert(normalMatrix, modelMatrix);
+-     mat4.transpose(normalMatrix, normalMatrix);
++     mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
+  
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
+  
+      gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+  
+
+```
+Now let's import more objects
+
+📄 src/3d.js
+```diff
+  import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
+  import monkeyObj from '../assets/objects/monkey.obj';
++ import torusObj from '../assets/objects/torus.obj';
++ import coneObj from '../assets/objects/cone.obj';
++ 
+  import { Object3D } from './Object3D';
+  
+  const canvas = document.querySelector('canvas');
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+  const monkey = new Object3D(monkeyObj);
++ const torus = new Object3D(torusObj);
++ const cone = new Object3D(coneObj);
+  
+  gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
+  
+
+```
+and store them in a collection
+
+📄 src/3d.js
+```diff
+  const torus = new Object3D(torusObj);
+  const cone = new Object3D(coneObj);
+  
++ const objects = [
++     monkey,
++     torus,
++     cone,
++ ];
++ 
+  gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
+
+```
+and instead of issuing a draw call for just a monkey, we'll iterate over collection
+
+📄 src/3d.js
+```diff
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  function frame() {
+-     mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
++     objects.forEach((object) => {
++         mat4.rotateY(object.modelMatrix, object.modelMatrix, Math.PI / 180);
+  
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
++         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
++         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
+  
+-     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++     });
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+Ok, but why do we still have only monkey rendered?
+
+
+No wonder, vertex and normals buffer stays the same, so we just render the same object N times. Let's update vertex and normals buffer each time we want to render an object
+
+📄 src/3d.js
+```diff
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
+          gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
+  
++         vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
++         normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
++ 
+          gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+      });
+  
+
+```
+![Multiple objects 1](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/multiple-objects-1.gif)
+
+Cool, we've rendered multiple objects, but they are all in the same spot. Let's fix that
+
+
+Each object will have a property storing a position in space
+
+📄 src/3d.js
+```diff
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const monkey = new Object3D(monkeyObj);
+- const torus = new Object3D(torusObj);
+- const cone = new Object3D(coneObj);
++ const monkey = new Object3D(monkeyObj, [0, 0, 0]);
++ const torus = new Object3D(torusObj, [-3, 0, 0]);
++ const cone = new Object3D(coneObj, [3, 0, 0]);
+  
+  const objects = [
+      monkey,
+
+```
+📄 src/Object3D.js
+```diff
+  import { mat4 } from "gl-matrix";
+  
+  export class Object3D {
+-     constructor(source) {
++     constructor(source, position) {
+          const { vertices, normals } = parseObj(source);
+  
+          this.vertices = vertices;
+          this.normals = normals;
++         this.position = position;
+  
+          this.modelMatrix = mat4.create();
+          this._normalMatrix = mat4.create();
+
+```
+and this position should be respected by model matrix
+
+📄 src/Object3D.js
+```diff
+          this.position = position;
+  
+          this.modelMatrix = mat4.create();
++         mat4.fromTranslation(this.modelMatrix, position);
+          this._normalMatrix = mat4.create();
+      }
+  
+
+```
+And one more thing. We can also define a color specific to each object
+
+📄 src/3d.js
+```diff
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+- const monkey = new Object3D(monkeyObj, [0, 0, 0]);
+- const torus = new Object3D(torusObj, [-3, 0, 0]);
+- const cone = new Object3D(coneObj, [3, 0, 0]);
++ const monkey = new Object3D(monkeyObj, [0, 0, 0], [1, 0, 0]);
++ const torus = new Object3D(torusObj, [-3, 0, 0], [0, 1, 0]);
++ const cone = new Object3D(coneObj, [3, 0, 0], [0, 0, 1]);
+  
+  const objects = [
+      monkey,
+      cone,
+  ];
+  
+- gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
+- 
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
+  const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
+  
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
+          gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
+  
++         gl.uniform3fv(programInfo.uniformLocations.color, object.color);
++ 
+          vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
+          normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
+  
+
+```
+📄 src/Object3D.js
+```diff
+  import { mat4 } from "gl-matrix";
+  
+  export class Object3D {
+-     constructor(source, position) {
++     constructor(source, position, color) {
+          const { vertices, normals } = parseObj(source);
+  
+          this.vertices = vertices;
+          this.modelMatrix = mat4.create();
+          mat4.fromTranslation(this.modelMatrix, position);
+          this._normalMatrix = mat4.create();
++ 
++         this.color = color;
+      }
+  
+      get normalMatrix () {
+
+```
+![Multiple objects 2](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/multiple-objects-2.gif)
+
+Yay! We now can render multiple objects with individual transforms and colors 🎉
+
+That's it for today, see you tomorrow 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day19)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day19)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
