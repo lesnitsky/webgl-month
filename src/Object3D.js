@@ -10,6 +10,7 @@ export class Object3D {
         this.position = position;
 
         this.modelMatrix = mat4.create();
+        mat4.fromTranslation(this.modelMatrix, position);
         this._normalMatrix = mat4.create();
     }
 
