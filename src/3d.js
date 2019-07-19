@@ -5,6 +5,9 @@ import fShaderSource from './shaders/3d.f.glsl';
 import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
 import { GLBuffer } from './GLBuffer';
 import monkeyObj from '../assets/objects/monkey.obj';
+import torusObj from '../assets/objects/torus.obj';
+import coneObj from '../assets/objects/cone.obj';
+
 import { Object3D } from './Object3D';
 
 const canvas = document.querySelector('canvas');
@@ -38,6 +41,8 @@ gl.enable(gl.DEPTH_TEST);
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const monkey = new Object3D(monkeyObj);
+const torus = new Object3D(torusObj);
+const cone = new Object3D(coneObj);
 
 gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
 
