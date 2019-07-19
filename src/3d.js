@@ -38,29 +38,13 @@ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const { vertices, normals } = parseObj(monkeyObj);
 
-const faceColors = [
-    [0.5, 0.5, 0.5, 1.0]
-];
-
-const colors = [];
-
-for (var j = 0; j < vertices.length / 3; ++j) {
-    colors.push(0, 0, 0, 0);
-}
-
-faceColors.forEach((color, index) => {
-    gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
-});
+gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-
-colorsBuffer.bind(gl);
-gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
 
 normalsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
