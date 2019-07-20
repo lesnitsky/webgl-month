@@ -6,6 +6,7 @@ module.exports = {
         texture: './src/texture.js',
         'rotating-square': './src/rotating-square.js',
         '3d': './src/3d.js',
+        '3d-textured': './src/3d-textured.js',
     },
 
     output: {
