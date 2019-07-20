@@ -70,3 +70,16 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
+
+function frame() {
+    mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
+
+    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+
+    requestAnimationFrame(frame);
+}
+
+frame();
