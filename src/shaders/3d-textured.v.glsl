@@ -1,4 +1,5 @@
 attribute vec3 position;
+attribute vec2 texCoord;
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
