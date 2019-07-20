@@ -1,6 +1,6 @@
 import vShaderSource from './shaders/3d-textured.v.glsl';
 import fShaderSource from './shaders/3d-textured.f.glsl';
-import { compileShader } from './gl-helpers';
+import { compileShader, setupShaderInput } from './gl-helpers';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -29,3 +29,5 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 gl.enable(gl.DEPTH_TEST);
+
+const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
