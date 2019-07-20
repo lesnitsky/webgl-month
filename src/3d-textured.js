@@ -1,3 +1,5 @@
+import { mat4 } from 'gl-matrix';
+
 import vShaderSource from './shaders/3d-textured.v.glsl';
 import fShaderSource from './shaders/3d-textured.f.glsl';
 import { compileShader, setupShaderInput } from './gl-helpers';
@@ -45,3 +47,21 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, fal
 
 texCoordsBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+
+const viewMatrix = mat4.create();
+const projectionMatrix = mat4.create();
+
+mat4.lookAt(
+    viewMatrix,
+    [0, 0, -7],
+    [0, 0, 0],
+    [0, 1, 0],
+);
+
+mat4.perspective(
+    projectionMatrix,
+    Math.PI / 360 * 90,
+    canvas.width / canvas.height,
+    0.01,
+    100,
+);
