@@ -3,11 +3,12 @@ import { mat4 } from "gl-matrix";
 
 export class Object3D {
     constructor(source, position, color) {
-        const { vertices, normals } = parseObj(source);
+        const { vertices, normals, texCoords } = parseObj(source);
 
         this.vertices = vertices;
         this.normals = normals;
         this.position = position;
+        this.texCoords = texCoords;
 
         this.modelMatrix = mat4.create();
         mat4.fromTranslation(this.modelMatrix, position);
