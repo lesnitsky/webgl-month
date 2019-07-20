@@ -65,3 +65,6 @@ mat4.perspective(
     0.01,
     100,
 );
+
+gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
