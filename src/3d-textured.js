@@ -39,3 +39,9 @@ const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
 const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
+
+vertexBuffer.bind(gl);
+gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+texCoordsBuffer.bind(gl);
+gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
