@@ -95,8 +95,11 @@ export function parseFace(string) {
 export function parseObj(objSource) {
     const _vertices = [];
     const _normals = [];
+    const _texCoords = [];
+
     const vertexIndices = [];
     const normalIndices = [];
+    const texCoordIndices = [];
 
     objSource.split('\n').forEach(line => {
         if (line.startsWith('v ')) {
@@ -107,30 +110,43 @@ export function parseObj(objSource) {
             _normals.push(parseVec(line, 'vn '));
         }
 
+        if (line.startsWith('vt ')) {
+            _texCoords.push(parseVec(line, 'vt '));
+        }
+
         if (line.startsWith('f ')) {
             const parsedFace = parseFace(line);
 
             vertexIndices.push(...parsedFace.map(face => face[0] - 1));
+            texCoordIndices.push(...parsedFace.map(face => face[1] - 1));
             normalIndices.push(...parsedFace.map(face => face[2] - 1));
         }
     });
 
     const vertices = [];
     const normals = [];
+    const texCoords = [];
 
     for (let i = 0; i < vertexIndices.length; i++) {
         const vertexIndex = vertexIndices[i];
         const normalIndex = normalIndices[i];
+        const texCoordIndex = texCoordIndices[i];
 
         const vertex = _vertices[vertexIndex];
         const normal = _normals[normalIndex];
+        const texCoord = _texCoords[texCoordIndex];
 
         vertices.push(...vertex);
         normals.push(...normal);
+
+        if (texCoord) {
+            texCoords.push(...texCoord);
+        }
     }
 
     return { 
         vertices: new Float32Array(vertices), 
-        normals: new Float32Array(normals), 
+        normals: new Float32Array(normals),
+        texCoords: new Float32Array(texCoords), 
     };
 }

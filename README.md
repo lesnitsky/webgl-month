@@ -6759,3 +6759,597 @@ That's it for today, see you tomorrow 👋
 Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+
+## Day 20. Texturing 3d objects
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day20)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day20)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome to [WebGL month](https://github.com/lesnitsky/webgl-month)
+
+Today we're going to explore how to add textures to 3d objects.
+
+
+First we'll need a new entry point
+
+📄 index.html
+```diff
+      </head>
+      <body>
+          <canvas></canvas>
+-         <script src="./dist/3d.js"></script>
++         <script src="./dist/3d-textured.js"></script>
+      </body>
+  </html>
+
+```
+📄 src/3d-textured.js
+```js
+console.log('Hello textures');
+
+```
+📄 webpack.config.js
+```diff
+          texture: './src/texture.js',
+          'rotating-square': './src/rotating-square.js',
+          '3d': './src/3d.js',
++         '3d-textured': './src/3d-textured.js',
+      },
+  
+      output: {
+
+```
+Now let's create simple shaders to render a 3d object with solid color. [Learn more in this tutorial](https://dev.to/lesnitsky/webgl-month-day-15-rendering-a-3d-cube-190f)
+
+📄 src/shaders/3d-textured.f.glsl
+```glsl
+precision mediump float;
+
+void main() {
+    gl_FragColor = vec4(1, 0, 0, 1);
+}
+
+```
+📄 src/shaders/3d-textured.v.glsl
+```glsl
+attribute vec3 position;
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+
+void main() {
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+}
+
+```
+We'll need a canvas, webgl context and make canvas fullscreen
+
+📄 src/3d-textured.js
+```diff
+- console.log('Hello textures');
++ const canvas = document.querySelector('canvas');
++ const gl = canvas.getContext('webgl');
++ 
++ const width = document.body.offsetWidth;
++ const height = document.body.offsetHeight;
++ 
++ canvas.width = width * devicePixelRatio;
++ canvas.height = height * devicePixelRatio;
++ 
++ canvas.style.width = `${width}px`;
++ canvas.style.height = `${height}px`;
+
+```
+Create and compile shaders. [Learn more here](https://dev.to/lesnitsky/shaders-and-points-3h2c)
+
+📄 src/3d-textured.js
+```diff
++ import vShaderSource from './shaders/3d-textured.v.glsl';
++ import fShaderSource from './shaders/3d-textured.f.glsl';
++ import { compileShader } from './gl-helpers';
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
++ 
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
+
+```
+Create, link and use webgl program
+
+📄 src/3d-textured.js
+```diff
+  
+  compileShader(gl, vShader, vShaderSource);
+  compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
+
+```
+Enable depth test since we're rendering 3d. [Learn more here](https://dev.to/lesnitsky/webgl-month-day-16-colorizing-cube-depth-buffer-and-array-uniforms-4nhc)
+
+📄 src/3d-textured.js
+```diff
+  
+  gl.linkProgram(program);
+  gl.useProgram(program);
++ 
++ gl.enable(gl.DEPTH_TEST);
+
+```
+Setup shader input. [Learn more here](https://dev.to/lesnitsky/webgl-month-day-11-3plb)
+
+📄 src/3d-textured.js
+```diff
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+- import { compileShader } from './gl-helpers';
++ import { compileShader, setupShaderInput } from './gl-helpers';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.useProgram(program);
+  
+  gl.enable(gl.DEPTH_TEST);
++ 
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+```
+Now let's go to [Blender](https://www.blender.org/) and create a cube, but make sure to check "Generate UVs" so that blender can map cube vertices to a plain image.
+
+![Blender 1](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-1.png)
+
+
+Next open "UV Editing" view
+
+![Blender 2](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-2.png)
+
+
+Enter edit mode
+
+![Blender 3](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-3.png)
+
+
+Unwrapped cube looks good already, so we can export UV layout
+
+![Blender 4](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-4.png)
+
+
+Now if we open exported image in some editor we'll see something like this
+
+![Photoshop 1](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/photoshop-1.png)
+
+
+Cool, now we can actually fill our texture with some content
+
+Let's render a minecraft dirt block
+
+![Photoshop 2](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/photoshop-2.png)
+
+
+Next we need to export our object from blender, but don't forget to triangulate it first
+
+![Blender 5](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-5.png)
+
+
+And finally export our object
+
+![Blender 6](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/blender-step-6.png)
+
+
+Now let's import our cube and create an object. [Learn here about this helper class](https://dev.to/lesnitsky/webgl-month-day-19-rendering-multiple-objects-45m7)
+
+📄 src/3d-textured.js
+```diff
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+  import { compileShader, setupShaderInput } from './gl-helpers';
++ import cubeObj from '../assets/objects/textured-cube.obj';
++ import { Object3D } from './Object3D';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.enable(gl.DEPTH_TEST);
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
++ 
++ const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
+
+```
+If we'll look into object source, we'll see lines like below
+
+```
+vt 0.625000 0.000000
+vt 0.375000 0.250000
+vt 0.375000 0.000000
+vt 0.625000 0.250000
+vt 0.375000 0.500000
+```
+
+These are texture coordinates which are referenced by faces in the 2nd "property"
+
+```
+f 2/1/1 3/2/1 1/3/1
+
+# vertexIndex / textureCoordinateIndex / normalIndex
+```
+
+so we need to update our parser to support texture coordinates
+
+📄 src/gl-helpers.js
+```diff
+  export function parseObj(objSource) {
+      const _vertices = [];
+      const _normals = [];
++     const _texCoords = [];
++ 
+      const vertexIndices = [];
+      const normalIndices = [];
++     const texCoordIndices = [];
+  
+      objSource.split('\n').forEach(line => {
+          if (line.startsWith('v ')) {
+              _normals.push(parseVec(line, 'vn '));
+          }
+  
++         if (line.startsWith('vt ')) {
++             _texCoords.push(parseVec(line, 'vt '));
++         }
++ 
+          if (line.startsWith('f ')) {
+              const parsedFace = parseFace(line);
+  
+              vertexIndices.push(...parsedFace.map(face => face[0] - 1));
++             texCoordIndices.push(...parsedFace.map(face => face[1] - 1));
+              normalIndices.push(...parsedFace.map(face => face[2] - 1));
+          }
+      });
+  
+      const vertices = [];
+      const normals = [];
++     const texCoords = [];
+  
+      for (let i = 0; i < vertexIndices.length; i++) {
+          const vertexIndex = vertexIndices[i];
+          const normalIndex = normalIndices[i];
++         const texCoordIndex = texCoordIndices[i];
+  
+          const vertex = _vertices[vertexIndex];
+          const normal = _normals[normalIndex];
++         const texCoord = _texCoords[texCoordIndex];
+  
+          vertices.push(...vertex);
+          normals.push(...normal);
++ 
++         if (texCoord) {
++             texCoords.push(...texCoord);
++         }
+      }
+  
+      return { 
+          vertices: new Float32Array(vertices), 
+-         normals: new Float32Array(normals), 
++         normals: new Float32Array(normals),
++         texCoords: new Float32Array(texCoords), 
+      };
+  }
+
+```
+and add this property to Object3D
+
+📄 src/Object3D.js
+```diff
+  
+  export class Object3D {
+      constructor(source, position, color) {
+-         const { vertices, normals } = parseObj(source);
++         const { vertices, normals, texCoords } = parseObj(source);
+  
+          this.vertices = vertices;
+          this.normals = normals;
+          this.position = position;
++         this.texCoords = texCoords;
+  
+          this.modelMatrix = mat4.create();
+          mat4.fromTranslation(this.modelMatrix, position);
+
+```
+Now we need to define gl buffers. [Learn more about this helper class here](https://dev.to/lesnitsky/webgl-month-day-11-3plb)
+
+📄 src/3d-textured.js
+```diff
+  import { compileShader, setupShaderInput } from './gl-helpers';
+  import cubeObj from '../assets/objects/textured-cube.obj';
+  import { Object3D } from './Object3D';
++ import { GLBuffer } from './GLBuffer';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
+  const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
++ 
++ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
++ const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
+
+```
+We also need to define an attribute to pass tex coords to the vertex shader
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  attribute vec3 position;
++ attribute vec2 texCoord;
+  
+  uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+
+```
+and varying to pass texture coordinate to the fragment shader. [Learn more here](https://dev.to/lesnitsky/shader-varyings-2p0f)
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  precision mediump float;
+  
++ varying vec2 vTexCoord;
++ 
+  void main() {
+      gl_FragColor = vec4(1, 0, 0, 1);
+  }
+
+```
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+  
++ varying vec2 vTexCoord;
++ 
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
++ 
++     vTexCoord = texCoord;
+  }
+
+```
+Let's setup attributes
+
+📄 src/3d-textured.js
+```diff
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+  const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
++ 
++ vertexBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
++ 
++ texCoordsBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+
+```
+Create and setup view and projection matrix. [Learn more here](https://dev.to/lesnitsky/webgl-month-day-15-rendering-a-3d-cube-190f)
+
+📄 src/3d-textured.js
+```diff
++ import { mat4 } from 'gl-matrix';
++ 
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+  import { compileShader, setupShaderInput } from './gl-helpers';
+  
+  texCoordsBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
++ 
++ const viewMatrix = mat4.create();
++ const projectionMatrix = mat4.create();
++ 
++ mat4.lookAt(
++     viewMatrix,
++     [0, 0, -7],
++     [0, 0, 0],
++     [0, 1, 0],
++ );
++ 
++ mat4.perspective(
++     projectionMatrix,
++     Math.PI / 360 * 90,
++     canvas.width / canvas.height,
++     0.01,
++     100,
++ );
+
+```
+Pass view and projection matrices to shader via uniforms
+
+📄 src/3d-textured.js
+```diff
+      0.01,
+      100,
+  );
++ 
++ gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
++ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+```
+Setup viewport
+
+📄 src/3d-textured.js
+```diff
+  
+  gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
++ 
++ gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+and finally render our cube
+
+📄 src/3d-textured.js
+```diff
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
++ 
++ function frame() {
++     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
++ 
++     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
++ 
++     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++ 
++     requestAnimationFrame(frame);
++ }
++ 
++ frame();
+
+```
+but before rendering the cube we need to load our texture image. [Learn more about loadImage helper here](https://dev.to/lesnitsky/webgl-month-day-8-textures-1mk8)
+
+📄 src/3d-textured.js
+```diff
+  
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+- import { compileShader, setupShaderInput } from './gl-helpers';
++ import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
+  import cubeObj from '../assets/objects/textured-cube.obj';
+  import { Object3D } from './Object3D';
+  import { GLBuffer } from './GLBuffer';
++ import textureSource from '../assets/images/cube-texture.png';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+      requestAnimationFrame(frame);
+  }
+  
+- frame();
++ loadImage(textureSource).then((image) => {
++     frame();
++ });
+
+```
+📄 webpack.config.js
+```diff
+              },
+  
+              {
+-                 test: /\.jpg$/,
++                 test: /\.(jpg|png)$/,
+                  use: 'url-loader',
+              },
+          ],
+
+```
+and create webgl texture. [Learn more here](https://dev.to/lesnitsky/webgl-month-day-10-multiple-textures-gf3)
+
+📄 src/3d-textured.js
+```diff
+  
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+- import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
++ import { compileShader, setupShaderInput, loadImage, createTexture, setImage } from './gl-helpers';
+  import cubeObj from '../assets/objects/textured-cube.obj';
+  import { Object3D } from './Object3D';
+  import { GLBuffer } from './GLBuffer';
+  }
+  
+  loadImage(textureSource).then((image) => {
++     const texture = createTexture(gl);
++     setImage(gl, texture, image);
++ 
+      frame();
+  });
+
+```
+and read fragment colors from texture
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  precision mediump float;
++ uniform sampler2D texture;
+  
+  varying vec2 vTexCoord;
+  
+  void main() {
+-     gl_FragColor = vec4(1, 0, 0, 1);
++     gl_FragColor = texture2D(texture, vTexCoord);
+  }
+
+```
+Let's move camera a bit to top to see the "grass" side
+
+📄 src/3d-textured.js
+```diff
+  
+  mat4.lookAt(
+      viewMatrix,
+-     [0, 0, -7],
++     [0, 4, -7],
+      [0, 0, 0],
+      [0, 1, 0],
+  );
+
+```
+Something is wrong, top part is partially white, but why?
+
+Turns out that image is flipped when read by GPU, so we need to flip it back
+
+
+Turns out that image is flipped when read by GPU, so we need to flip it back
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  varying vec2 vTexCoord;
+  
+  void main() {
+-     gl_FragColor = texture2D(texture, vTexCoord);
++     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
+  }
+
+```
+![Minecraft cube](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/minecraft-cube.gif)
+
+Cool, we rendered a minecraft cube with WebGL 🎉
+
+That's it for today, see you tomorrow 👋!
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
