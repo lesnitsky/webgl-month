@@ -54,7 +54,7 @@ const projectionMatrix = mat4.create();
 
 mat4.lookAt(
     viewMatrix,
-    [0, 0, -7],
+    [0, 4, -7],
     [0, 0, 0],
     [0, 1, 0],
 );
