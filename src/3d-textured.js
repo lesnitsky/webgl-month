@@ -3,6 +3,7 @@ import fShaderSource from './shaders/3d-textured.f.glsl';
 import { compileShader, setupShaderInput } from './gl-helpers';
 import cubeObj from '../assets/objects/textured-cube.obj';
 import { Object3D } from './Object3D';
+import { GLBuffer } from './GLBuffer';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -35,3 +36,6 @@ gl.enable(gl.DEPTH_TEST);
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
+
+const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
