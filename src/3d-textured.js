@@ -2,10 +2,11 @@ import { mat4 } from 'gl-matrix';
 
 import vShaderSource from './shaders/3d-textured.v.glsl';
 import fShaderSource from './shaders/3d-textured.f.glsl';
-import { compileShader, setupShaderInput } from './gl-helpers';
+import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
 import cubeObj from '../assets/objects/textured-cube.obj';
 import { Object3D } from './Object3D';
 import { GLBuffer } from './GLBuffer';
+import textureSource from '../assets/images/cube-texture.png';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -82,4 +83,6 @@ function frame() {
     requestAnimationFrame(frame);
 }
 
-frame();
+loadImage(textureSource).then((image) => {
+    frame();
+});
