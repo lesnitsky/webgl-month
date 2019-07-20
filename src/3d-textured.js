@@ -27,3 +27,5 @@ gl.attachShader(program, fShader);
 
 gl.linkProgram(program);
 gl.useProgram(program);
+
+gl.enable(gl.DEPTH_TEST);
