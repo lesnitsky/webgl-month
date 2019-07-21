@@ -79,10 +79,12 @@ for (let i = -50; i < 50; i++) {
 }
 
 function frame() {
-    gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+    matrices.forEach((matrix) => {
+        gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
+        gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
 
-    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+        gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+    });
 
     requestAnimationFrame(frame);
 }
