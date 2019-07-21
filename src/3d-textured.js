@@ -73,6 +73,8 @@ for (let i = -50; i < 50; i++) {
 
         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
         mat4.multiply(matrix, matrix, rotationMatrix);
+
+        matrices.push(matrix);
     }
 }
 
