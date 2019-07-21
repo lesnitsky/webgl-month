@@ -68,6 +68,7 @@ for (let i = -50; i < 50; i++) {
         const matrix = mat4.create();
 
         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
+        mat4.fromTranslation(matrix, position);
     }
 }
 
