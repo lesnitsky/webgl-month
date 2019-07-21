@@ -61,6 +61,8 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
+const matrices = [];
+
 function frame() {
     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
 
