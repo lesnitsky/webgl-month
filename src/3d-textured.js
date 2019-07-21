@@ -52,8 +52,6 @@ gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, fal
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
 
-mat4.lookAt(viewMatrix, [0, 4, -7], [0, 0, 0], [0, 1, 0]);
-
 mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
 
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
