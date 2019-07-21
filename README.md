@@ -7364,3 +7364,248 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 21. Rendering a minecraft terrain
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day21)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-20-rendering-a-minecraft-dirt-cube-5ag3) we rendered a single minecraft dirt cube, let's render a terrain today!
+
+
+We'll need to store each block position in separate transform matrix
+
+📄 src/3d-textured.js
+```diff
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
++ const matrices = [];
++ 
+  function frame() {
+      mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
+  
+
+```
+Now let's create 10k blocks iteration over x and z axis from -50 to 50
+
+📄 src/3d-textured.js
+```diff
+  
+  const matrices = [];
+  
++ for (let i = -50; i < 50; i++) {
++     for (let j = -50; j < 50; j++) {
++         const matrix = mat4.create();
++     }
++ }
++ 
+  function frame() {
+      mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
+  
+
+```
+Each block is a size of 2 (vertex coordinates are in [-1..1] range) so positions should be divisible by two
+
+📄 src/3d-textured.js
+```diff
+  for (let i = -50; i < 50; i++) {
+      for (let j = -50; j < 50; j++) {
+          const matrix = mat4.create();
++ 
++         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
+      }
+  }
+  
+
+```
+Now we need to create a transform matrix. Let's use `ma4.fromTranslation`
+
+📄 src/3d-textured.js
+```diff
+          const matrix = mat4.create();
+  
+          const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
++         mat4.fromTranslation(matrix, position);
+      }
+  }
+  
+
+```
+Let's also rotate each block around Y axis to make terrain look more random
+
+📄 src/3d-textured.js
+```diff
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  const matrices = [];
++ const rotationMatrix = mat4.create();
+  
+  for (let i = -50; i < 50; i++) {
+      for (let j = -50; j < 50; j++) {
+  
+          const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
+          mat4.fromTranslation(matrix, position);
++ 
++         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
++         mat4.multiply(matrix, matrix, rotationMatrix);
+      }
+  }
+  
+
+```
+and finally push matrix of each block to matrices collection
+
+📄 src/3d-textured.js
+```diff
+  
+          mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
+          mat4.multiply(matrix, matrix, rotationMatrix);
++ 
++         matrices.push(matrix);
+      }
+  }
+  
+
+```
+Since our blocks are static, we don't need a rotation transform in each frame
+
+📄 src/3d-textured.js
+```diff
+  }
+  
+  function frame() {
+-     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
+- 
+      gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
+      gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+  
+
+```
+Now we'll need to iterate over matrices collection and issue a draw call for each cube with its transform matrix passed to uniform
+
+📄 src/3d-textured.js
+```diff
+  }
+  
+  function frame() {
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
+-     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
++     matrices.forEach((matrix) => {
++         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
++         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+  
+-     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++     });
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+Now let's create an animation of rotating camera. Camera has a position and a point where it is pointed. So to implement this, we need to rotate focus point around camera position. Let's first get rid of static view matrix
+
+📄 src/3d-textured.js
+```diff
+  const viewMatrix = mat4.create();
+  const projectionMatrix = mat4.create();
+  
+- mat4.lookAt(viewMatrix, [0, 4, -7], [0, 0, 0], [0, 1, 0]);
+- 
+  mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
+  
+  gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+
+```
+Define camera position, camera focus point vector and focus point transform matrix
+
+📄 src/3d-textured.js
+```diff
+- import { mat4 } from 'gl-matrix';
++ import { mat4, vec3 } from 'gl-matrix';
+  
+  import vShaderSource from './shaders/3d-textured.v.glsl';
+  import fShaderSource from './shaders/3d-textured.f.glsl';
+      }
+  }
+  
++ const cameraPosition = [0, 10, 0];
++ const cameraFocusPoint = vec3.fromValues(30, 0, 0);
++ const cameraFocusPointMatrix = mat4.create();
++ 
++ mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
++ 
+  function frame() {
+      matrices.forEach((matrix) => {
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
+
+```
+Our camera is located in 0.0.0, so we need to translate camera focus point to 0.0.0, rotate it, and translate back to original position
+
+📄 src/3d-textured.js
+```diff
+  mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+  
+  function frame() {
++     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [-30, 0, 0]);
++     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
++     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
++ 
+      matrices.forEach((matrix) => {
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
+          gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+
+```
+Final step – update view matrix uniform
+
+📄 src/3d-textured.js
+```diff
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
+  
++     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
++ 
++     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
++ 
+      matrices.forEach((matrix) => {
+          gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
+-         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
+  
+          gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+      });
+
+```
+That's it!
+
+This approach is not very performant though, as we're issuing 2 gl calls for each object, so it is a 20k of gl calls each frame. GL calls are expensive, so we'll need to reduce this number. We'll learn a great technique tomorrow!
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day21)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
