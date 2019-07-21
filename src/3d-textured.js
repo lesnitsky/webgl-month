@@ -87,9 +87,13 @@ function frame() {
     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
 
+    mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
+
+    mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+
     matrices.forEach((matrix) => {
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
-        gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
 
         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
     });
