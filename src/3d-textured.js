@@ -66,6 +66,8 @@ const matrices = [];
 for (let i = -50; i < 50; i++) {
     for (let j = -50; j < 50; j++) {
         const matrix = mat4.create();
+
+        const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
     }
 }
 
