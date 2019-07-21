@@ -79,8 +79,6 @@ for (let i = -50; i < 50; i++) {
 }
 
 function frame() {
-    mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
-
     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
 
