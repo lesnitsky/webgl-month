@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 import vShaderSource from './shaders/3d-textured.v.glsl';
 import fShaderSource from './shaders/3d-textured.f.glsl';
@@ -75,6 +75,12 @@ for (let i = -50; i < 50; i++) {
         matrices.push(matrix);
     }
 }
+
+const cameraPosition = [0, 10, 0];
+const cameraFocusPoint = vec3.fromValues(30, 0, 0);
+const cameraFocusPointMatrix = mat4.create();
+
+mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
 
 function frame() {
     matrices.forEach((matrix) => {
