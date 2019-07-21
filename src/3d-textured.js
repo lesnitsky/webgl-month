@@ -63,6 +63,12 @@ gl.viewport(0, 0, canvas.width, canvas.height);
 
 const matrices = [];
 
+for (let i = -50; i < 50; i++) {
+    for (let j = -50; j < 50; j++) {
+        const matrix = mat4.create();
+    }
+}
+
 function frame() {
     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
 
