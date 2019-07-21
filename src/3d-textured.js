@@ -83,6 +83,10 @@ const cameraFocusPointMatrix = mat4.create();
 mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
 
 function frame() {
+    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [-30, 0, 0]);
+    mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
+
     matrices.forEach((matrix) => {
         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
