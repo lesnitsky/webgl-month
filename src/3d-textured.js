@@ -87,6 +87,13 @@ for (let i = -50; i < 50; i++) {
 
 const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
 
+const offset = 4 * 4; // 4 floats 4 bytes each
+const stride = offset * 4; // 4 rows of 4 floats
+
+for (let i = 0; i < 4; i++) {
+    gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
+}
+
 const cameraPosition = [0, 10, 0];
 const cameraFocusPoint = vec3.fromValues(30, 0, 0);
 const cameraFocusPointMatrix = mat4.create();
