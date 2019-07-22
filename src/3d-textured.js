@@ -85,6 +85,8 @@ for (let i = -50; i < 50; i++) {
     }
 }
 
+const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
+
 const cameraPosition = [0, 10, 0];
 const cameraFocusPoint = vec3.fromValues(30, 0, 0);
 const cameraFocusPointMatrix = mat4.create();
