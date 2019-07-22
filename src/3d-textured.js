@@ -63,7 +63,7 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-const matrices = [];
+const matrices = new Float32Array(100 * 100 * 4 * 4);
 const rotationMatrix = mat4.create();
 
 for (let i = -50; i < 50; i++) {
