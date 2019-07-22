@@ -90,6 +90,8 @@ const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRA
 const offset = 4 * 4; // 4 floats 4 bytes each
 const stride = offset * 4; // 4 rows of 4 floats
 
+const ext = gl.getExtension('ANGLE_instanced_arrays');
+
 for (let i = 0; i < 4; i++) {
     gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
 }
