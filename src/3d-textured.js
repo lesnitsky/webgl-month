@@ -67,6 +67,8 @@ const matrices = new Float32Array(100 * 100 * 4 * 4);
 const modelMatrix = mat4.create();
 const rotationMatrix = mat4.create();
 
+let cubeIndex = 0;
+
 for (let i = -50; i < 50; i++) {
     for (let j = -50; j < 50; j++) {
         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
@@ -75,7 +77,11 @@ for (let i = -50; i < 50; i++) {
         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
         mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
 
-        matrices.push(matrix);
+        modelMatrix.forEach((value, index) => {
+            matrices[cubeIndex * 4 * 4 + index] = value;
+        });
+
+        cubeIndex++;
     }
 }
 
