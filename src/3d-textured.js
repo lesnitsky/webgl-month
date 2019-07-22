@@ -38,6 +38,10 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
+for (let i = 0; i < 4; i++) {
+    gl.enableVertexAttribArray(programInfo.attributeLocations.modelMatrix + i);
+}
+
 const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
@@ -52,45 +56,45 @@ gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, fal
 const viewMatrix = mat4.create();
 const projectionMatrix = mat4.create();
 
-<<<<<<< HEAD
-mat4.lookAt(
-    viewMatrix,
-    [0, 4, -7],
-    [0, 0, 0],
-    [0, 1, 0],
-);
-
-mat4.perspective(
-    projectionMatrix,
-    Math.PI / 360 * 90,
-    canvas.width / canvas.height,
-    0.01,
-    100,
-);
-=======
 mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
->>>>>>> 947a17d... Day 21
 
 gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-const matrices = [];
+const matrices = new Float32Array(100 * 100 * 4 * 4);
+const modelMatrix = mat4.create();
 const rotationMatrix = mat4.create();
+
+let cubeIndex = 0;
 
 for (let i = -50; i < 50; i++) {
     for (let j = -50; j < 50; j++) {
-        const matrix = mat4.create();
-
         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
-        mat4.fromTranslation(matrix, position);
+        mat4.fromTranslation(modelMatrix, position);
 
         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
-        mat4.multiply(matrix, matrix, rotationMatrix);
+        mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
 
-        matrices.push(matrix);
+        modelMatrix.forEach((value, index) => {
+            matrices[cubeIndex * 4 * 4 + index] = value;
+        });
+
+        cubeIndex++;
     }
+}
+
+const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
+
+const offset = 4 * 4; // 4 floats 4 bytes each
+const stride = offset * 4; // 4 rows of 4 floats
+
+const ext = gl.getExtension('ANGLE_instanced_arrays');
+
+for (let i = 0; i < 4; i++) {
+    gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
+    ext.vertexAttribDivisorANGLE(programInfo.attributeLocations.modelMatrix + i, 1);
 }
 
 const cameraPosition = [0, 10, 0];
@@ -109,11 +113,7 @@ function frame() {
     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 
-    matrices.forEach((matrix) => {
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
-
-        gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-    });
+    ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, vertexBuffer.data.length / 3, 100 * 100);
 
     requestAnimationFrame(frame);
 }
