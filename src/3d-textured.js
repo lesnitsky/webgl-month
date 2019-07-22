@@ -94,6 +94,7 @@ const ext = gl.getExtension('ANGLE_instanced_arrays');
 
 for (let i = 0; i < 4; i++) {
     gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
+    ext.vertexAttribDivisorANGLE(programInfo.attributeLocations.modelMatrix + i, 1);
 }
 
 const cameraPosition = [0, 10, 0];
