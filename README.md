@@ -7609,3 +7609,231 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 22. Optimizing minecraft terrain by reducing number of webgl calls by 5000 times
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month
+
+[Yesterday](https://dev.to/lesnitsky/webgl-month-day-21-rendering-a-minecraft-terrain-24b5) we've rendered minecraft terrain, but implementation wasn't optimal. We had to issue two gl calls for each block. One to update model matrix uniform, another to issue a draw call. There is a way to render the whole scene with a SINGLE call, so that way we'll reduce number of calls by 5000 times 🤯.
+
+
+These technique is called WebGL instancing. Our cubes share the same vertex and tex coord data, the only difference is model matrix. Instead of passing it as uniform we can define an attribute
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  attribute vec3 position;
+  attribute vec2 texCoord;
++ attribute mat4 modelMatrix;
+  
+- uniform mat4 modelMatrix;
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+  
+
+```
+Matrix attributes are actually a number of `vec4` attributes, so if `mat4` attribute location is `0`, we'll have 4 separate attributes with locations `0`, `1`, `2`, `3`. Our `setupShaderInput` helper doesn't support these, so we'll need to enable each attribute manually
+
+📄 src/3d-textured.js
+```diff
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  
++ for (let i = 0; i < 4; i++) {
++     gl.enableVertexAttribArray(programInfo.attributeLocations.modelMatrix + i);
++ }
++ 
+  const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
+  
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+
+```
+Now we need to define a Float32Array for matrices data. The size is `100 * 100` (size of our world) `* 4 * 4` (dimensions of the model matrix)
+
+📄 src/3d-textured.js
+```diff
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- const matrices = [];
++ const matrices = new Float32Array(100 * 100 * 4 * 4);
+  const rotationMatrix = mat4.create();
+  
+  for (let i = -50; i < 50; i++) {
+
+```
+To save resources we can use a single model matrix for all cubes while filling matrices array with data
+
+📄 src/3d-textured.js
+```diff
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+  const matrices = new Float32Array(100 * 100 * 4 * 4);
++ const modelMatrix = mat4.create();
+  const rotationMatrix = mat4.create();
+  
+  for (let i = -50; i < 50; i++) {
+      for (let j = -50; j < 50; j++) {
+-         const matrix = mat4.create();
+- 
+          const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
+-         mat4.fromTranslation(matrix, position);
++         mat4.fromTranslation(modelMatrix, position);
+  
+          mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
+-         mat4.multiply(matrix, matrix, rotationMatrix);
++         mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
+  
+          matrices.push(matrix);
+      }
+
+```
+We'll also need a counter to know the offset at the matrices Float32Array to write data to an appropriate location
+
+📄 src/3d-textured.js
+```diff
+  const modelMatrix = mat4.create();
+  const rotationMatrix = mat4.create();
+  
++ let cubeIndex = 0;
++ 
+  for (let i = -50; i < 50; i++) {
+      for (let j = -50; j < 50; j++) {
+          const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
+          mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
+          mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
+  
+-         matrices.push(matrix);
++         modelMatrix.forEach((value, index) => {
++             matrices[cubeIndex * 4 * 4 + index] = value;
++         });
++ 
++         cubeIndex++;
+      }
+  }
+  
+
+```
+Next we need a matrices gl buffer
+
+📄 src/3d-textured.js
+```diff
+      }
+  }
+  
++ const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
++ 
+  const cameraPosition = [0, 10, 0];
+  const cameraFocusPoint = vec3.fromValues(30, 0, 0);
+  const cameraFocusPointMatrix = mat4.create();
+
+```
+and setup attribute pointer using stride and offset, since our buffer is interleaved. [Learn more about interleaved buffers here](https://dev.to/lesnitsky/webgl-month-day-5-interleaved-buffers-2k9a)
+
+📄 src/3d-textured.js
+```diff
+  
+  const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
+  
++ const offset = 4 * 4; // 4 floats 4 bytes each
++ const stride = offset * 4; // 4 rows of 4 floats
++ 
++ for (let i = 0; i < 4; i++) {
++     gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
++ }
++ 
+  const cameraPosition = [0, 10, 0];
+  const cameraFocusPoint = vec3.fromValues(30, 0, 0);
+  const cameraFocusPointMatrix = mat4.create();
+
+```
+Instancing itself isn't supported be webgl 1 out of the box, but available via extension, so we need to get it
+
+📄 src/3d-textured.js
+```diff
+  const offset = 4 * 4; // 4 floats 4 bytes each
+  const stride = offset * 4; // 4 rows of 4 floats
+  
++ const ext = gl.getExtension('ANGLE_instanced_arrays');
++ 
+  for (let i = 0; i < 4; i++) {
+      gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
+  }
+
+```
+Basically what this extension does, is helps us avoid repeating vertex positions and texture coordinates for each cube, since these are the same. By using instancing we tell WebGL to render N instances of objects, reusing some attribute data for each object, and getting "unique" data for other attributes. To specify which attributes contain data for each object, we need to call `vertexAttribDivisorANGLE(location, divisor)` method of the extension.
+
+Divisor is used to determine how to read data from attributes filled with data for each object.
+
+Our modelMatrix attribute has a matrix for each object, so divisor should be `1`.
+We can use modelMarix `A` for objects `0` and `1`, `B` for objects `2` and `3` – in this case divisor is `2`.
+
+In our case it is `1`.
+
+📄 src/3d-textured.js
+```diff
+  
+  for (let i = 0; i < 4; i++) {
+      gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
++     ext.vertexAttribDivisorANGLE(programInfo.attributeLocations.modelMatrix + i, 1);
+  }
+  
+  const cameraPosition = [0, 10, 0];
+
+```
+Finally we can get read of iteration over all matrices, and use a single  call. However we should call it on the instance of extension instead of gl itself. The last argument should be the number of instances we want to render
+
+📄 src/3d-textured.js
+```diff
+      mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
+      gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+  
+-     matrices.forEach((matrix) => {
+-         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
+- 
+-         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+-     });
++     ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, vertexBuffer.data.length / 3, 100 * 100);
+  
+      requestAnimationFrame(frame);
+  }
+
+```
+That's it! We just reduced number of gl calls by 5000 times 🎉!
+
+WebGL instancing extension is widely support, so don't hesitate to use it whenever it makes sense.
+
+Typical case – need to render a lot of the same objects but with different locations, colors and other type of "attributes"
+
+Thanks for reading!
+See you tomorrow 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
