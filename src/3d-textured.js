@@ -38,6 +38,10 @@ gl.enable(gl.DEPTH_TEST);
 
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
+for (let i = 0; i < 4; i++) {
+    gl.enableVertexAttribArray(programInfo.attributeLocations.modelMatrix + i);
+}
+
 const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
 
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
