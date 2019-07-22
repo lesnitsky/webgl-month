@@ -64,17 +64,16 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 gl.viewport(0, 0, canvas.width, canvas.height);
 
 const matrices = new Float32Array(100 * 100 * 4 * 4);
+const modelMatrix = mat4.create();
 const rotationMatrix = mat4.create();
 
 for (let i = -50; i < 50; i++) {
     for (let j = -50; j < 50; j++) {
-        const matrix = mat4.create();
-
         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
-        mat4.fromTranslation(matrix, position);
+        mat4.fromTranslation(modelMatrix, position);
 
         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
-        mat4.multiply(matrix, matrix, rotationMatrix);
+        mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
 
         matrices.push(matrix);
     }
