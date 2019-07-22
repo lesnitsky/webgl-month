@@ -113,11 +113,7 @@ function frame() {
     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 
-    matrices.forEach((matrix) => {
-        gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
-
-        gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-    });
+    ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, vertexBuffer.data.length / 3, 100 * 100);
 
     requestAnimationFrame(frame);
 }
