@@ -1,3 +1,8 @@
+import vShaderSource from './shaders/skybox.v.glsl';
+import fShaderSource from './shaders/skybox.f.glsl';
+
+import { compileShader, setupShaderInput } from './gl-helpers';
+
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
@@ -9,3 +14,19 @@ canvas.height = height * devicePixelRatio;
 
 canvas.style.width = `${width}px`;
 canvas.style.height = `${height}px`;
+
+const vShader = gl.createShader(gl.VERTEX_SHADER);
+const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+compileShader(gl, vShader, vShaderSource);
+compileShader(gl, fShader, fShaderSource);
+
+const program = gl.createProgram();
+
+gl.attachShader(program, vShader);
+gl.attachShader(program, fShader);
+
+gl.linkProgram(program);
+gl.useProgram(program);
+
+const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
