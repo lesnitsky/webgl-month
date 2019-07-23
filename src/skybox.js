@@ -6,6 +6,7 @@ import { Object3D } from './Object3D';
 import { GLBuffer } from './GLBuffer';
 
 import cubeObj from '../assets/objects/cube.obj';
+import { mat4 } from 'gl-matrix';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -40,3 +41,15 @@ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_
 
 vertexBuffer.bind(gl);
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+const viewMatrix = mat4.create();
+const projectionMatrix = mat4.create();
+
+mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
+
+mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
+
+gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+gl.viewport(0, 0, canvas.width, canvas.height);
