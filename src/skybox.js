@@ -37,3 +37,6 @@ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
 const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+
+vertexBuffer.bind(gl);
+gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
