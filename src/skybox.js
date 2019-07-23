@@ -6,7 +6,7 @@ import { Object3D } from './Object3D';
 import { GLBuffer } from './GLBuffer';
 
 import cubeObj from '../assets/objects/cube.obj';
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 import rightTexture from '../assets/images/skybox/right.JPG';
 import leftTexture from '../assets/images/skybox/left.JPG';
@@ -61,7 +61,22 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projec
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
+const cameraPosition = [0, 0, 0];
+const cameraFocusPoint = vec3.fromValues(0, 0, 1);
+const cameraFocusPointMatrix = mat4.create();
+
+mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+
 function frame() {
+    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -1]);
+    mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 1]);
+
+    mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
+
+    mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
+    gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+
     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
     requestAnimationFrame(frame);
