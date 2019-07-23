@@ -75,5 +75,7 @@ Promise.all([
     loadImage(backTexture),
     loadImage(frontTexture),
 ]).then((images) => {
+    const texture = gl.createTexture();
+
     frame();
 });
