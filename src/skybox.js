@@ -1,12 +1,19 @@
 import vShaderSource from './shaders/skybox.v.glsl';
 import fShaderSource from './shaders/skybox.f.glsl';
 
-import { compileShader, setupShaderInput } from './gl-helpers';
+import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
 import { Object3D } from './Object3D';
 import { GLBuffer } from './GLBuffer';
 
 import cubeObj from '../assets/objects/cube.obj';
 import { mat4 } from 'gl-matrix';
+
+import rightTexture from '../assets/images/skybox/right.JPG';
+import leftTexture from '../assets/images/skybox/left.JPG';
+import upTexture from '../assets/images/skybox/up.JPG';
+import downTexture from '../assets/images/skybox/down.JPG';
+import backTexture from '../assets/images/skybox/back.JPG';
+import frontTexture from '../assets/images/skybox/front.JPG';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -59,3 +66,14 @@ function frame() {
 
     requestAnimationFrame(frame);
 }
+
+Promise.all([
+    loadImage(rightTexture),
+    loadImage(leftTexture),
+    loadImage(upTexture),
+    loadImage(downTexture),
+    loadImage(backTexture),
+    loadImage(frontTexture),
+]).then((images) => {
+    frame();
+});
