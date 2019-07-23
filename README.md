@@ -7827,3 +7827,402 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 23. Skybox in WebGL
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+In previous tutorials we've rendered objects without any surroundings, but what if we want to add sky to our scene?
+
+There's a special texture type which mught help us with it
+
+We can treat our scene as a giant cube where camera is always in the center of this cube.
+So all we need it render this cube and apply a texture, like below
+
+![Skybox](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/skybox.png)
+
+
+Vertex shader will have vertex positions and texCoord attribute, view and projection matrix uniforms. We don't need model matrix as our "world" cube is static
+
+📄 src/shaders/skybox.v.glsl
+```glsl
+attribute vec3 position;
+varying vec3 vTexCoord;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+
+void main() {
+
+}
+
+```
+If our cube vertices coordinates are in `[-1..1]` range, we can use this coordinates as texture coordinates directly
+
+📄 src/shaders/skybox.v.glsl
+```diff
+  uniform mat4 viewMatrix;
+  
+  void main() {
+- 
++     vTexCoord = position;
+  }
+
+```
+And to calculate position of transformed vertex we need to multiply vertex position, view matrix and projection matrix
+
+📄 src/shaders/skybox.v.glsl
+```diff
+  
+  void main() {
+      vTexCoord = position;
++     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
+  }
+
+```
+Fragment shader should have a vTexCoord varying to receive tex coords from vertex shader
+
+📄 src/shaders/skybox.f.glsl
+```glsl
+precision mediump float;
+
+varying vec3 vTexCoord;
+
+void main() {
+
+}
+
+```
+and a special type of texture – sampler cube
+
+📄 src/shaders/skybox.f.glsl
+```diff
+  precision mediump float;
+  
+  varying vec3 vTexCoord;
++ uniform samplerCube skybox;
+  
+  void main() {
+- 
+  }
+
+```
+and all we need to calculate fragment color is to read color from cubemap texture
+
+📄 src/shaders/skybox.f.glsl
+```diff
+  uniform samplerCube skybox;
+  
+  void main() {
++     gl_FragColor = textureCube(skybox, vTexCoord);
+  }
+
+```
+As usual we need to get a canvas reference, webgl context, and make canvas fullscreen
+
+📄 src/skybox.js
+```js
+const canvas = document.querySelector('canvas');
+const gl = canvas.getContext('webgl');
+
+const width = document.body.offsetWidth;
+const height = document.body.offsetHeight;
+
+canvas.width = width * devicePixelRatio;
+canvas.height = height * devicePixelRatio;
+
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+
+```
+Setup webgl program
+
+📄 src/skybox.js
+```diff
++ import vShaderSource from './shaders/skybox.v.glsl';
++ import fShaderSource from './shaders/skybox.f.glsl';
++ 
++ import { compileShader, setupShaderInput } from './gl-helpers';
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
++ 
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
++ 
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
+```
+Create cube object and setup buffer for vertex positions
+
+📄 src/skybox.js
+```diff
+  import fShaderSource from './shaders/skybox.f.glsl';
+  
+  import { compileShader, setupShaderInput } from './gl-helpers';
++ import { Object3D } from './Object3D';
++ import { GLBuffer } from './GLBuffer';
++ 
++ import cubeObj from '../assets/objects/cube.obj';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  gl.useProgram(program);
+  
+  const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
++ 
++ const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
++ const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+
+```
+Setup position attribute
+
+📄 src/skybox.js
+```diff
+  
+  const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
+  const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
++ 
++ vertexBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+
+```
+Setup view, projection matrices, pass values to uniforms and set viewport
+
+📄 src/skybox.js
+```diff
+  import { GLBuffer } from './GLBuffer';
+  
+  import cubeObj from '../assets/objects/cube.obj';
++ import { mat4 } from 'gl-matrix';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  vertexBuffer.bind(gl);
+  gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
++ 
++ const viewMatrix = mat4.create();
++ const projectionMatrix = mat4.create();
++ 
++ mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
++ 
++ mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
++ 
++ gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
++ gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
++ 
++ gl.viewport(0, 0, canvas.width, canvas.height);
+
+```
+And define a function which will render our scene
+
+📄 src/skybox.js
+```diff
+  gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
++ 
++ function frame() {
++     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
++ 
++     requestAnimationFrame(frame);
++ }
+
+```
+Now the fun part. Texture for each side of the cube should be stored in separate file, so we need to laod all images. [Check out this site for other textures](http://www.custommapmakers.org/skyboxes.php)
+
+📄 src/skybox.js
+```diff
+  import vShaderSource from './shaders/skybox.v.glsl';
+  import fShaderSource from './shaders/skybox.f.glsl';
+  
+- import { compileShader, setupShaderInput } from './gl-helpers';
++ import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
+  import { Object3D } from './Object3D';
+  import { GLBuffer } from './GLBuffer';
+  
+  import cubeObj from '../assets/objects/cube.obj';
+  import { mat4 } from 'gl-matrix';
+  
++ import rightTexture from '../assets/images/skybox/right.JPG';
++ import leftTexture from '../assets/images/skybox/left.JPG';
++ import upTexture from '../assets/images/skybox/up.JPG';
++ import downTexture from '../assets/images/skybox/down.JPG';
++ import backTexture from '../assets/images/skybox/back.JPG';
++ import frontTexture from '../assets/images/skybox/front.JPG';
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  
+      requestAnimationFrame(frame);
+  }
++ 
++ Promise.all([
++     loadImage(rightTexture),
++     loadImage(leftTexture),
++     loadImage(upTexture),
++     loadImage(downTexture),
++     loadImage(backTexture),
++     loadImage(frontTexture),
++ ]).then((images) => {
++     frame();
++ });
+
+```
+Now we need to create a webgl texture
+
+📄 src/skybox.js
+```diff
+      loadImage(backTexture),
+      loadImage(frontTexture),
+  ]).then((images) => {
++     const texture = gl.createTexture();
++ 
+      frame();
+  });
+
+```
+And pass a special texture type to bind method – `gl.TEXTURE_CUBE_MAP`
+
+📄 src/skybox.js
+```diff
+      loadImage(frontTexture),
+  ]).then((images) => {
+      const texture = gl.createTexture();
++     gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+  
+      frame();
+  });
+
+```
+Then we need to setup texture
+
+📄 src/skybox.js
+```diff
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
+  
++     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
++     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
++ 
+      frame();
+  });
+
+```
+and upload each image to gpu
+
+Targets are:
+
+-   `gl.TEXTURE_CUBE_MAP_POSITIVE_X` – right
+-   `gl.TEXTURE_CUBE_MAP_NEGATIVE_X` – left
+-   `gl.TEXTURE_CUBE_MAP_POSITIVE_Y` – top
+-   `gl.TEXTURE_CUBE_MAP_NEGATIVE_Y` – bottom
+-   `gl.TEXTURE_CUBE_MAP_POSITIVE_Z` – front
+-   `gl.TEXTURE_CUBE_MAP_NEGATIVE_Z` – back
+
+Since all these values are integers, we can iterate over all images and add image index to `TEXTURE_CUBE_MAP_POSITIVE_X` target
+
+📄 src/skybox.js
+```diff
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  
++     images.forEach((image, index) => {
++         gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
++     });
++ 
+      frame();
+  });
+
+```
+and finally let's reuse the code from [previous tutorial](https://dev.to/lesnitsky/webgl-month-day-21-rendering-a-minecraft-terrain-24b5) to implement camera rotation animation
+
+📄 src/skybox.js
+```diff
+  import { GLBuffer } from './GLBuffer';
+  
+  import cubeObj from '../assets/objects/cube.obj';
+- import { mat4 } from 'gl-matrix';
++ import { mat4, vec3 } from 'gl-matrix';
+  
+  import rightTexture from '../assets/images/skybox/right.JPG';
+  import leftTexture from '../assets/images/skybox/left.JPG';
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
++ const cameraPosition = [0, 0, 0];
++ const cameraFocusPoint = vec3.fromValues(0, 0, 1);
++ const cameraFocusPointMatrix = mat4.create();
++ 
++ mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
++ 
+  function frame() {
++     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -1]);
++     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
++     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 1]);
++ 
++     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
++ 
++     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
++     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
++ 
+      gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+  
+      requestAnimationFrame(frame);
+
+```
+That's it, we now have a skybox which makes scene look more impressive 😎
+
+Thanks for reading!
+
+See you tomorrow 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
