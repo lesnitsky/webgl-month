@@ -7,6 +7,7 @@ module.exports = {
         'rotating-square': './src/rotating-square.js',
         '3d': './src/3d.js',
         '3d-textured': './src/3d-textured.js',
+        skybox: './src/skybox.js',
     },
 
     output: {
@@ -22,7 +23,7 @@ module.exports = {
             },
 
             {
-                test: /\.(jpg|png)$/,
+                test: /\.(jpg|png)$/i,
                 use: 'url-loader',
             },
         ],
