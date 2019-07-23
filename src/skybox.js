@@ -53,3 +53,9 @@ gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
 gl.viewport(0, 0, canvas.width, canvas.height);
+
+function frame() {
+    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
+
+    requestAnimationFrame(frame);
+}
