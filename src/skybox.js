@@ -76,6 +76,7 @@ Promise.all([
     loadImage(frontTexture),
 ]).then((images) => {
     const texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
 
     frame();
 });
