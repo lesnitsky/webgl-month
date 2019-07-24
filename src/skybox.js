@@ -6,7 +6,6 @@ import { Object3D } from './Object3D';
 import { GLBuffer } from './GLBuffer';
 
 import cubeObj from '../assets/objects/cube.obj';
-import { mat4, vec3 } from 'gl-matrix';
 
 import rightTexture from '../assets/images/skybox/right.JPG';
 import leftTexture from '../assets/images/skybox/left.JPG';
@@ -15,92 +14,65 @@ import downTexture from '../assets/images/skybox/down.JPG';
 import backTexture from '../assets/images/skybox/back.JPG';
 import frontTexture from '../assets/images/skybox/front.JPG';
 
-const canvas = document.querySelector('canvas');
-const gl = canvas.getContext('webgl');
+const State = {};
 
-const width = document.body.offsetWidth;
-const height = document.body.offsetHeight;
+export async function prepare(gl) {
+    const vShader = gl.createShader(gl.VERTEX_SHADER);
+    const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
-canvas.width = width * devicePixelRatio;
-canvas.height = height * devicePixelRatio;
+    compileShader(gl, vShader, vShaderSource);
+    compileShader(gl, fShader, fShaderSource);
 
-canvas.style.width = `${width}px`;
-canvas.style.height = `${height}px`;
+    const program = gl.createProgram();
+    State.program = program;
 
-const vShader = gl.createShader(gl.VERTEX_SHADER);
-const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.attachShader(program, vShader);
+    gl.attachShader(program, fShader);
 
-compileShader(gl, vShader, vShaderSource);
-compileShader(gl, fShader, fShaderSource);
+    gl.linkProgram(program);
+    gl.useProgram(program);
 
-const program = gl.createProgram();
+    State.programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-gl.attachShader(program, vShader);
-gl.attachShader(program, fShader);
+    const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
+    State.vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
 
-gl.linkProgram(program);
-gl.useProgram(program);
+    await Promise.all([
+        loadImage(rightTexture),
+        loadImage(leftTexture),
+        loadImage(upTexture),
+        loadImage(downTexture),
+        loadImage(backTexture),
+        loadImage(frontTexture),
+    ]).then((images) => {
+        State.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_CUBE_MAP, State.texture);
 
-const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
-const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
-
-vertexBuffer.bind(gl);
-gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-
-const viewMatrix = mat4.create();
-const projectionMatrix = mat4.create();
-
-mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
-
-mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
-
-gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
-gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-
-gl.viewport(0, 0, canvas.width, canvas.height);
-
-const cameraPosition = [0, 0, 0];
-const cameraFocusPoint = vec3.fromValues(0, 0, 1);
-const cameraFocusPointMatrix = mat4.create();
-
-mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-
-function frame() {
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -1]);
-    mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 1]);
-
-    mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
-
-    mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
-    gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
-
-    gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-
-    requestAnimationFrame(frame);
-}
-
-Promise.all([
-    loadImage(rightTexture),
-    loadImage(leftTexture),
-    loadImage(upTexture),
-    loadImage(downTexture),
-    loadImage(backTexture),
-    loadImage(frontTexture),
-]).then((images) => {
-    const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
-
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    images.forEach((image, index) => {
-        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        images.forEach((image, index) => {
+            gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        });
     });
 
-    frame();
-});
+    setupAttributes(gl);
+}
+
+function setupAttributes(gl) {
+    State.vertexBuffer.bind(gl);
+    gl.vertexAttribPointer(State.programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+}
+
+export function render(gl, viewMatrix, projectionMatrix) {
+    gl.useProgram(State.program);
+
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    setupAttributes(gl);
+
+    gl.drawArrays(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3);
+}

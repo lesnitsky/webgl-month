@@ -6,14 +6,17 @@ module.exports = {
         texture: './src/texture.js',
         'rotating-square': './src/rotating-square.js',
         '3d': './src/3d.js',
-        '3d-textured': './src/3d-textured.js',
+        'minecraft-terrain': './src/minecraft-terrain.js',
         skybox: './src/skybox.js',
+        minecraft: './src/minecraft.js',
     },
 
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
     },
+
+    devtool: 'sourcemap',
 
     module: {
         rules: [

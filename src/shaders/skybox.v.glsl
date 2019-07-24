@@ -6,5 +6,5 @@ uniform mat4 viewMatrix;
 
 void main() {
     vTexCoord = position;
-    gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * viewMatrix * vec4(position, 0.01);
 }

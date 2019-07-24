@@ -8226,3 +8226,291 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 24. Combining terrain and skybox
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month
+
+In previous tutorials we've rendered minecraft terrain and skybox, but in different examples. How do we combine them? WebGL allows to use multiple programs, so we can combine both examples with a slight refactor.
+
+Let's create a new entry point file `minecraft.js` and assume `skybox.js` and `minecraft-terrain.js` export `prepare` and `render` functions
+
+```javascript
+import { prepare as prepareSkybox, render as renderSkybox } from './skybox';
+import { prepare as prepareTerrain, render as renderTerrain } from './minecraft-terrain';
+```
+
+Next we'll need to setup a canvas
+
+```javascript
+const canvas = document.querySelector('canvas');
+const gl = canvas.getContext('webgl');
+
+const width = document.body.offsetWidth;
+const height = document.body.offsetHeight;
+
+canvas.width = width * devicePixelRatio;
+canvas.height = height * devicePixelRatio;
+
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+```
+
+Setup camera matrices
+
+```javascript
+const viewMatrix = mat4.create();
+const projectionMatrix = mat4.create();
+
+mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
+
+mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 142);
+
+gl.viewport(0, 0, canvas.width, canvas.height);
+
+const cameraPosition = [0, 5, 0];
+const cameraFocusPoint = vec3.fromValues(0, 0, 30);
+const cameraFocusPointMatrix = mat4.create();
+
+mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+```
+
+Define a render function
+
+```javascript
+function render() {
+    renderSkybox(gl, viewMatrix, projectionMatrix);
+    renderTerrain(gl, viewMatrix, projectionMatrix);
+
+    requestAnimationFrame(render);
+}
+```
+
+and execute "preparation" code
+
+```javascript
+(async () => {
+    await prepareSkybox(gl);
+    await prepareTerrain(gl);
+
+    render();
+})();
+```
+
+Now we need to implement `prepare` and `render` functions of skybox and terrain
+
+Both functions will require access to shared state, like WebGL program, attributes and buffers, so let's create an object
+
+```javascript
+const State = {};
+
+export async function prepare(gl) {
+    // initialization code goes here
+}
+```
+
+So what's a "preparation" step?
+
+It's about creating program
+
+```diff
+  export async function prepare(gl) {
++     const vShader = gl.createShader(gl.VERTEX_SHADER);
++     const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+
++     compileShader(gl, vShader, vShaderSource);
++     compileShader(gl, fShader, fShaderSource);
+
++     const program = gl.createProgram();
++     State.program = program;
+
++     gl.attachShader(program, vShader);
++     gl.attachShader(program, fShader);
+
++     gl.linkProgram(program);
++     gl.useProgram(program);
+
++     State.programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+  }
+```
+
+Buffers
+
+```diff
+      gl.useProgram(program);
+
+      State.programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
+
++     const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
++     State.vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+  }
+```
+
+Textures
+
+```diff
+      const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
+      State.vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
+
++     await Promise.all([
++         loadImage(rightTexture),
++         loadImage(leftTexture),
++         loadImage(upTexture),
++         loadImage(downTexture),
++         loadImage(backTexture),
++         loadImage(frontTexture),
++     ]).then((images) => {
++         State.texture = gl.createTexture();
++         gl.bindTexture(gl.TEXTURE_CUBE_MAP, State.texture);
+
++         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
++         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
++         images.forEach((image, index) => {
++             gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
++         });
++     });
+}
+```
+
+and setting up attributes
+
+```diff
+              gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X   index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+          });
+      });
++     setupAttributes(gl);
+}
+```
+
+We need a separate function to setup attributes because we'll need to do this in render function as well. Attributes share the state between different programs, so we'll need to setup them properly each time we use different program
+
+`setupAttributes` looks like this for `skybox`
+
+```javascript
+function setupAttributes(gl) {
+    State.vertexBuffer.bind(gl);
+    gl.vertexAttribPointer(State.programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
+}
+```
+
+And now we need a render function which will pass view and projection matrices to uniforms and issue a draw call
+
+```javascript
+export function render(gl, viewMatrix, projectionMatrix) {
+    gl.useProgram(State.program);
+
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    setupAttributes(gl);
+
+    gl.drawArrays(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3);
+}
+```
+
+This refactor is pretty straightforward, as it requires only moving pieces of code to necessary functions, so this steps will look the same for `minecraft-terrain`, with one exception
+
+We're using `ANGLE_instanced_arrays` extension to render terrain, which sets up `divisorAngle`. As attributes share the state between programs, we'll need to "reset" those divisor angles.
+
+```javascript
+function resetDivisorAngles() {
+    for (let i = 0; i < 4; i++) {
+        State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 0);
+    }
+}
+```
+
+and call this function after a draw call
+
+```javascript
+export function render(gl, viewMatrix, projectionMatrix) {
+    gl.useProgram(State.program);
+
+    setupAttributes(gl);
+
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+    gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    State.ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3, 100 * 100);
+
+    resetDivisorAngles();
+}
+```
+
+Does resulting code actually work?
+
+Unfortunatelly no 😢
+The issue is that we render the skybox inisde the cube which is smaller than our terrain, but we can fix it with a single change in skybox vertex shader
+
+```diff
+  attribute vec3 position;
+  varying vec3 vTexCoord;
+
+  uniform mat4 projectionMatrix;
+  uniform mat4 viewMatrix;
+
+  void main() {
+      vTexCoord = position;
+-     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1);
++     gl_Position = projectionMatrix * viewMatrix * vec4(position, 0.01);
+  }
+```
+
+By changing the 4th argument, we'll scale our skybox by 100 times (the magic of homogeneous coordinates).
+
+After this change the world looks ok, until we try to look at the farthest "edge" of our world cube. Skybox isn't rendered there 😢
+
+This happens because of the `zFar` argument passed to projection matrix
+
+```diff
+  const projectionMatrix = mat4.create();
+
+  mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
+
+- mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
++ mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 142);
+
+  gl.viewport(0, 0, canvas.width, canvas.height);
+```
+
+The distance to the farthest edge is `Math.sqrt(size ** 2 + size ** 2)`, which is `141.4213562373095`, so we can just pass `142`
+
+That's it!
+
+Thanks for reading, see you tomorrow 👋
+
+---
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
