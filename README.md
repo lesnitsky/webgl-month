@@ -8524,3 +8524,107 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 25. Mipmaps
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month
+
+Today we're going to learn one more webgl concept which might improve the quality of the final rendered image
+
+First we need to discuss how color is being read from texture.
+
+Let say we have a 1024x1024 image, but render only a 512x512 area on canvas. So each pixel in resulting image represents 4 pixels in original texture.
+
+Here's where `gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter)` plays some role
+
+There are several algorithms on how to read a color from the texture
+
+-   `gl.LINEAR` - this one will read 4 pixels of original image and blend colors of 4 pixels to calculate final pixel color
+
+-   `gl.NEARETS` will just take the closest coordinate of the pixel from original image and use this color. While being more performant, this method has a lower quality
+
+Both methods has it's caveats, especially when the size of area which need to be painted with texture is much smaller than original texture
+
+There is a special technique which allows to improve the quality and performance of rendering when dealing with textures. This special textures are called [mipmaps] – pre-calculated sequences of images, where each next image has a progressively smaller resolution. So when fragment shader reads a color from a texture, it takes the closest texture in size, and reads a color from it.
+
+In WebGL 1.0 mipmaps can only be generated for textures of "power-of-2" size (256x256, 512x512, 1024x1024 etc.)
+
+And that's how mipmap will look like for our dirt cube
+
+![Mipmap](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/mipmap.jpg)
+
+
+Don't worry, you don't need to generate such a sequence for all your textures, this could be done automatically if your texture is a size of power of 2
+
+📄 src/minecraft-terrain.js
+```diff
+  
+  const State = {};
+  
++ /**
++  *
++  * @param {WebGLRenderingContext} gl
++  */
+  export async function prepare(gl) {
+      const vShader = gl.createShader(gl.VERTEX_SHADER);
+      const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+      await loadImage(textureSource).then((image) => {
+          const texture = createTexture(gl);
+          setImage(gl, texture, image);
++ 
++         gl.generateMipmap(gl.TEXTURE_2D);
+      });
+  
+      setupAttributes(gl);
+
+```
+And in order to make GPU read a pixel color from mipmap, we need to specify `TEXTURE_MIN_FILTER`.
+
+📄 src/minecraft-terrain.js
+```diff
+          setImage(gl, texture, image);
+  
+          gl.generateMipmap(gl.TEXTURE_2D);
++         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+      });
+  
+      setupAttributes(gl);
+
+```
+`NEAREST_MIPMAP_LINEAR` will choose the closest size mipmap and interpolate 4 pixels to get resulting color
+
+
+That's it for today!
+
+Thanks for reading, see you tomorrow 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
