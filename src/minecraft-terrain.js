@@ -77,6 +77,7 @@ export async function prepare(gl) {
         setImage(gl, texture, image);
 
         gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
     });
 
     setupAttributes(gl);
