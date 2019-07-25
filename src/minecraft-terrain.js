@@ -10,6 +10,10 @@ import textureSource from '../assets/images/cube-texture.png';
 
 const State = {};
 
+/**
+ *
+ * @param {WebGLRenderingContext} gl
+ */
 export async function prepare(gl) {
     const vShader = gl.createShader(gl.VERTEX_SHADER);
     const fShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -71,6 +75,8 @@ export async function prepare(gl) {
     await loadImage(textureSource).then((image) => {
         const texture = createTexture(gl);
         setImage(gl, texture, image);
+
+        gl.generateMipmap(gl.TEXTURE_2D);
     });
 
     setupAttributes(gl);
