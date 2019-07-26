@@ -100,6 +100,8 @@ function render() {
 
     gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
 
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
     requestAnimationFrame(render);
 }
 
