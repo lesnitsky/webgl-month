@@ -95,6 +95,11 @@ function render() {
 
     gl.useProgram(program);
 
+    vertexPositionBuffer.bind(gl);
+    gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+
+    gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+
     requestAnimationFrame(render);
 }
 
