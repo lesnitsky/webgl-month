@@ -93,6 +93,8 @@ function render() {
     renderSkybox(gl, viewMatrix, projectionMatrix);
     renderTerrain(gl, viewMatrix, projectionMatrix);
 
+    gl.useProgram(program);
+
     requestAnimationFrame(render);
 }
 
