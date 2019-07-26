@@ -69,6 +69,8 @@ function setupAttributes(gl) {
 export function render(gl, viewMatrix, projectionMatrix) {
     gl.useProgram(State.program);
 
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, State.texture);
+
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
