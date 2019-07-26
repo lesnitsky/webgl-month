@@ -88,6 +88,8 @@ gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.heigh
 function render() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
