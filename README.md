@@ -8618,3 +8618,380 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 26. Rendering to texture
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋 Welcome to WebGL month.
+
+In one of our previous tutorials we've build some simple image filters, like "black and white", "sepia", etc.
+Can we apply this "post effects" not only to an existing image, but to the whole 3d scene we're rendering?
+
+Yes, we can! However we'll still need a texture to process, so we need to render our scene not to a canvas, but to a texture first
+
+As we know from the very first tutorial, canvas is just a buffer of pixel colors (4 integers, r, g, b, a)
+There's also a depth buffer (for Z coordinate of each pixel)
+
+So the idea is to make webgl render to some different "buffer" instead of canvas.
+
+There's a special type of buffer, called `framebuffer` which can be treated as a render target
+
+
+To create a framebuffer we need to call `gl.createFramebuffer`
+
+📄 src/minecraft.js
+```diff
+  
+  mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+  
++ const framebuffer = gl.createFramebuffer();
++ 
+  function render() {
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+
+```
+Framebuffer itself is not a storage, but rather a set of references to "attachments" (color, depth)
+
+To render colors we'll need a texture
+
+📄 src/minecraft.js
+```diff
+  
+  const framebuffer = gl.createFramebuffer();
+  
++ const texture = gl.createTexture();
++ 
++ gl.bindTexture(gl.TEXTURE_2D, texture);
++ gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
++ 
++ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
++ 
+  function render() {
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+
+```
+Now we need to bind a framebuffer and setup a color attachment
+
+📄 src/minecraft.js
+```diff
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  
++ gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
++ gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
++ 
+  function render() {
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+
+```
+Now our canvas is white. Did we break something? No – everything is fine, but our scene is now rendered to a texture instead of canvas
+
+
+Now we need to render from texture to canvas
+
+
+Vertex shader is very simple, we just need to render a canvas-size rectangle, so we can pass vertex positions from js without any transformations
+
+📄 src/shaders/filter.v.glsl
+```glsl
+attribute vec2 position;
+
+void main() {
+    gl_Position = vec4(position, 0, 1);
+}
+
+```
+Fragment shader needs a texture to read a color from and resolution to transform pixel coordinates to texture coordinates
+
+📄 src/shaders/filter.f.glsl
+```glsl
+precision mediump float;
+
+uniform sampler2D texture;
+uniform vec2 resolution;
+
+void main() {
+    gl_FragColor = texture2D(texture, gl_FragCoord.xy / resolution);
+}
+
+```
+Now we need to go through a program setup routine
+
+📄 src/minecraft.js
+```diff
+  import { prepare as prepareSkybox, render as renderSkybox } from './skybox';
+  import { prepare as prepareTerrain, render as renderTerrain } from './minecraft-terrain';
+  
++ import vShaderSource from './shaders/filter.v.glsl';
++ import fShaderSource from './shaders/filter.f.glsl';
++ import { setupShaderInput, compileShader } from './gl-helpers';
++ import { GLBuffer } from './GLBuffer';
++ import { createRect } from './shape-helpers';
++ 
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+  
++ const vShader = gl.createShader(gl.VERTEX_SHADER);
++ const fShader = gl.createShader(gl.FRAGMENT_SHADER);
++ 
++ compileShader(gl, vShader, vShaderSource);
++ compileShader(gl, fShader, fShaderSource);
++ 
++ const program = gl.createProgram();
++ 
++ gl.attachShader(program, vShader);
++ gl.attachShader(program, fShader);
++ 
++ gl.linkProgram(program);
++ gl.useProgram(program);
++ 
++ const vertexPositionBuffer = new GLBuffer(
++     gl,
++     gl.ARRAY_BUFFER,
++     new Float32Array([...createRect(-1, -1, 2, 2)]),
++     gl.STATIC_DRAW
++ );
++ 
++ const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([0, 1, 2, 1, 2, 3]), gl.STATIC_DRAW);
++ 
++ const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
++ 
++ vertexPositionBuffer.bind(gl);
++ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
++ 
++ gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
++ 
+  function render() {
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+
+```
+In the beginning of each frame we need to bind a framebuffer to tell webgl to render to a texture
+
+📄 src/minecraft.js
+```diff
+  gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
+  function render() {
++     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
++ 
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
+
+```
+and after we rendered the scene to texture, we need to use our new program
+
+📄 src/minecraft.js
+```diff
+      renderSkybox(gl, viewMatrix, projectionMatrix);
+      renderTerrain(gl, viewMatrix, projectionMatrix);
+  
++     gl.useProgram(program);
++ 
+      requestAnimationFrame(render);
+  }
+  
+
+```
+Setup program attributes and uniforms
+
+📄 src/minecraft.js
+```diff
+  
+      gl.useProgram(program);
+  
++     vertexPositionBuffer.bind(gl);
++     gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
++ 
++     gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
++ 
+      requestAnimationFrame(render);
+  }
+  
+
+```
+Bind null framebuffer (this will make webgl render to canvas)
+
+📄 src/minecraft.js
+```diff
+  
+      gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
++     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
++ 
+      requestAnimationFrame(render);
+  }
+  
+
+```
+Bind texture to use it as a source of color data
+
+📄 src/minecraft.js
+```diff
+      gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
++     gl.bindTexture(gl.TEXTURE_2D, texture);
+  
+      requestAnimationFrame(render);
+  }
+
+```
+And issue a draw call
+
+📄 src/minecraft.js
+```diff
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+  
++     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
++ 
+      requestAnimationFrame(render);
+  }
+  
+
+```
+Since we're binding different texture after we render terrain and skybox, we need to re-bind textures in terrain and skybox programs
+
+📄 src/minecraft-terrain.js
+```diff
+  
+      await loadImage(textureSource).then((image) => {
+          const texture = createTexture(gl);
++         State.texture = texture;
++ 
+          setImage(gl, texture, image);
+  
+          gl.generateMipmap(gl.TEXTURE_2D);
+  
+      setupAttributes(gl);
+  
++     gl.bindTexture(gl.TEXTURE_2D, State.texture);
++ 
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
+
+```
+📄 src/skybox.js
+```diff
+  export function render(gl, viewMatrix, projectionMatrix) {
+      gl.useProgram(State.program);
+  
++     gl.bindTexture(gl.TEXTURE_CUBE_MAP, State.texture);
++ 
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
+
+```
+We need to create a depth buffer. Depth buffer is a render buffer (object which contains a data which came from fragmnt shader output)
+
+📄 src/minecraft.js
+```diff
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+  
++ const depthBuffer = gl.createRenderbuffer();
++ gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
++ 
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+
+```
+and setup renderbuffer to store depth info
+
+📄 src/minecraft.js
+```diff
+  const depthBuffer = gl.createRenderbuffer();
+  gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+  
++ gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, canvas.width, canvas.height);
++ gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
++ 
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  
+
+```
+Now scene looks better, but only for a single frame, others seem to be drawn on top of previous. This happens because texture is
+n't cleared before next draw call
+
+
+We need to call a `gl.clear` to clear the texture (clears currently bound framebuffer). This method accepts a bitmask which tells webgl which buffers to clear. We need to clear both color and depth buffer, so the mask is `gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT`
+
+📄 src/minecraft.js
+```diff
+  function render() {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+  
++     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
++ 
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
+
+```
+> NOTE: This also should be done before rendering to canvas if `preserveDrawingBuffer` context argument is set to true
+
+
+Now we can reuse our filter function from previous tutorial to make the whole scene black and white
+
+📄 src/shaders/filter.f.glsl
+```diff
+  uniform sampler2D texture;
+  uniform vec2 resolution;
+  
++ vec4 blackAndWhite(vec4 color) {
++     return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
++ }
++ 
+  void main() {
+-     gl_FragColor = texture2D(texture, gl_FragCoord.xy / resolution);
++     gl_FragColor = blackAndWhite(texture2D(texture, gl_FragCoord.xy / resolution));
+  }
+
+```
+That's it!
+
+Offscreen rendering (rendering to texture) might be used to apply different "post" effects like blur, water on camera, etc. We'll learn another useful usecase of offscreen rendering tomorrow
+
+Thanks for reading! 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+

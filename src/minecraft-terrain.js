@@ -74,6 +74,8 @@ export async function prepare(gl) {
 
     await loadImage(textureSource).then((image) => {
         const texture = createTexture(gl);
+        State.texture = texture;
+
         setImage(gl, texture, image);
 
         gl.generateMipmap(gl.TEXTURE_2D);
@@ -117,6 +119,8 @@ export function render(gl, viewMatrix, projectionMatrix) {
     gl.useProgram(State.program);
 
     setupAttributes(gl);
+
+    gl.bindTexture(gl.TEXTURE_2D, State.texture);
 
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
