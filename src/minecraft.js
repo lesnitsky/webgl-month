@@ -103,6 +103,8 @@ function render() {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+
     requestAnimationFrame(render);
 }
 
