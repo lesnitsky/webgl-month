@@ -80,6 +80,8 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, fal
 gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
 
 function render() {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
