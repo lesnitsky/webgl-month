@@ -29,6 +29,8 @@ const cameraFocusPointMatrix = mat4.create();
 
 mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
 
+const framebuffer = gl.createFramebuffer();
+
 function render() {
     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
