@@ -101,6 +101,7 @@ function render() {
     gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
     requestAnimationFrame(render);
 }
