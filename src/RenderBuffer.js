@@ -23,4 +23,9 @@ export class RenderBuffer {
     bind(gl) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
     }
+
+    clear(gl) {
+        this.bind(gl);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    }
 }
