@@ -43,6 +43,8 @@ export async function prepare(gl) {
     State.modelMatrix = mat4.create();
     State.rotationMatrix = mat4.create();
 
+    const indices = new Float32Array(100 * 100);
+
     let cubeIndex = 0;
 
     for (let i = -50; i < 50; i++) {
@@ -57,11 +59,14 @@ export async function prepare(gl) {
                 matrices[cubeIndex * 4 * 4 + index] = value;
             });
 
+            indices[cubeIndex] = cubeIndex;
+
             cubeIndex++;
         }
     }
 
     State.matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
+    State.indexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
     State.offset = 4 * 4; // 4 floats 4 bytes each
     State.stride = State.offset * 4; // 4 rows of 4 floats
@@ -107,15 +112,21 @@ function setupAttributes(gl) {
 
         State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 1);
     }
+
+    State.indexBuffer.bind(gl);
+    gl.vertexAttribPointer(State.programInfo.attributeLocations.index, 1, gl.FLOAT, false, 0, 0);
+    State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 1);
 }
 
 function resetDivisorAngles() {
     for (let i = 0; i < 4; i++) {
         State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 0);
     }
+
+    State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
 }
 
-export function render(gl, viewMatrix, projectionMatrix) {
+export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
     gl.useProgram(State.program);
 
     setupAttributes(gl);
@@ -124,6 +135,12 @@ export function render(gl, viewMatrix, projectionMatrix) {
 
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    if (renderIndices) {
+        gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);
+    } else {
+        gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 0);
+    }
 
     State.ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3, 100 * 100);
 
