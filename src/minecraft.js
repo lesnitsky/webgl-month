@@ -98,6 +98,10 @@ function render() {
     requestAnimationFrame(render);
 }
 
+document.body.addEventListener('click', () => {
+    coloredCubesRenderBuffer.bind(gl);
+});
+
 (async () => {
     await prepareSkybox(gl);
     await prepareTerrain(gl);
