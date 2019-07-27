@@ -102,6 +102,8 @@ document.body.addEventListener('click', () => {
     coloredCubesRenderBuffer.bind(gl);
 
     renderTerrain(gl, viewMatrix, projectionMatrix, true);
+
+    const pixels = new Uint8Array(canvas.width * canvas.height * 4);
 });
 
 (async () => {
