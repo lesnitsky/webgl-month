@@ -100,6 +100,8 @@ function render() {
 
 document.body.addEventListener('click', () => {
     coloredCubesRenderBuffer.bind(gl);
+
+    renderTerrain(gl, viewMatrix, projectionMatrix, true);
 });
 
 (async () => {
