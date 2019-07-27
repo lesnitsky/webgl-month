@@ -112,12 +112,18 @@ function setupAttributes(gl) {
 
         State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 1);
     }
+
+    State.indexBuffer.bind(gl);
+    gl.vertexAttribPointer(State.programInfo.attributeLocations.index, 1, gl.FLOAT, false, 0, 0);
+    State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 1);
 }
 
 function resetDivisorAngles() {
     for (let i = 0; i < 4; i++) {
         State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 0);
     }
+
+    State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
 }
 
 export function render(gl, viewMatrix, projectionMatrix) {
