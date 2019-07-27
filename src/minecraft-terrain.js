@@ -43,6 +43,8 @@ export async function prepare(gl) {
     State.modelMatrix = mat4.create();
     State.rotationMatrix = mat4.create();
 
+    const indices = new Float32Array(100 * 100);
+
     let cubeIndex = 0;
 
     for (let i = -50; i < 50; i++) {
