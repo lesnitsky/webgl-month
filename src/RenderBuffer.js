@@ -19,4 +19,8 @@ export class RenderBuffer {
         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
     }
+
+    bind(gl) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+    }
 }
