@@ -8,5 +8,5 @@ vec4 blackAndWhite(vec4 color) {
 }
 
 void main() {
-    gl_FragColor = blackAndWhite(texture2D(texture, gl_FragCoord.xy / resolution));
+    gl_FragColor = texture2D(texture, gl_FragCoord.xy / resolution);
 }
