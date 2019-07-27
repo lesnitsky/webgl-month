@@ -9005,3 +9005,419 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 27. Click detection. Part I
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Yesterday we've learned how to render to a texture. This is a nice ability to make some nice effects after the scene was completely rendered, but we can get advantage of offscreen rendering for something else.
+
+One important thing in interactive 3D is click detection. While it may be done with javascript, it involves some complex math. Instead we can:
+
+-   assign a unique solid color to each object
+-   render scene to a texture
+-   read pixel color under cursor
+-   match color with an object
+
+
+Since we'll need another framebuffer, let's create a helper class
+
+📄 src/RenderBuffer.js
+```js
+export class RenderBuffer {
+    constructor(gl) {
+        this.framebuffer = gl.createFramebuffer();
+        this.texture = gl.createTexture();
+    }
+}
+
+```
+Setup framebuffer and color texture
+
+📄 src/RenderBuffer.js
+```diff
+      constructor(gl) {
+          this.framebuffer = gl.createFramebuffer();
+          this.texture = gl.createTexture();
++ 
++         gl.bindTexture(gl.TEXTURE_2D, this.texture);
++         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
++ 
++         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
++         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
++         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
++ 
++         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
++         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
+      }
+  }
+
+```
+Setup depth buffer
+
+📄 src/RenderBuffer.js
+```diff
+  
+          gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
++ 
++         this.depthBuffer = gl.createRenderbuffer();
++         gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
++ 
++         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
++         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+      }
+  }
+
+```
+Implement bind method
+
+📄 src/RenderBuffer.js
+```diff
+          gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
+          gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
+      }
++ 
++     bind(gl) {
++         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
++     }
+  }
+
+```
+and clear
+
+📄 src/RenderBuffer.js
+```diff
+      bind(gl) {
+          gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
+      }
++ 
++     clear(gl) {
++         this.bind(gl);
++         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
++     }
+  }
+
+```
+Use new helper class
+
+📄 src/minecraft.js
+```diff
+  import { setupShaderInput, compileShader } from './gl-helpers';
+  import { GLBuffer } from './GLBuffer';
+  import { createRect } from './shape-helpers';
++ import { RenderBuffer } from './RenderBuffer';
+  
+  const canvas = document.querySelector('canvas');
+  const gl = canvas.getContext('webgl');
+  
+  mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+  
+- const framebuffer = gl.createFramebuffer();
+- 
+- const texture = gl.createTexture();
+- 
+- gl.bindTexture(gl.TEXTURE_2D, texture);
+- gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+- 
+- gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+- gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+- gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+- 
+- gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+- gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+- 
+- const depthBuffer = gl.createRenderbuffer();
+- gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
+- 
+- gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, canvas.width, canvas.height);
+- gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
++ const offscreenRenderBuffer = new RenderBuffer(gl);
+  
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+  gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
+  function render() {
+-     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+- 
+-     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
++     offscreenRenderBuffer.clear(gl);
+  
+      mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+      mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+      gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+-     gl.bindTexture(gl.TEXTURE_2D, texture);
++     gl.bindTexture(gl.TEXTURE_2D, offscreenRenderBuffer.texture);
+  
+      gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+  
+
+```
+Instead of passing the whole unique color of the object, which is a vec3, we can pass only object index
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  attribute vec3 position;
+  attribute vec2 texCoord;
+  attribute mat4 modelMatrix;
++ attribute float index;
+  
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
+
+```
+and convert this float to a color right in the shader
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  
+  varying vec2 vTexCoord;
+  
++ vec3 encodeObject(float id) {
++     int b = int(mod(id, 255.0));
++     int r = int(id) / 255 / 255;
++     int g = (int(id) - b - r * 255 * 255) / 255;
++     return vec3(r, g, b) / 255.0;
++ }
++ 
+  void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  
+
+```
+Now we need to pass the color to a fragment shader via varying
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  uniform sampler2D texture;
+  
+  varying vec2 vTexCoord;
++ varying vec3 vColor;
+  
+  void main() {
+      gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
+
+```
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  uniform mat4 projectionMatrix;
+  
+  varying vec2 vTexCoord;
++ varying vec3 vColor;
+  
+  vec3 encodeObject(float id) {
+      int b = int(mod(id, 255.0));
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+  
+      vTexCoord = texCoord;
++     vColor = encodeObject(index);
+  }
+
+```
+We also need to specify what do we want to render: textured object or colored, so let's use a uniform for it
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  varying vec2 vTexCoord;
+  varying vec3 vColor;
+  
++ uniform float renderIndices;
++ 
+  void main() {
+      gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
++ 
++     if (renderIndices == 1.0) {
++         gl_FragColor.rgb = vColor;
++     }
+  }
+
+```
+Now let's create indices array
+
+📄 src/minecraft-terrain.js
+```diff
+      State.modelMatrix = mat4.create();
+      State.rotationMatrix = mat4.create();
+  
++     const indices = new Float32Array(100 * 100);
++ 
+      let cubeIndex = 0;
+  
+      for (let i = -50; i < 50; i++) {
+
+```
+Fill it with data and setup a GLBuffer
+
+📄 src/minecraft-terrain.js
+```diff
+                  matrices[cubeIndex * 4 * 4 + index] = value;
+              });
+  
++             indices[cubeIndex] = cubeIndex;
++ 
+              cubeIndex++;
+          }
+      }
+  
+      State.matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
++     State.indexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+  
+      State.offset = 4 * 4; // 4 floats 4 bytes each
+      State.stride = State.offset * 4; // 4 rows of 4 floats
+
+```
+Since we have a new attribute, we need to update setupAttribute and resetDivisorAngles functions
+
+📄 src/minecraft-terrain.js
+```diff
+  
+          State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 1);
+      }
++ 
++     State.indexBuffer.bind(gl);
++     gl.vertexAttribPointer(State.programInfo.attributeLocations.index, 1, gl.FLOAT, false, 0, 0);
++     State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 1);
+  }
+  
+  function resetDivisorAngles() {
+      for (let i = 0; i < 4; i++) {
+          State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 0);
+      }
++ 
++     State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
+  }
+  
+  export function render(gl, viewMatrix, projectionMatrix) {
+
+```
+And finally we need another argument of a render function to distinguish between "render modes" (either textured cubes or colored)
+
+📄 src/minecraft-terrain.js
+```diff
+      State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
+  }
+  
+- export function render(gl, viewMatrix, projectionMatrix) {
++ export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
+      gl.useProgram(State.program);
+  
+      setupAttributes(gl);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
++     if (renderIndices) {
++         gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);
++     } else {
++         gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 0);
++     }
++ 
+      State.ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3, 100 * 100);
+  
+      resetDivisorAngles();
+
+```
+Now we need another render buffer to render colored cubes to
+
+📄 src/minecraft.js
+```diff
+  mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+  
+  const offscreenRenderBuffer = new RenderBuffer(gl);
++ const coloredCubesRenderBuffer = new RenderBuffer(gl);
+  
+  const vShader = gl.createShader(gl.VERTEX_SHADER);
+  const fShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+```
+Now let's add a click listeneer
+
+📄 src/minecraft.js
+```diff
+      requestAnimationFrame(render);
+  }
+  
++ document.body.addEventListener('click', () => {
++     coloredCubesRenderBuffer.bind(gl);
++ });
++ 
+  (async () => {
+      await prepareSkybox(gl);
+      await prepareTerrain(gl);
+
+```
+and render colored cubes to a texture each time user clicks on a canvas
+
+📄 src/minecraft.js
+```diff
+  
+  document.body.addEventListener('click', () => {
+      coloredCubesRenderBuffer.bind(gl);
++ 
++     renderTerrain(gl, viewMatrix, projectionMatrix, true);
+  });
+  
+  (async () => {
+
+```
+Now we need a storage to read pixel colors to
+
+📄 src/minecraft.js
+```diff
+      coloredCubesRenderBuffer.bind(gl);
+  
+      renderTerrain(gl, viewMatrix, projectionMatrix, true);
++ 
++     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+  });
+  
+  (async () => {
+
+```
+and actually read pixel colors
+
+📄 src/minecraft.js
+```diff
+      renderTerrain(gl, viewMatrix, projectionMatrix, true);
+  
+      const pixels = new Uint8Array(canvas.width * canvas.height * 4);
++     gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+  });
+  
+  (async () => {
+
+```
+That's it, we now have the whole scene rendered to an offscreen texture, where each object has a unique color. We'll continue click detection tomorrow
+
+Thanks for reading! 👋
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
