@@ -59,11 +59,14 @@ export async function prepare(gl) {
                 matrices[cubeIndex * 4 * 4 + index] = value;
             });
 
+            indices[cubeIndex] = cubeIndex;
+
             cubeIndex++;
         }
     }
 
     State.matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
+    State.indexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
     State.offset = 4 * 4; // 4 floats 4 bytes each
     State.stride = State.offset * 4; // 4 rows of 4 floats
