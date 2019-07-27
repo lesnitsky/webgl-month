@@ -104,6 +104,7 @@ document.body.addEventListener('click', () => {
     renderTerrain(gl, viewMatrix, projectionMatrix, true);
 
     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+    gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 });
 
 (async () => {
