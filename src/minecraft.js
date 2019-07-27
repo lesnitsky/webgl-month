@@ -37,6 +37,7 @@ const cameraFocusPointMatrix = mat4.create();
 mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
 
 const offscreenRenderBuffer = new RenderBuffer(gl);
+const coloredCubesRenderBuffer = new RenderBuffer(gl);
 
 const vShader = gl.createShader(gl.VERTEX_SHADER);
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
