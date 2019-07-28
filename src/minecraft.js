@@ -72,12 +72,6 @@ gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.heigh
 function render() {
     offscreenRenderBuffer.clear(gl);
 
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
-    mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
-
-    mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
-
     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
 
     renderSkybox(gl, viewMatrix, projectionMatrix);
@@ -122,6 +116,10 @@ document.body.addEventListener('click', (e) => {
     const g = pixels[pixelIndex + 1];
     const b = pixels[pixelIndex + 2];
     const a = pixels[pixelIndex + 3];
+
+    const index = rgbToInt(r, g, b);
+
+    console.log(index);
 });
 
 (async () => {
