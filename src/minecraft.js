@@ -98,13 +98,16 @@ function render() {
     requestAnimationFrame(render);
 }
 
-document.body.addEventListener('click', () => {
+document.body.addEventListener('click', (e) => {
     coloredCubesRenderBuffer.bind(gl);
 
     renderTerrain(gl, viewMatrix, projectionMatrix, true);
 
     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
     gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    const x = e.clientX * devicePixelRatio;
+    const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
 });
 
 (async () => {
