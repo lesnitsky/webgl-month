@@ -98,6 +98,10 @@ function render() {
     requestAnimationFrame(render);
 }
 
+function rgbToInt(r, g, b) {
+    return b + g * 255 + r * 255 ** 2;
+}
+
 document.body.addEventListener('click', (e) => {
     coloredCubesRenderBuffer.bind(gl);
 
