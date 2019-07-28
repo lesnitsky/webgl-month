@@ -69,13 +69,15 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, fal
 
 gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
 
+let selectedObjectIndex = -1;
+
 function render() {
     offscreenRenderBuffer.clear(gl);
 
     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
 
     renderSkybox(gl, viewMatrix, projectionMatrix);
-    renderTerrain(gl, viewMatrix, projectionMatrix);
+    renderTerrain(gl, viewMatrix, projectionMatrix, false, selectedObjectIndex);
 
     gl.useProgram(program);
 
@@ -119,7 +121,7 @@ document.body.addEventListener('click', (e) => {
 
     const index = rgbToInt(r, g, b);
 
-    console.log(index);
+    selectedObjectIndex = index;
 });
 
 (async () => {
