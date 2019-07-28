@@ -30,8 +30,8 @@ mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.h
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-const cameraPosition = [0, 5, 0];
-const cameraFocusPoint = vec3.fromValues(0, 0, 30);
+const cameraPosition = [0, 10, 0];
+const cameraFocusPoint = vec3.fromValues(30, 0, 30);
 const cameraFocusPointMatrix = mat4.create();
 
 mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
