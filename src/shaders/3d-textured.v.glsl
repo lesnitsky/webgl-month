@@ -5,9 +5,11 @@ attribute float index;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform float selectedObjectIndex;
 
 varying vec2 vTexCoord;
 varying vec3 vColor;
+varying vec4 vColorMultiplier;
 
 vec3 encodeObject(float id) {
     int b = int(mod(id, 255.0));
@@ -21,4 +23,10 @@ void main() {
 
     vTexCoord = texCoord;
     vColor = encodeObject(index);
+    
+    if (selectedObjectIndex == index) {
+        vColorMultiplier = vec4(1.5, 1.5, 1.5, 1.0);
+    } else {
+        vColorMultiplier = vec4(1.0, 1.0, 1.0, 1.0);
+    }
 }

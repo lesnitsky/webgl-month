@@ -126,7 +126,7 @@ function resetDivisorAngles() {
     State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
 }
 
-export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
+export function render(gl, viewMatrix, projectionMatrix, renderIndices, selectedObjectIndex) {
     gl.useProgram(State.program);
 
     setupAttributes(gl);
@@ -135,6 +135,8 @@ export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
 
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
     gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+
+    gl.uniform1f(State.programInfo.uniformLocations.selectedObjectIndex, selectedObjectIndex);
 
     if (renderIndices) {
         gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);

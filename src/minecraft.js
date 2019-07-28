@@ -30,8 +30,8 @@ mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.h
 
 gl.viewport(0, 0, canvas.width, canvas.height);
 
-const cameraPosition = [0, 5, 0];
-const cameraFocusPoint = vec3.fromValues(0, 0, 30);
+const cameraPosition = [0, 10, 0];
+const cameraFocusPoint = vec3.fromValues(30, 0, 30);
 const cameraFocusPointMatrix = mat4.create();
 
 mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
@@ -69,19 +69,15 @@ gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, fal
 
 gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
 
+let selectedObjectIndex = -1;
+
 function render() {
     offscreenRenderBuffer.clear(gl);
-
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
-    mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
-    mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
-
-    mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
 
     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
 
     renderSkybox(gl, viewMatrix, projectionMatrix);
-    renderTerrain(gl, viewMatrix, projectionMatrix);
+    renderTerrain(gl, viewMatrix, projectionMatrix, false, selectedObjectIndex);
 
     gl.useProgram(program);
 
@@ -98,13 +94,34 @@ function render() {
     requestAnimationFrame(render);
 }
 
-document.body.addEventListener('click', () => {
+function rgbToInt(r, g, b) {
+    return b + g * 255 + r * 255 ** 2;
+}
+
+document.body.addEventListener('click', (e) => {
     coloredCubesRenderBuffer.bind(gl);
 
     renderTerrain(gl, viewMatrix, projectionMatrix, true);
 
     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
     gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+
+    const x = e.clientX * devicePixelRatio;
+    const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
+
+    const rowsToSkip = y * canvas.width * 4;
+    const col = x * 4;
+
+    const pixelIndex = rowsToSkip + col;
+
+    const r = pixels[pixelIndex];
+    const g = pixels[pixelIndex + 1];
+    const b = pixels[pixelIndex + 2];
+    const a = pixels[pixelIndex + 3];
+
+    const index = rgbToInt(r, g, b);
+
+    selectedObjectIndex = index;
 });
 
 (async () => {
