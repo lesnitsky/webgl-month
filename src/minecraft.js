@@ -111,6 +111,8 @@ document.body.addEventListener('click', (e) => {
 
     const rowsToSkip = y * canvas.width * 4;
     const col = x * 4;
+
+    const pixelIndex = rowsToSkip + col;
 });
 
 (async () => {
