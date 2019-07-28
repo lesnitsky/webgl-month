@@ -9421,3 +9421,287 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 28. Click detection. Part II
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month
+
+Yesterday we've rendered our minecraft terrain to a offscreen texture, where each object is encoded into a specific color and learned how to read pixel colors from the texture back to JS. Now let's decode this color to an object index and highlight selected cube
+
+
+`gl.readPixels` fills the `Uint8Array` with pixel colors startig from the bottom left corner. We need to convert client coordinates to the pixels coordinate in the array. Don't forget the pixel ration, since our offscreen framebuffer takes it into account, and event coordinates don't.
+
+📄 src/minecraft.js
+```diff
+      requestAnimationFrame(render);
+  }
+  
+- document.body.addEventListener('click', () => {
++ document.body.addEventListener('click', (e) => {
+      coloredCubesRenderBuffer.bind(gl);
+  
+      renderTerrain(gl, viewMatrix, projectionMatrix, true);
+  
+      const pixels = new Uint8Array(canvas.width * canvas.height * 4);
+      gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
++ 
++     const x = e.clientX * devicePixelRatio;
++     const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
+  });
+  
+  (async () => {
+
+```
+We need to skip `y` rows (`y * canvas.width`) multiplied by 4 (4 integers per pixel)
+
+📄 src/minecraft.js
+```diff
+  
+      const x = e.clientX * devicePixelRatio;
+      const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
++ 
++     const rowsToSkip = y * canvas.width * 4;
+  });
+  
+  (async () => {
+
+```
+Horizontal coordinate is `x * 4` (coordinate multiplied by number of integers per pixel)
+
+📄 src/minecraft.js
+```diff
+      const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
+  
+      const rowsToSkip = y * canvas.width * 4;
++     const col = x * 4;
+  });
+  
+  (async () => {
+
+```
+So the final index of pixel is rowsToSkip + col
+
+📄 src/minecraft.js
+```diff
+  
+      const rowsToSkip = y * canvas.width * 4;
+      const col = x * 4;
++ 
++     const pixelIndex = rowsToSkip + col;
+  });
+  
+  (async () => {
+
+```
+Now we need to read each pixel color component
+
+📄 src/minecraft.js
+```diff
+      const col = x * 4;
+  
+      const pixelIndex = rowsToSkip + col;
++ 
++     const r = pixels[pixelIndex];
++     const g = pixels[pixelIndex + 1];
++     const b = pixels[pixelIndex + 2];
++     const a = pixels[pixelIndex + 3];
+  });
+  
+  (async () => {
+
+```
+Now we need to convert back to integer from r g b
+
+📄 src/minecraft.js
+```diff
+      requestAnimationFrame(render);
+  }
+  
++ function rgbToInt(r, g, b) {
++     return b + g * 255 + r * 255 ** 2;
++ }
++ 
+  document.body.addEventListener('click', (e) => {
+      coloredCubesRenderBuffer.bind(gl);
+  
+
+```
+Let's drop camera rotation code to make scene static
+
+📄 src/minecraft.js
+```diff
+  function render() {
+      offscreenRenderBuffer.clear(gl);
+  
+-     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
+-     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
+-     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
+- 
+-     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
+- 
+      mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
+  
+      renderSkybox(gl, viewMatrix, projectionMatrix);
+      const g = pixels[pixelIndex + 1];
+      const b = pixels[pixelIndex + 2];
+      const a = pixels[pixelIndex + 3];
++ 
++     const index = rgbToInt(r, g, b);
++ 
++     console.log(index);
+  });
+  
+  (async () => {
+
+```
+and update initial camera position to see the scene better
+
+📄 src/minecraft.js
+```diff
+  
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  
+- const cameraPosition = [0, 5, 0];
+- const cameraFocusPoint = vec3.fromValues(0, 0, 30);
++ const cameraPosition = [0, 10, 0];
++ const cameraFocusPoint = vec3.fromValues(30, 0, 30);
+  const cameraFocusPointMatrix = mat4.create();
+  
+  mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
+
+```
+Next let's pass selected color index into vertex shader as varying
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  
+  uniform mat4 viewMatrix;
+  uniform mat4 projectionMatrix;
++ uniform float selectedObjectIndex;
+  
+  varying vec2 vTexCoord;
+  varying vec3 vColor;
+
+```
+And multiply object color if its index matches selected object index
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  varying vec3 vColor;
+  
+  uniform float renderIndices;
++ varying vec4 vColorMultiplier;
+  
+  void main() {
+-     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
++     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
+  
+      if (renderIndices == 1.0) {
+          gl_FragColor.rgb = vColor;
+
+```
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  
+  varying vec2 vTexCoord;
+  varying vec3 vColor;
++ varying vec4 vColorMultiplier;
+  
+  vec3 encodeObject(float id) {
+      int b = int(mod(id, 255.0));
+  
+      vTexCoord = texCoord;
+      vColor = encodeObject(index);
++     
++     if (selectedObjectIndex == index) {
++         vColorMultiplier = vec4(1.5, 1.5, 1.5, 1.0);
++     } else {
++         vColorMultiplier = vec4(1.0, 1.0, 1.0, 1.0);
++     }
+  }
+
+```
+and reflect shader changes in js
+
+📄 src/minecraft-terrain.js
+```diff
+      State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
+  }
+  
+- export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
++ export function render(gl, viewMatrix, projectionMatrix, renderIndices, selectedObjectIndex) {
+      gl.useProgram(State.program);
+  
+      setupAttributes(gl);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
+      gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
+  
++     gl.uniform1f(State.programInfo.uniformLocations.selectedObjectIndex, selectedObjectIndex);
++ 
+      if (renderIndices) {
+          gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);
+      } else {
+
+```
+📄 src/minecraft.js
+```diff
+  
+  gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
+  
++ let selectedObjectIndex = -1;
++ 
+  function render() {
+      offscreenRenderBuffer.clear(gl);
+  
+      mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
+  
+      renderSkybox(gl, viewMatrix, projectionMatrix);
+-     renderTerrain(gl, viewMatrix, projectionMatrix);
++     renderTerrain(gl, viewMatrix, projectionMatrix, false, selectedObjectIndex);
+  
+      gl.useProgram(program);
+  
+  
+      const index = rgbToInt(r, g, b);
+  
+-     console.log(index);
++     selectedObjectIndex = index;
+  });
+  
+  (async () => {
+
+```
+That's it! We now know selected object index, so that we can perform JS operations as well as visual feedback!
+
+Thanks for reading!
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
