@@ -108,6 +108,8 @@ document.body.addEventListener('click', (e) => {
 
     const x = e.clientX * devicePixelRatio;
     const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
+
+    const rowsToSkip = y * canvas.width * 4;
 });
 
 (async () => {
