@@ -113,6 +113,11 @@ document.body.addEventListener('click', (e) => {
     const col = x * 4;
 
     const pixelIndex = rowsToSkip + col;
+
+    const r = pixels[pixelIndex];
+    const g = pixels[pixelIndex + 1];
+    const b = pixels[pixelIndex + 2];
+    const a = pixels[pixelIndex + 3];
 });
 
 (async () => {
