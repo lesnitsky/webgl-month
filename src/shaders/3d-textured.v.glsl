@@ -5,6 +5,7 @@ attribute float index;
 
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
+uniform float selectedObjectIndex;
 
 varying vec2 vTexCoord;
 varying vec3 vColor;
