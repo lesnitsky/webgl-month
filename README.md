@@ -9867,3 +9867,145 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 30. Text rendering in WebGL
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month.
+
+In previuos tutorials we were focused on rendering 2d and 3d shapes, but never rendered text, which is important part of any application.
+
+In this article we'll review possible ways of text rendering.
+
+### HTML overlay
+
+The most obvoius and simple solution would be to render text with HTML and place it above the webgl canvas, but this will only work for 2D scenes, 3D stuff will require some calculations to calculate text position and css transforms
+
+### Canvas as texture
+
+Other technique might be applied in a wider range of cases. It requires several steps
+
+1. create another canvas
+2. get 2d context (`canvas.getContext('2d')`)
+3. render text with `fillText` or `strokeText`
+4. use this canvas as webgl texture with correct texture coordinates
+
+Since the texture is a rasterized image, it will loose the quality when you'll come "closer" to the object
+
+### Glyphs texture
+
+Each font is actually a set of "glyphs" – each symbol is rendered in a signle image
+
+```
+A | B | C | D | E | F | G |
+---------------------------
+H | I | J | K | L | M | N |
+...
+```
+
+Each letter will have it's own "properties", like width (`i` is thiner than `W`), height (`o` vs `L`) etc.
+These properties will affect how to build rectangles, containing each letter
+
+Typically aside of texture you'll need to have a javascript object describing all these properties and coordinates in original texture image
+
+```javascript
+const font = {
+    textureSize: {
+        width: 512,
+        height: 512,
+    },
+    height: 32,
+    glyphs: {
+        a: { x: 0, y: 0, height: 32, width: 16 },
+        b: { x: 16, y: 0, height: 32, width: 14 },
+    },
+    // ...
+};
+```
+
+and to render some text you'll need something like this
+
+```javascript
+function getRects(text, sizeMultiplier) {
+    let prevLetterX = 0;
+
+    const rects = text.split('').map((symbol) => {
+        const glyph = font.glyphs[symbol];
+
+        return {
+            x: prevLetterX,
+            y: font.height - glyph.height,
+            width: glyph.width * sizeMultiplier,
+            height: glyph.height * sizeMultiplier,
+            texCoords: glyph,
+        };
+    });
+}
+```
+
+Later this "rects" will be used to generate attributes data
+
+```javascript
+import { createRect } from './gl-helpers';
+
+function generateBuffers(rects) {
+    const attributeBuffers = {
+        position: [],
+        texCoords: [],
+    };
+
+    rects.forEach((rect, index) => {
+        attributeBuffers.position.push(...createRect(rect.x, rect.y, rect.width, rect.height)),
+            attributeBuffers.texCoords.push(
+                ...createRect(rect.texCoords.x, rect.texCoords.y, rect.texCoords.width, rect.texCoords.height)
+            );
+    });
+
+    return attributeBuffers;
+}
+```
+
+There's a [gl-render-text](https://www.npmjs.com/package/gl-render-text) package which can render texture based fonts
+
+### Font triangulation
+
+Since webgl is capable of drawing triangles, one more obvious solution would be to break each letter into triangles
+This seem to be a very complex task 😢
+
+Luckily – there's a [fontpath-gl](https://github.com/mattdesl/fontpath-gl) package, which does exactly this
+
+### Signed distance field font
+
+Another technique for rendering text in OpenGL/WebGL
+
+Find [more info here](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts)
+
+---
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Soruce code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
