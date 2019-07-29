@@ -9705,3 +9705,165 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 29. Fog
+
+This is a series of blog posts related to WebGL. New post will be available every day
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+---
+
+Hey 👋
+
+Welcome to WebGL month
+
+Today we're going to improve our 3D minecraft terrain scene with fog
+
+Basically we need to "lighten" the color of far cubes (calculate distance between camera and cube vertex)
+
+
+To calculate relative distance between camera position and some point, we need to multiply position by view and model matrices. Since we also need the same resulting matrix together with projection matrix, let's just extract it to a variable
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  }
+  
+  void main() {
+-     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
++     mat4 modelView = viewMatrix * modelMatrix;
++ 
++     gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
+  
+      vTexCoord = texCoord;
+      vColor = encodeObject(index);
+
+```
+Since our camera looks in a negative direction of Z axis, we need to get `z` coordinate of resulting vertex position
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  
+      gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
+  
++     float depth = (modelView * vec4(position, 1.0)).z;
++ 
+      vTexCoord = texCoord;
+      vColor = encodeObject(index);
+      
+
+```
+But this value will be negative, while we need a positive value, so let's just negate it
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  
+      gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
+  
+-     float depth = (modelView * vec4(position, 1.0)).z;
++     float depth = -(modelView * vec4(position, 1.0)).z;
+  
+      vTexCoord = texCoord;
+      vColor = encodeObject(index);
+
+```
+We can't use `depth` directly, since we need a value in `[0..1]` range. Also it'd be nice to have a smooth "gradient" like fog. We can apply glsl [smoothstep](https://thebookofshaders.com/glossary/?search=smoothstep) function to calcuate the final amount of fog. This function interpolates a value in range of `lowerBound` and `upperBound`. Max depth of our camera is `142`
+
+```javascript
+mat4.perspective(
+    projectionMatrix,
+    (Math.PI / 360) * 90,
+    canvas.width / canvas.height,
+    0.01,
+    142 // <- zFar
+);
+```
+
+So the max value of `depth` should be < 142 in order to see any fog at all (object farther than 142 won't be visible at all). Let's use `60..100` range.
+
+One more thing to take into account is that we don't want to see the object _completely_ white, so let's multiply the final amount by `0.9`
+
+We'll need the final value of `fogAmount` in fragment shader, so this should be a `varying`
+
+📄 src/shaders/3d-textured.v.glsl
+```diff
+  varying vec2 vTexCoord;
+  varying vec3 vColor;
+  varying vec4 vColorMultiplier;
++ varying float vFogAmount;
+  
+  vec3 encodeObject(float id) {
+      int b = int(mod(id, 255.0));
+      gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
+  
+      float depth = -(modelView * vec4(position, 1.0)).z;
++     vFogAmount = smoothstep(60.0, 100.0, depth) * 0.9;
+  
+      vTexCoord = texCoord;
+      vColor = encodeObject(index);
+
+```
+Let's define this varying in fragment shader
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  
+  uniform float renderIndices;
+  varying vec4 vColorMultiplier;
++ varying float vFogAmount;
+  
+  void main() {
+      gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
+
+```
+Now let's define a color of the fog (white). We can also pass this color to a uniform, but let's keep things simple
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+  void main() {
+      gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
+  
++     vec3 fogColor = vec3(1.0, 1.0, 1.0);
++ 
+      if (renderIndices == 1.0) {
+          gl_FragColor.rgb = vColor;
+      }
+
+```
+and finally we need to mix original color of the pixel with the fog. We can use glsl [mix](https://thebookofshaders.com/glossary/\?search\=mix)
+
+📄 src/shaders/3d-textured.f.glsl
+```diff
+      gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
+  
+      vec3 fogColor = vec3(1.0, 1.0, 1.0);
++     gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, vFogAmount);
+  
+      if (renderIndices == 1.0) {
+          gl_FragColor.rgb = vColor;
+
+```
+That's it, our scene is now "foggy". To implement the same effect, but "at night", we just need to change fog color to black.
+
+Thanks for reading!
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
