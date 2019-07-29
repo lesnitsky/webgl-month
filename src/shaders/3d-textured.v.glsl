@@ -23,7 +23,7 @@ void main() {
 
     gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
 
-    float depth = (modelView * vec4(position, 1.0)).z;
+    float depth = -(modelView * vec4(position, 1.0)).z;
 
     vTexCoord = texCoord;
     vColor = encodeObject(index);
