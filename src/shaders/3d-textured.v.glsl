@@ -10,6 +10,7 @@ uniform float selectedObjectIndex;
 varying vec2 vTexCoord;
 varying vec3 vColor;
 varying vec4 vColorMultiplier;
+varying float vFogAmount;
 
 vec3 encodeObject(float id) {
     int b = int(mod(id, 255.0));
@@ -19,7 +20,12 @@ vec3 encodeObject(float id) {
 }
 
 void main() {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    mat4 modelView = viewMatrix * modelMatrix;
+
+    gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
+
+    float depth = -(modelView * vec4(position, 1.0)).z;
+    vFogAmount = smoothstep(60.0, 100.0, depth) * 0.9;
 
     vTexCoord = texCoord;
     vColor = encodeObject(index);
