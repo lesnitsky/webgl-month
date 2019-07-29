@@ -12,6 +12,7 @@ void main() {
     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
 
     vec3 fogColor = vec3(1.0, 1.0, 1.0);
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, vFogAmount);
 
     if (renderIndices == 1.0) {
         gl_FragColor.rgb = vColor;
