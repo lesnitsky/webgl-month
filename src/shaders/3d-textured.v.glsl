@@ -19,7 +19,9 @@ vec3 encodeObject(float id) {
 }
 
 void main() {
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    mat4 modelView = viewMatrix * modelMatrix;
+
+    gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
 
     vTexCoord = texCoord;
     vColor = encodeObject(index);
