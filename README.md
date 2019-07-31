@@ -10009,3 +10009,157 @@ Built with
 
 [![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
 
+
+## Day 31. WebGL Month summary
+
+[![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+
+[Source code available here](https://github.com/lesnitsky/webgl-month)
+
+Built with
+
+[![Git Tutor Logo](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/git-tutor-logo-50.png)](https://github.com/lesnitsky/git-tutor)
+
+Hey 👋
+
+Welcome to the last day of WebGL month.
+This article won't cover any new topics, but rather summarize previous 30 days
+
+### Previuos tutorials:
+
+#### [Day 1. Intro](https://dev.to/lesnitsky/webgl-month-day-1-19ha)
+
+This article doesn't cover any WebGL topics, but rather explains what WebGL does under the hood. TL;DR: it calculates colors of each pixel it has to draw
+
+#### [Day 2. Shaders and points](https://dev.to/lesnitsky/shaders-and-points-3h2c)
+
+Introduction to WebGL API and GLSL shaders with the simpliest possible primitive type – point
+
+#### [Day 3. Shader uniforms, lines and triangles](https://dev.to/lesnitsky/webgl-month-day-3-shader-uniforms-lines-and-triangles-5dof)
+
+This article covers more ways of passing data to shaders and uses more complex primitives to render
+
+#### [Day 4. Shader varying](https://dev.to/lesnitsky/shader-varyings-2p0f)
+
+Passing data from vertex to fragment shader with varyings
+
+#### [Day 5. Interleaved buffers](https://dev.to/lesnitsky/webgl-month-day-5-interleaved-buffers-2k9a)
+
+Alternative ways of storing and passing vertex data to shaders
+
+#### [Day 6. Indexed buffer](https://dev.to/lesnitsky/webgl-month-day-6-indexed-buffer-ll6)
+
+A technique which helps reduce number of duplicate vertices
+
+#### [Day 7. Cleanup and tooling](https://dev.to/lesnitsky/webgl-month-day-7-a-bit-of-cleanup-and-tooling-bd4)
+
+WebGL is fun, but it requires a bit of tooling when your project grows. Luckily we have awesome tools like webpack
+
+#### [Day 8. Textures](https://dev.to/lesnitsky/webgl-month-day-8-textures-1mk8)
+
+Intro to textures
+
+#### [Day 9. Image filters](https://dev.to/lesnitsky/webgl-month-day-9-image-filters-5g8e)
+
+Taking advantage of fragment shader to implement simple image "filters" (inverse, black and white, sepia)
+
+#### [Day 10. Multiple textures](https://dev.to/lesnitsky/webgl-month-day-10-multiple-textures-gf3)
+
+How to use multiple textures in a single webgl program
+
+#### [Day 11. Reducing WebGL boilerplate](https://dev.to/lesnitsky/webgl-month-day-11-3plb)
+
+Implementation of some utility classes and functions to reduce WebGL boilerplate
+
+#### [Day 12. Highdpi displays and WebGL viewport](https://dev.to/lesnitsky/webgl-month-day-12-highdpi-displays-and-webgl-viewport-2cg3)
+
+How to handle retina displays with canvas and use webgl viewport
+
+#### [Day 13. Simple animation](https://dev.to/lesnitsky/webgl-month-simple-animation-5hc3)
+
+All previous examples where static images, this article will add some motion to the scene
+
+#### [Day 14. Intro to 3D](https://dev.to/lesnitsky/webgl-month-day-14-intro-to-3d-2ni2)
+
+Theory of 3D compuatations required for 3D rendering. No code
+
+#### [Day 15. Rendering a cube](https://dev.to/lesnitsky/webgl-month-day-15-rendering-a-3d-cube-190f)
+
+3D theory applied on practice to render 3D cube
+
+#### [Day 16. Depth buffer. Cube faces colors](https://dev.to/lesnitsky/webgl-month-day-16-colorizing-cube-depth-buffer-and-array-uniforms-4nhc)
+
+This article contains fixes for previous example and adds more colors
+
+#### [Day 17. OBJ format](https://dev.to/lesnitsky/webgl-month-day-17-exploring-obj-format-6fn)
+
+Implementing simple parser for OBJ format
+
+#### [Day 18. Flat shading](https://dev.to/lesnitsky/webgl-month-day-18-flat-shading-3nhg)
+
+Implementation of flat shading
+
+#### [Day 19. Rendering multiple objects](https://dev.to/lesnitsky/webgl-month-day-19-rendering-multiple-objects-45m7)
+
+A typical 3D scene consists of multiple objects, this tutorial will teach you how to render more than 1 object
+
+#### [Day 20. Rendering a minecraft dirt cube](https://dev.to/lesnitsky/webgl-month-day-20-rendering-a-minecraft-dirt-cube-5ag3)
+
+Texturing 3D object with Blender and WebGL
+
+#### [Day 21. Rendering a minecraft terrain](https://dev.to/lesnitsky/webgl-month-day-21-rendering-a-minecraft-terrain-24b5)
+
+We've learned how to render multiple objects. How to render 10000 of objects?
+
+#### [Day 22. Reducing number of webgl calls by 5000 times](https://dev.to/lesnitsky/webgl-month-day-22-reducing-number-of-webgl-calls-by-5000-times-3a4j)
+
+Previous example worked, but wasn't really performance. This article explains _instancing_ (a technique which helps to improve performance when rendering a large amount of same objects)
+
+#### [Day 23. Skynox](https://dev.to/lesnitsky/webgl-month-day-23-skybox-in-webgl-1eig)
+
+Adding "environment" to the scene
+
+#### [Day 24. Combining terrain and skybox](https://dev.to/lesnitsky/webgl-month-day-24-combining-terrain-and-skybox-kgo)
+
+How to use multiple WebGL programs together
+
+#### [Day 25. Mipmaps](https://dev.to/lesnitsky/webgl-month-day-25-mipmaps-33i)
+
+A technique which improves performance of shaders reading data from textures
+
+#### [Day 26. Rendering to texture](https://dev.to/lesnitsky/webgl-month-day-26-rendering-to-texture-4hkp)
+
+Rendering to texture allows to apply some "post-effects" and might be used for a variety of use-cases
+
+#### [Day 27. Click detection. Part I](https://dev.to/lesnitsky/webgl-month-day-27-click-detection-part-i-5920)
+
+#### [Day 28. Click detection. Part II](https://dev.to/lesnitsky/webgl-month-day-28-click-detection-part-ii-367e)
+
+Detecting object under the cursor might seem a tough task, but it might be done without complex 3d math in JS
+
+#### [Day 29. Fog](https://dev.to/lesnitsky/webgl-month-day-29-fog-58od)
+
+Improving scene with fog
+
+#### [Day 30. Text rendering in WebGL](https://dev.to/lesnitsky/webgl-month-day-30-text-rendering-in-webgl-3ih3)
+
+An overview of text rendering techniques in WebGL
+
+### Useful links
+
+I've started working with WebGL only a year and a half ago. My WebGL journey started with an awesome resource – [https://webglfundamentals.org/](https://webglfundamentals.org/)
+
+One more important thing to understand: WebGL is just a wrapper of OpenGL, so almost everything from OpenGL tutorials might be used in WebGL as well: [https://learnopengl.com/](https://learnopengl.com/)
+
+Exploring more glsl stuff: [https://thebookofshaders.com/](https://thebookofshaders.com/)
+
+Codepen for shaders: [https://www.shadertoy.com/](https://www.shadertoy.com/)
+
+[Getting started with WebGL tutorial on MDN](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Getting_started_with_WebGL)
+
+### Thanks!
+
+Thanks for joining WebGL month. Hope this articles helped you learn WebGL! 😉
+Feel free to submit questions, suggestions, improvements to [github repo](https://github.com/lesnitsky/webgl-month), get in touch with me [via email](mailto:andrei.lesnitsky@gmail.com) or [twitter](https://twitter.com/lesnitsky_a)
+
