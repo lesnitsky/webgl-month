@@ -2,14 +2,14 @@
 
 Hi 👋 My name is Andrei. I have some fun experience with WebGL and I want to share it. I'm starting a month of WebGL, each day I will post a WebGL related tutorial. Not Three.js, not pixi.js, WebGL API itself.
 
-[Follow me on twitter](https://twitter.com/lesnitsky_a) to get WebGL month updates or [join WebGL month mailing list](http://eepurl.com/gwiSeH)
+[Follow me on twitter](https://twitter.com/lesnitsky_dev) to get WebGL month updates or [join WebGL month mailing list](http://eepurl.com/gwiSeH)
 
 
 ## Day 1. Intro
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -225,7 +225,7 @@ That's exactly what WebGL API does – _it calculates color of each pixel and fi
 
 In next article we'll start working with WebGL API and render a WebGL "Hello world". See you tomorrow
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -242,7 +242,7 @@ Extend custom `fillRect` to support custom colors
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -886,7 +886,7 @@ Render a `Math.cos` graph with dots
 Hint: all you need is fill `positionData` with valid values
 
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -899,7 +899,7 @@ Hint: all you need is fill `positionData` with valid values
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1355,7 +1355,7 @@ Render different shapes using triangles:
 
 See you tomorrow 👋
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1368,7 +1368,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1724,7 +1724,7 @@ See you tomorrow 👋
 
 ---
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Soruce code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1737,7 +1737,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1968,7 +1968,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -1981,7 +1981,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2140,7 +2140,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2153,7 +2153,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2525,7 +2525,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2538,7 +2538,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2972,7 +2972,7 @@ Cool 😎 We can now render images, but there is much more to learn about textur
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -2985,7 +2985,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -3143,7 +3143,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -3156,7 +3156,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -3550,7 +3550,7 @@ See you tomorrow 👋
 
 This is a series of blog posts related to WebGL. New post will be available every day
 
-[Subscribe](https://twitter.com/lesnitsky_a) for updates or [join mailing list](http://eepurl.com/gwiSeH)
+[Subscribe](https://twitter.com/lesnitsky_dev) for updates or [join mailing list](http://eepurl.com/gwiSeH)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -3564,7 +3564,7 @@ This is a series of blog posts related to WebGL. New post will be available ever
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -3996,7 +3996,7 @@ See you tomorrow 👋
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4012,7 +4012,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4172,7 +4172,7 @@ Oops, canvas clears after resize. Turns out that modification of `width` or `hei
 That's it for today, see you tomorrow 👋
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day12)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day12)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day12)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4188,7 +4188,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4647,7 +4647,7 @@ That's it for today, see you tomorrow! 👋
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4663,7 +4663,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4729,7 +4729,7 @@ There's also a [good article on MDN explaining these concepts](https://developer
 ---
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -4745,7 +4745,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5258,7 +5258,7 @@ That's it for today, see you tomorrow 👋
 ---
 
 ![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day11)
-![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day11)
+![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day11)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5274,7 +5274,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5546,7 +5546,7 @@ See you in next tutorials 👋
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5562,7 +5562,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month&hash=day17)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a&hash=day17)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev&hash=day17)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5974,7 +5974,7 @@ That's it for today, see you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -5999,7 +5999,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -6333,7 +6333,7 @@ See you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -6349,7 +6349,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -6760,7 +6760,7 @@ That's it for today, see you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -6776,7 +6776,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day20)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day20)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day20)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7354,7 +7354,7 @@ That's it for today, see you tomorrow 👋!
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7370,7 +7370,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day21)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7599,7 +7599,7 @@ This approach is not very performant though, as we're issuing 2 gl calls for eac
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social&hash=day21)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social&hash=day21)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7615,7 +7615,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7827,7 +7827,7 @@ See you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -7843,7 +7843,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8226,7 +8226,7 @@ See you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8242,7 +8242,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8514,7 +8514,7 @@ Thanks for reading, see you tomorrow 👋
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8530,7 +8530,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8618,7 +8618,7 @@ Thanks for reading, see you tomorrow 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8634,7 +8634,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -8995,7 +8995,7 @@ Thanks for reading! 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9011,7 +9011,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9411,7 +9411,7 @@ Thanks for reading! 👋
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9427,7 +9427,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9695,7 +9695,7 @@ Thanks for reading!
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9711,7 +9711,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9857,7 +9857,7 @@ That's it, our scene is now "foggy". To implement the same effect, but "at night
 Thanks for reading!
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9873,7 +9873,7 @@ Built with
 This is a series of blog posts related to WebGL. New post will be available every day
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -9999,7 +9999,7 @@ Find [more info here](https://github.com/libgdx/libgdx/wiki/Distance-field-fonts
 ---
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Join mailing list](http://eepurl.com/gwiSeH) to get new posts right to your inbox
 
@@ -10013,7 +10013,7 @@ Built with
 ## Day 31. WebGL Month summary
 
 [![GitHub stars](https://img.shields.io/github/stars/lesnitsky/webgl-month.svg?style=social)](https://github.com/lesnitsky/webgl-month)
-[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_a.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_a)
+[![Twitter Follow](https://img.shields.io/twitter/follow/lesnitsky_dev.svg?label=Follow%20me&style=social)](https://twitter.com/lesnitsky_dev)
 
 [Source code available here](https://github.com/lesnitsky/webgl-month)
 
@@ -10161,5 +10161,5 @@ Codepen for shaders: [https://www.shadertoy.com/](https://www.shadertoy.com/)
 ### Thanks!
 
 Thanks for joining WebGL month. Hope this articles helped you learn WebGL! 😉
-Feel free to submit questions, suggestions, improvements to [github repo](https://github.com/lesnitsky/webgl-month), get in touch with me [via email](mailto:andrei.lesnitsky@gmail.com) or [twitter](https://twitter.com/lesnitsky_a)
+Feel free to submit questions, suggestions, improvements to [github repo](https://github.com/lesnitsky/webgl-month), get in touch with me [via email](mailto:andrei.lesnitsky@gmail.com) or [twitter](https://twitter.com/lesnitsky_dev)
 
