@@ -34,14 +34,14 @@ gl.useProgram(program);
 const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
-    ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, 0),
+    ...createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200, 0)
 ]), gl.STATIC_DRAW);
 
 gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
 const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
-    0, 1, 2, 
-    1, 2, 3, 
+    0, 1, 2,
+    1, 2, 3,
 ]), gl.STATIC_DRAW);
 
 gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);

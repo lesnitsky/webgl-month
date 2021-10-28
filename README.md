@@ -74,7 +74,7 @@ Let's grab a reference to canvas and get 2d context
 📄 src/canvas2d.js
 ```diff
 - console.log('Hello WebGL month');+ console.log('Hello WebGL month');
-+ 
++
 + const canvas = document.querySelector('canvas');
 + const ctx = canvas.getContext('2d');
 
@@ -83,10 +83,10 @@ and do smth pretty simple, like drawing a black rectangle
 
 📄 src/canvas2d.js
 ```diff
-  
+
   const canvas = document.querySelector('canvas');
   const ctx = canvas.getContext('2d');
-+ 
++
 + ctx.fillRect(0, 0, 100, 50);
 
 ```
@@ -104,10 +104,10 @@ Let's implement our own version of
 ```diff
   const canvas = document.querySelector('canvas');
   const ctx = canvas.getContext('2d');
-  
+
 - ctx.fillRect(0, 0, 100, 50);
 + function fillRect(top, left, width, height) {
-+ 
++
 + }
 
 ```
@@ -118,9 +118,9 @@ The size of this array is `canvas.width * canvas.height` (pixels count) `* 4` (e
 📄 src/canvas2d.js
 ```diff
   const ctx = canvas.getContext('2d');
-  
+
   function fillRect(top, left, width, height) {
-- 
+-
 +     const pixelStore = new Uint8ClampedArray(canvas.width * canvas.height * 4);
   }
 
@@ -129,10 +129,10 @@ Now we can fill each pixel storage with colors. Note that alpha component is als
 
 📄 src/canvas2d.js
 ```diff
-  
+
   function fillRect(top, left, width, height) {
       const pixelStore = new Uint8ClampedArray(canvas.width * canvas.height * 4);
-+ 
++
 +     for (let i = 0; i < pixelStore.length; i += 4) {
 +         pixelStore[i] = 0; // r
 +         pixelStore[i + 1] = 0; // g
@@ -149,11 +149,11 @@ But how do we render this pixels? There is a special canvas renderable class
           pixelStore[i + 2] = 0; // b
           pixelStore[i + 3] = 255; // alpha
       }
-+ 
++
 +     const imageData = new ImageData(pixelStore, canvas.width, canvas.height);
 +     ctx.putImageData(imageData, 0, 0);
   }
-+ 
++
 + fillRect();
 
 ```
@@ -166,38 +166,38 @@ Calculate pixel indices inside rectangle
 ```diff
   const canvas = document.querySelector('canvas');
   const ctx = canvas.getContext('2d');
-  
+
 + function calculatePixelIndices(top, left, width, height) {
 +     const pixelIndices = [];
-+ 
++
 +     for (let x = left; x < left + width; x++) {
 +         for (let y = top; y < top + height; y++) {
 +             const i =
 +                 y * canvas.width * 4 + // pixels to skip from top
 +                 x * 4; // pixels to skip from left
-+ 
++
 +             pixelIndices.push(i);
 +         }
 +     }
-+ 
++
 +     return pixelIndices;
 + }
-+ 
++
   function fillRect(top, left, width, height) {
       const pixelStore = new Uint8ClampedArray(canvas.width * canvas.height * 4);
-  
+
 
 ```
 and iterate over these pixels instead of the whole canvas
 
 📄 src/canvas2d.js
 ```diff
-  
+
   function fillRect(top, left, width, height) {
       const pixelStore = new Uint8ClampedArray(canvas.width * canvas.height * 4);
-+     
++
 +     const pixelIndices = calculatePixelIndices(top, left, width, height);
-  
+
 -     for (let i = 0; i < pixelStore.length; i += 4) {
 +     pixelIndices.forEach((i) => {
           pixelStore[i] = 0; // r
@@ -206,11 +206,11 @@ and iterate over these pixels instead of the whole canvas
           pixelStore[i + 3] = 255; // alpha
 -     }
 +     });
-  
+
       const imageData = new ImageData(pixelStore, canvas.width, canvas.height);
       ctx.putImageData(imageData, 0, 0);
   }
-  
+
 - fillRect();
 + fillRect(10, 10, 100, 50);
 
@@ -291,7 +291,7 @@ The program executable by GPU is created by  method of WebGL rendering context
 ```diff
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-+ 
++
 + const program = gl.createProgram();
 
 ```
@@ -305,9 +305,9 @@ Both could be created with `createShader` method
 📄 src/webgl-hello-world.js
 ```diff
   const gl = canvas.getContext('webgl');
-  
+
   const program = gl.createProgram();
-+ 
++
 + const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 + const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -316,13 +316,13 @@ Now let's write the simpliest possible shader
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + const vShaderSource = `
 + void main() {
-+     
++
 + }
 + `;
 
@@ -334,10 +334,10 @@ Unlike C or C++ `main` doesn't return anyhting, it assignes a value to a global 
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vShaderSource = `
   void main() {
--     
+-
 +     gl_Position = vec4(0, 0, 0, 1);
   }
   `;
@@ -370,7 +370,7 @@ Alright, we have a shader variable, shader source in another variable. How do we
       gl_Position = vec4(0, 0, 0, 1);
   }
   `;
-+ 
++
 + gl.shaderSource(vertexShader, vShaderSource);
 
 ```
@@ -379,7 +379,7 @@ GLSL shader should be compiled in order to be executed
 📄 src/webgl-hello-world.js
 ```diff
   `;
-  
+
   gl.shaderSource(vertexShader, vShaderSource);
 + gl.compileShader(vertexShader);
 
@@ -388,10 +388,10 @@ Compilation result could be retreived by . This method returns a "compiler" outp
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.shaderSource(vertexShader, vShaderSource);
   gl.compileShader(vertexShader);
-+ 
++
 + console.log(gl.getShaderInfoLog(vertexShader));
 
 ```
@@ -401,21 +401,21 @@ We'll need to do the same with fragment shader, so let's implement a helper func
 ```diff
   }
   `;
-  
+
 - gl.shaderSource(vertexShader, vShaderSource);
 - gl.compileShader(vertexShader);
 + function compileShader(shader, source) {
 +     gl.shaderSource(shader, source);
 +     gl.compileShader(shader);
-  
+
 - console.log(gl.getShaderInfoLog(vertexShader));
 +     const log = gl.getShaderInfoLog(shader);
-+ 
++
 +     if (log) {
 +         throw new Error(log);
 +     }
 + }
-+ 
++
 + compileShader(vertexShader, vShaderSource);
 
 ```
@@ -425,13 +425,13 @@ How does the simpliest fragment shader looks like? Exactly the same
 ```diff
   }
   `;
-  
+
 + const fShaderSource = `
 +     void main() {
-+         
++
 +     }
 + `;
-+ 
++
   function compileShader(shader, source) {
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
@@ -441,16 +441,16 @@ Computation result of a fragment shader is a color, which is also a vector of 4 
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const fShaderSource = `
       void main() {
--         
+-
 +         gl_FragColor = vec4(1, 0, 0, 1);
       }
   `;
-  
+
   }
-  
+
   compileShader(vertexShader, vShaderSource);
 + compileShader(fragmentShader, fShaderSource);
 
@@ -459,10 +459,10 @@ Now we should connect `program` with our shaders
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   compileShader(vertexShader, vShaderSource);
   compileShader(fragmentShader, fShaderSource);
-+ 
++
 + gl.attachShader(program, vertexShader);
 + gl.attachShader(program, fragmentShader);
 
@@ -471,10 +471,10 @@ Next step – link program. This phase is required to verify if vertex and fragm
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
-+ 
++
 + gl.linkProgram(program);
 
 ```
@@ -483,9 +483,9 @@ Our application could have several programs, so we should tell gpu which program
 📄 src/webgl-hello-world.js
 ```diff
   gl.attachShader(program, fragmentShader);
-  
+
   gl.linkProgram(program);
-+ 
++
 + gl.useProgram(program);
 
 ```
@@ -494,9 +494,9 @@ Ok, we're ready to draw something
 📄 src/webgl-hello-world.js
 ```diff
   gl.linkProgram(program);
-  
+
   gl.useProgram(program);
-+ 
++
 + gl.drawArrays();
 
 ```
@@ -510,9 +510,9 @@ We should pass a primitive type we want to render
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.useProgram(program);
-  
+
 - gl.drawArrays();
 + gl.drawArrays(gl.POINTS);
 
@@ -521,9 +521,9 @@ There is a way to pass input data containing info about positions of our primiti
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.useProgram(program);
-  
+
 - gl.drawArrays(gl.POINTS);
 + gl.drawArrays(gl.POINTS, 0);
 
@@ -532,9 +532,9 @@ and primitives count
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.useProgram(program);
-  
+
 - gl.drawArrays(gl.POINTS, 0);
 + gl.drawArrays(gl.POINTS, 0, 1);
 
@@ -546,7 +546,7 @@ Actually to render point, we should also specify a point size inside vertex shad
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vShaderSource = `
   void main() {
 +     gl_PointSize = 20.0;
@@ -599,28 +599,28 @@ Let's define `position` attribute
 📄 src/webgl-hello-world.js
 ```diff
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
   const vShaderSource = `
 + attribute vec2 position;
-+ 
++
   void main() {
       gl_PointSize = 20.0;
 -     gl_Position = vec4(0, 0, 0, 1);
 +     gl_Position = vec4(position.x, position.y, 0, 1);
   }
   `;
-  
+
 
 ```
 In order to fill attribute with data we need to get attribute location. Think of it as of unique identifier of attribute in javascript world
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.useProgram(program);
-  
+
 + const positionPointer = gl.getAttribLocation(program, 'position');
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -628,11 +628,11 @@ GPU accepts only typed arrays as input, so let's define a `Float32Array` as a st
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
 + const positionData = new Float32Array([0, 0]);
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -641,11 +641,11 @@ There are different kinds of "buffers" in GPU world, in this case we need `ARRAY
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionData = new Float32Array([0, 0]);
-  
+
 + const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -653,11 +653,11 @@ To make any changes to GPU buffers, we need to "bind" it. After buffer is bound,
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 + gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -666,10 +666,10 @@ To fill buffer with some data, we need to call `bufferData` method
 📄 src/webgl-hello-world.js
 ```diff
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, positionData);
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -691,11 +691,11 @@ To optimize buffer operations (memory management) on GPU side, we should pass a 
 📄 src/webgl-hello-world.js
 ```diff
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, positionData);
 + gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -709,9 +709,9 @@ Attribute size (2 in case of `vec2`, 3 in case of `vec3` etc)
 ```diff
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
-  
+
 + const attributeSize = 2;
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -720,10 +720,10 @@ type of data in buffer
 📄 src/webgl-hello-world.js
 ```diff
   gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
-  
+
   const attributeSize = 2;
 + const type = gl.FLOAT;
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -737,11 +737,11 @@ for types `gl.FLOAT` and `gl.HALF_FLOAT`, this parameter has no effect.
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const attributeSize = 2;
   const type = gl.FLOAT;
 + const nomralized = false;
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -754,7 +754,7 @@ We'll talk about these two later 😉
   const nomralized = false;
 + const stride = 0;
 + const offset = 0;
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -764,9 +764,9 @@ Now we need to call `vertexAttribPointer` to setup our `position` attribute
 ```diff
   const stride = 0;
   const offset = 0;
-  
+
 + gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
-+ 
++
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -774,14 +774,14 @@ Let's try to change a position of the point
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
 - const positionData = new Float32Array([0, 0]);
 + const positionData = new Float32Array([1.0, 0.0]);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 
 ```
 Nothing changed 😢 But why?
@@ -792,10 +792,10 @@ Turns out – all attributes are disabled by default (filled with 0), so we need
 ```diff
   const stride = 0;
   const offset = 0;
-  
+
 + gl.enableVertexAttribArray(positionPointer);
   gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
-  
+
   gl.drawArrays(gl.POINTS, 0, 1);
 
 ```
@@ -804,29 +804,29 @@ Let's mark every corner of a canvas with a point
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
 - const positionData = new Float32Array([1.0, 0.0]);
 + const positionData = new Float32Array([
 +     -1.0, // point 1 x
 +     -1.0, // point 1 y
-+ 
++
 +     1.0, // point 2 x
 +     1.0, // point 2 y
-+ 
++
 +     -1.0, // point 3 x
 +     1.0, // point 3 y
-+ 
++
 +     1.0, // point 4 x
 +     -1.0, // point 4 y
 + ]);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
   gl.enableVertexAttribArray(positionPointer);
   gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
-  
+
 - gl.drawArrays(gl.POINTS, 0, 1);
 + gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
 
@@ -837,22 +837,22 @@ We don't necessarily need to explicitly pass `position.x` and `position.y` to a 
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   void main() {
       gl_PointSize = 20.0;
 -     gl_Position = vec4(position.x, position.y, 0, 1);
 +     gl_Position = vec4(position, 0, 1);
   }
   `;
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
   const positionData = new Float32Array([
 -     -1.0, // point 1 x
 -     -1.0, // point 1 y
 +     -1.0, // top left x
 +     -1.0, // top left y
-  
+
       1.0, // point 2 x
       1.0, // point 2 y
 
@@ -861,14 +861,14 @@ Now let's move all points closer to the center by dividing each position by 2.0
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   void main() {
       gl_PointSize = 20.0;
 -     gl_Position = vec4(position, 0, 1);
 +     gl_Position = vec4(position / 2.0, 0, 1);
   }
   `;
-  
+
 
 ```
 Result:
@@ -914,27 +914,27 @@ We need to remove hardcoded points data
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
 - const positionData = new Float32Array([
 -     -1.0, // top left x
 -     -1.0, // top left y
-- 
+-
 -     1.0, // point 2 x
 -     1.0, // point 2 y
-- 
+-
 -     -1.0, // point 3 x
 -     1.0, // point 3 y
-- 
+-
 -     1.0, // point 4 x
 -     -1.0, // point 4 y
 - ]);
 + const points = [];
 + const positionData = new Float32Array(points);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 
 ```
 Iterate over each vertical line of pixels of canvas `[0..width]`
@@ -942,15 +942,15 @@ Iterate over each vertical line of pixels of canvas `[0..width]`
 📄 src/webgl-hello-world.js
 ```diff
   const positionPointer = gl.getAttribLocation(program, 'position');
-  
+
   const points = [];
-+ 
++
 + for (let i = 0; i < canvas.width; i++) {
-+ 
++
 + }
-+ 
++
   const positionData = new Float32Array(points);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 ```
@@ -959,12 +959,12 @@ Transform value from `[0..width]` to `[-1..1]` (remember webgl coordinat grid? t
 📄 src/webgl-hello-world.js
 ```diff
   const points = [];
-  
+
   for (let i = 0; i < canvas.width; i++) {
-- 
+-
 +     const x = i / canvas.width * 2 - 1;
   }
-  
+
   const positionData = new Float32Array(points);
 
 ```
@@ -972,14 +972,14 @@ Calculate `cos` and add both x and y to `points` array
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   for (let i = 0; i < canvas.width; i++) {
       const x = i / canvas.width * 2 - 1;
 +     const y = Math.cos(x * Math.PI);
-+ 
++
 +     points.push(x, y);
   }
-  
+
   const positionData = new Float32Array(points);
 
 ```
@@ -988,7 +988,7 @@ Graph looks a bit weird, let's fix our vertex shader
 📄 src/webgl-hello-world.js
 ```diff
   attribute vec2 position;
-  
+
   void main() {
 -     gl_PointSize = 20.0;
 -     gl_Position = vec4(position / 2.0, 0, 1);
@@ -996,7 +996,7 @@ Graph looks a bit weird, let's fix our vertex shader
 +     gl_Position = vec4(position, 0, 1);
   }
   `;
-  
+
 
 ```
 Niiiice 😎 We now have fancy cos graph!
@@ -1013,25 +1013,25 @@ GLSL doesn't have `Math` namespace, so we'll need to define `M_PI` variable
 ```diff
   const vShaderSource = `
   attribute vec2 position;
-  
+
 + #define M_PI 3.1415926535897932384626433832795
-+ 
++
   void main() {
       gl_PointSize = 2.0;
 -     gl_Position = vec4(position, 0, 1);
 +     gl_Position = vec4(position.x, cos(position.y * M_PI), 0, 1);
   }
   `;
-  
-  
+
+
   for (let i = 0; i < canvas.width; i++) {
       const x = i / canvas.width * 2 - 1;
 -     const y = Math.cos(x * Math.PI);
-- 
+-
 -     points.push(x, y);
 +     points.push(x, x);
   }
-  
+
   const positionData = new Float32Array(points);
 
 ```
@@ -1046,13 +1046,13 @@ Let's define a `uniform`
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vShaderSource = `
   attribute vec2 position;
 + uniform float width;
-  
+
   #define M_PI 3.1415926535897932384626433832795
-  
+
 
 ```
 To assign a value to a uniform, we'll need to do smth similar to what we did with attribute. We need to get location of the uniform.
@@ -1060,12 +1060,12 @@ To assign a value to a uniform, we'll need to do smth similar to what we did wit
 📄 src/webgl-hello-world.js
 ```diff
   gl.useProgram(program);
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
 + const widthUniformLocation = gl.getUniformLocation(program, 'width');
-  
+
   const points = [];
-  
+
 
 ```
 There's a bunch of methods which can assign different types of values to uniforms
@@ -1081,11 +1081,11 @@ etc
 ```diff
   const positionPointer = gl.getAttribLocation(program, 'position');
   const widthUniformLocation = gl.getUniformLocation(program, 'width');
-  
+
 + gl.uniform1f(widthUniformLocation, canvas.width);
-+ 
++
   const points = [];
-  
+
   for (let i = 0; i < canvas.width; i++) {
 
 ```
@@ -1094,7 +1094,7 @@ And finally let's move our js computation to a shader
 📄 src/webgl-hello-world.js
 ```diff
   #define M_PI 3.1415926535897932384626433832795
-  
+
   void main() {
 +     float x = position.x / width * 2.0 - 1.0;
       gl_PointSize = 2.0;
@@ -1102,15 +1102,15 @@ And finally let's move our js computation to a shader
 +     gl_Position = vec4(x, cos(x * M_PI), 0, 1);
   }
   `;
-  
+
   const points = [];
-  
+
   for (let i = 0; i < canvas.width; i++) {
 -     const x = i / canvas.width * 2 - 1;
 -     points.push(x, x);
 +     points.push(i, i);
   }
-  
+
   const positionData = new Float32Array(points);
 
 ```
@@ -1122,42 +1122,42 @@ We need to fill our position data with line starting and ending point coordinate
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.uniform1f(widthUniformLocation, canvas.width);
-  
+
 - const points = [];
 + const lines = [];
 + let prevLineY = 0;
-  
+
 - for (let i = 0; i < canvas.width; i++) {
 -     points.push(i, i);
 + for (let i = 0; i < canvas.width - 5; i += 5) {
 +     lines.push(i, prevLineY);
 +     const y =  Math.random() * canvas.height;
 +     lines.push(i + 5, y);
-+ 
++
 +     prevLineY = y;
   }
-  
+
 - const positionData = new Float32Array(points);
 + const positionData = new Float32Array(lines);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 
 ```
 We'll also need to transform `y` to a WebGL clipspace, so let's pass a resolution of canvas, not just width
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vShaderSource = `
   attribute vec2 position;
 - uniform float width;
 + uniform vec2 resolution;
-  
+
   #define M_PI 3.1415926535897932384626433832795
-  
+
   void main() {
 -     float x = position.x / width * 2.0 - 1.0;
 +     vec2 transformedPosition = position / resolution * 2.0 - 1.0;
@@ -1166,16 +1166,16 @@ We'll also need to transform `y` to a WebGL clipspace, so let's pass a resolutio
 +     gl_Position = vec4(transformedPosition, 0, 1);
   }
   `;
-  
+
   gl.useProgram(program);
-  
+
   const positionPointer = gl.getAttribLocation(program, 'position');
 - const widthUniformLocation = gl.getUniformLocation(program, 'width');
 + const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
-  
+
 - gl.uniform1f(widthUniformLocation, canvas.width);
 + gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-  
+
   const lines = [];
   let prevLineY = 0;
 
@@ -1186,7 +1186,7 @@ The final thing – we need to change primitive type to `gl.LINES`
 ```diff
   gl.enableVertexAttribArray(positionPointer);
   gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
-  
+
 - gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
 + gl.drawArrays(gl.LINES, 0, positionData.length / 2);
 
@@ -1204,11 +1204,11 @@ Let's try to use it
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 + gl.lineWidth(10);
-  
+
   const attributeSize = 2;
   const type = gl.FLOAT;
 
@@ -1262,9 +1262,9 @@ and change primitive type
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-  
+
 - const lines = [];
 - let prevLineY = 0;
 + const triangles = [
@@ -1272,23 +1272,23 @@ and change primitive type
 +     canvas.width / 2, canvas.height, // v2 (x, y)
 +     canvas.width, 0, // v3 (x, y)
 + ];
-  
+
 - for (let i = 0; i < canvas.width - 5; i += 5) {
 -     lines.push(i, prevLineY);
 -     const y =  Math.random() * canvas.height;
 -     lines.push(i + 5, y);
-- 
+-
 -     prevLineY = y;
 - }
-- 
+-
 - const positionData = new Float32Array(lines);
 + const positionData = new Float32Array(triangles);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
   gl.enableVertexAttribArray(positionPointer);
   gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
-  
+
 - gl.drawArrays(gl.LINES, 0, positionData.length / 2);
 + gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
 
@@ -1300,24 +1300,24 @@ We'll need to go through the same steps as for resolution uniform, but declare t
 📄 src/webgl-hello-world.js
 ```diff
   `;
-  
+
   const fShaderSource = `
 +     uniform vec4 color;
-+ 
++
       void main() {
 -         gl_FragColor = vec4(1, 0, 0, 1);
 +         gl_FragColor = color / 255.0;
       }
   `;
-  
-  
+
+
   const positionPointer = gl.getAttribLocation(program, 'position');
   const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 + const colorUniformLocation = gl.getUniformLocation(program, 'color');
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 + gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
   const triangles = [
       0, 0, // v1 (x, y)
 
@@ -1336,11 +1336,11 @@ Usually `mediump` is both performant and precise, but sometimes you might want t
 📄 src/webgl-hello-world.js
 ```diff
   `;
-  
+
   const fShaderSource = `
 +     precision mediump float;
       uniform vec4 color;
-  
+
       void main() {
 
 ```
@@ -1397,7 +1397,7 @@ Let's define the coordinates of triangle vertices
 📄 src/webgl-hello-world.js
 ```diff
   gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
   const triangles = [
 -     0, 0, // v1 (x, y)
 -     canvas.width / 2, canvas.height, // v2 (x, y)
@@ -1406,13 +1406,13 @@ Let's define the coordinates of triangle vertices
 +     0, 150, // top left
 +     150, 150, // top right
 +     0, 0, // bottom left
-+     
++
 +     // second triangle
 +     0, 0, // bottom left
 +     150, 150, // top right
 +     150, 0, // bottom right
   ];
-  
+
   const positionData = new Float32Array(triangles);
 
 ```
@@ -1427,13 +1427,13 @@ Now let's draw a hexagon. This is somewhat harder to draw manually, so let's cre
 ```diff
       150, 0, // bottom right
   ];
-  
+
 + function createHexagon(center, radius, segmentsCount) {
-+     
++
 + }
-+ 
++
   const positionData = new Float32Array(triangles);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 ```
@@ -1443,33 +1443,33 @@ We need to iterate over (360 - segment angle) degrees with a step of a signle se
 ```diff
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
   gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
 - const triangles = [
 -     // first triangle
 -     0, 150, // top left
 -     150, 150, // top right
 -     0, 0, // bottom left
--     
+-
 -     // second triangle
 -     0, 0, // bottom left
 -     150, 150, // top right
 -     150, 0, // bottom right
 - ];
-- 
+-
 - function createHexagon(center, radius, segmentsCount) {
--     
+-
 + const triangles = [createHexagon()];
-+ 
++
 + function createHexagon(centerX, centerY, radius, segmentsCount) {
 +     const vertices = [];
-+ 
++
 +     for (let i = 0; i < Math.PI * 2; i += Math.PI * 2 / (segmentsCount - 1)) {
-+         
++
 +     }
-+ 
++
 +     return vertices;
   }
-  
+
   const positionData = new Float32Array(triangles);
 
 ```
@@ -1481,25 +1481,25 @@ And apply some simple school math
 ```diff
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
   gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
 - const triangles = [createHexagon()];
 + const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 6);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertices = [];
 +     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
-  
+
 -     for (let i = 0; i < Math.PI * 2; i += Math.PI * 2 / (segmentsCount - 1)) {
--         
+-
 +     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
 +         const from = i;
 +         const to = i + segmentAngle;
-+ 
++
 +         vertices.push(centerX, centerY);
 +         vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
 +         vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
       }
-  
+
       return vertices;
 
 ```
@@ -1510,10 +1510,10 @@ Actually a circle can be built with the same function, we just need to increase 
 ```diff
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
   gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
 - const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 6);
 + const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertices = [];
 
@@ -1538,42 +1538,42 @@ Make sure type matches. If e.g. varying will be `vec3` in vertex shader and `vec
 ```diff
   attribute vec2 position;
   uniform vec2 resolution;
-  
+
 + varying vec4 vColor;
-+ 
++
   #define M_PI 3.1415926535897932384626433832795
-  
+
   void main() {
       vec2 transformedPosition = position / resolution * 2.0 - 1.0;
       gl_PointSize = 2.0;
       gl_Position = vec4(transformedPosition, 0, 1);
-+ 
++
 +     vColor = vec4(255, 0, 0, 255);
   }
   `;
-  
+
   const fShaderSource = `
       precision mediump float;
 -     uniform vec4 color;
-+ 
++
 +     varying vec4 vColor;
-  
+
       void main() {
 -         gl_FragColor = color / 255.0;
 +         gl_FragColor = vColor / 255.0;
       }
   `;
-  
-  
+
+
   const positionPointer = gl.getAttribLocation(program, 'position');
   const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
 - const colorUniformLocation = gl.getUniformLocation(program, 'color');
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
 - gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255]);
-  
+
   const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
-  
+
 
 ```
 Now let's try to colorize our circle based on `gl_Position`
@@ -1582,12 +1582,12 @@ Now let's try to colorize our circle based on `gl_Position`
 ```diff
       gl_PointSize = 2.0;
       gl_Position = vec4(transformedPosition, 0, 1);
-  
+
 -     vColor = vec4(255, 0, 0, 255);
 +     vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
   }
   `;
-  
+
 
 ```
 ![Colorized circle](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/colorized-circle.png)
@@ -1601,39 +1601,39 @@ We need to create another attribute
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const vShaderSource = `
   attribute vec2 position;
 + attribute vec4 color;
   uniform vec2 resolution;
-  
+
   varying vec4 vColor;
       gl_PointSize = 2.0;
       gl_Position = vec4(transformedPosition, 0, 1);
-  
+
 -     vColor = vec4((gl_Position.xy + 1.0 / 2.0) * 255.0, 0, 255);
 +     vColor = color;
   }
   `;
-  
-  
+
+
   gl.useProgram(program);
-  
+
 - const positionPointer = gl.getAttribLocation(program, 'position');
 + const positionLocation = gl.getAttribLocation(program, 'position');
 + const colorLocation = gl.getAttribLocation(program, 'color');
-+ 
++
   const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
   const stride = 0;
   const offset = 0;
-  
+
 - gl.enableVertexAttribArray(positionPointer);
 - gl.vertexAttribPointer(positionPointer, attributeSize, type, nomralized, stride, offset);
 + gl.enableVertexAttribArray(positionLocation);
 + gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-  
+
   gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
 
 ```
@@ -1642,16 +1642,16 @@ Setup buffer for this attribute
 📄 src/webgl-hello-world.js
 ```diff
   }
-  
+
   const positionData = new Float32Array(triangles);
 + const colorData = new Float32Array(colors);
-  
+
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 + const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-+ 
++
 + gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 
@@ -1661,18 +1661,18 @@ Fill buffer with data
 📄 src/webgl-hello-world.js
 ```diff
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-  
+
   const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 + const colors = fillWithColors(360);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertices = [];
       return vertices;
   }
-  
+
 + function fillWithColors(segmentsCount) {
 +     const colors = [];
-+ 
++
 +     for (let i = 0; i < segmentsCount; i++) {
 +         for (let j = 0; j < 3; j++) {
 +             if (j == 0) { // vertex in center of circle
@@ -1682,13 +1682,13 @@ Fill buffer with data
 +             }
 +         }
 +     }
-+ 
++
 +     return colors;
 + }
-+ 
++
   const positionData = new Float32Array(triangles);
   const colorData = new Float32Array(colors);
-  
+
 
 ```
 And setup the attribute pointer (the way how attribute reads data from the buffer).
@@ -1697,12 +1697,12 @@ And setup the attribute pointer (the way how attribute reads data from the buffe
 ```diff
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-  
+
 + gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-+ 
++
 + gl.enableVertexAttribArray(colorLocation);
 + gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
-+ 
++
   gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
 
 ```
@@ -1753,9 +1753,9 @@ We need to define raingbow colors first
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-  
+
 + const rainbowColors = [
 +     [255, 0.0, 0.0, 255], // red
 +     [255, 165, 0.0, 255], // orange
@@ -1765,10 +1765,10 @@ We need to define raingbow colors first
 +     [0.0, 0.0, 255, 255], // blue,
 +     [128, 0.0, 128, 255], // purple
 + ];
-+ 
++
   const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
   const colors = fillWithColors(360);
-  
+
 
 ```
 Render a 7-gon
@@ -1777,12 +1777,12 @@ Render a 7-gon
 ```diff
       [128, 0.0, 128, 255], // purple
   ];
-  
+
 - const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 - const colors = fillWithColors(360);
 + const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
 + const colors = fillWithColors(7);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertices = [];
 
@@ -1791,7 +1791,7 @@ Fill colors buffer with rainbow colors
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
       for (let i = 0; i < segmentsCount; i++) {
           for (let j = 0; j < 3; j++) {
 -             if (j == 0) { // vertex in center of circle
@@ -1802,7 +1802,7 @@ Fill colors buffer with rainbow colors
 +             colors.push(...rainbowColors[i]);
           }
       }
-  
+
 
 ```
 ![Rainbow](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/rainbow.png)
@@ -1830,38 +1830,38 @@ x3, y3, color.r, color.g, color.b, color.a
 📄 src/webgl-hello-world.js
 ```diff
   ];
-  
+
   const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
 - const colors = fillWithColors(7);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
 -     const vertices = [];
 +     const vertexData = [];
       const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
-  
+
       for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
           const from = i;
           const to = i + segmentAngle;
-  
+
 -         vertices.push(centerX, centerY);
 -         vertices.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
 -         vertices.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
 +         const color = rainbowColors[i / segmentAngle];
-+ 
++
 +         vertexData.push(centerX, centerY);
 +         vertexData.push(...color);
-+ 
++
 +         vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
 +         vertexData.push(...color);
-+ 
++
 +         vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
 +         vertexData.push(...color);
       }
-  
+
 -     return vertices;
 +     return vertexData;
   }
-  
+
   function fillWithColors(segmentsCount) {
 
 ```
@@ -1870,16 +1870,16 @@ We don't need color buffer anymore
 📄 src/webgl-hello-world.js
 ```diff
   }
-  
+
   const positionData = new Float32Array(triangles);
 - const colorData = new Float32Array(colors);
-- 
+-
   const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 - const colorBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-- 
+-
 - gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, colorData, gl.STATIC_DRAW);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 
@@ -1890,18 +1890,18 @@ and it also makes sense to rename `positionData` and `positionBuffer` to a `vert
 ```diff
       return colors;
   }
-  
+
 - const positionData = new Float32Array(triangles);
 - const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 + const vertexData = new Float32Array(triangles);
 + const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 - gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
 + gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
   gl.lineWidth(10);
-  
+
   const attributeSize = 2;
 
 ```
@@ -1932,16 +1932,16 @@ Color data goes right after position, position is 2 floats, so offset for color 
 - const stride = 0;
 + const stride = 24;
   const offset = 0;
-  
+
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-  
+
 - gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-- 
+-
   gl.enableVertexAttribArray(colorLocation);
 - gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, offset);
 + gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
-  
+
 - gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
 + gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
 
@@ -1998,10 +1998,10 @@ Let's get back to a simple example of rectangle
 ```diff
       [128, 0.0, 128, 255], // purple
   ];
-  
+
 - const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
 + const triangles = createRect(0, 0, canvas.height, canvas.height);
-  
+
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertexData = [];
 
@@ -2010,9 +2010,9 @@ and fill it only with unique vertex coordinates
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const triangles = createRect(0, 0, canvas.height, canvas.height);
-  
+
 + function createRect(top, left, width, height) {
 +     return [
 +         left, top, // x1 y1
@@ -2021,7 +2021,7 @@ and fill it only with unique vertex coordinates
 +         left + width, top + height, // x4 y4
 +     ];
 + }
-+ 
++
   function createHexagon(centerX, centerY, radius, segmentsCount) {
       const vertexData = [];
       const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
@@ -2037,15 +2037,15 @@ Let's also disable color attribute for now
 - const stride = 24;
 + const stride = 0;
   const offset = 0;
-  
+
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-  
+
 - gl.enableVertexAttribArray(colorLocation);
 - gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
 + // gl.enableVertexAttribArray(colorLocation);
 + // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
-  
+
   gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
 
 ```
@@ -2060,14 +2060,14 @@ So we need to specify indices of triangle vertices.
 ```diff
   const vertexData = new Float32Array(triangles);
   const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 + const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-+ 
++
 + const indexData = new Uint6Array([
 +     0, 1, 2, // first triangle
 +     1, 2, 3, // second trianlge
 + ]);
-+ 
++
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
   gl.lineWidth(10);
@@ -2080,10 +2080,10 @@ To tell GPU that we're using `index buffer` we need to pass `gl.ELEMENT_ARRAY_BU
 ```diff
       1, 2, 3, // second trianlge
   ]);
-  
+
 + gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 + gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-+ 
++
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
   gl.lineWidth(10);
@@ -2093,9 +2093,9 @@ And the final step: to render indexed vertices we need to call different method 
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
   const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
 - const indexData = new Uint6Array([
 + const indexData = new Uint8Array([
       0, 1, 2, // first triangle
@@ -2103,7 +2103,7 @@ And the final step: to render indexed vertices we need to call different method 
   ]);
   // gl.enableVertexAttribArray(colorLocation);
   // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
-  
+
 - gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
 + gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
 
@@ -2116,13 +2116,13 @@ Let's fix that
 
 📄 src/webgl-hello-world.js
 ```diff
-  
+
       void main() {
           gl_FragColor = vColor / 255.0;
 +         gl_FragColor.a = 1.0;
       }
   `;
-  
+
 
 ```
 ### Conclusion
@@ -2249,7 +2249,7 @@ Since shaders are raw strings, we can store shader source in separate file and u
 ```diff
           filename: '[name].js',
       },
-  
+
 +     module: {
 +         rules: [
 +             {
@@ -2258,7 +2258,7 @@ Since shaders are raw strings, we can store shader source in separate file and u
 +             },
 +         ],
 +     },
-+ 
++
       mode: 'development',
   };
 
@@ -2300,42 +2300,42 @@ void main() {
 ```diff
 + import vShaderSource from './shaders/vertex.glsl';
 + import fShaderSource from './shaders/fragment.glsl';
-+ 
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   const vertexShader = gl.createShader(gl.VERTEX_SHADER);
   const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 - const vShaderSource = `
 - attribute vec2 position;
 - attribute vec4 color;
 - uniform vec2 resolution;
-- 
+-
 - varying vec4 vColor;
-- 
+-
 - #define M_PI 3.1415926535897932384626433832795
-- 
+-
 - void main() {
 -     vec2 transformedPosition = position / resolution * 2.0 - 1.0;
 -     gl_PointSize = 2.0;
 -     gl_Position = vec4(transformedPosition, 0, 1);
-- 
+-
 -     vColor = color;
 - }
 - `;
-- 
+-
 - const fShaderSource = `
 -     precision mediump float;
-- 
+-
 -     varying vec4 vColor;
-- 
+-
 -     void main() {
 -         gl_FragColor = vColor / 255.0;
 -         gl_FragColor.a = 1.0;
 -     }
 - `;
-- 
+-
   function compileShader(shader, source) {
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
@@ -2382,16 +2382,16 @@ export function createHexagon(centerX, centerY, radius, segmentsCount) {
 ```diff
   import vShaderSource from './shaders/vertex.glsl';
   import fShaderSource from './shaders/fragment.glsl';
-  
+
 + import { createRect } from './shape-helpers';
-+ 
-+ 
++
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
-  
+
+
   const triangles = createRect(0, 0, canvas.height, canvas.height);
-  
+
 - function createRect(top, left, width, height) {
 -     return [
 -         left, top, // x1 y1
@@ -2400,33 +2400,33 @@ export function createHexagon(centerX, centerY, radius, segmentsCount) {
 -         left + width, top + height, // x4 y4
 -     ];
 - }
-- 
+-
 - function createHexagon(centerX, centerY, radius, segmentsCount) {
 -     const vertexData = [];
 -     const segmentAngle =  Math.PI * 2 / (segmentsCount - 1);
-- 
+-
 -     for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
 -         const from = i;
 -         const to = i + segmentAngle;
-- 
+-
 -         const color = rainbowColors[i / segmentAngle];
-- 
+-
 -         vertexData.push(centerX, centerY);
 -         vertexData.push(...color);
-- 
+-
 -         vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
 -         vertexData.push(...color);
-- 
+-
 -         vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
 -         vertexData.push(...color);
 -     }
-- 
+-
 -     return vertexData;
 - }
-- 
+-
   function fillWithColors(segmentsCount) {
       const colors = [];
-  
+
 
 ```
 Since we're no longer using color attribute, we can drop everyhting related to it
@@ -2434,9 +2434,9 @@ Since we're no longer using color attribute, we can drop everyhting related to i
 📄 src/shaders/fragment.glsl
 ```diff
   precision mediump float;
-  
+
 - varying vec4 vColor;
-- 
+-
   void main() {
 -     gl_FragColor = vColor / 255.0;
 -     gl_FragColor.a = 1.0;
@@ -2449,38 +2449,38 @@ Since we're no longer using color attribute, we can drop everyhting related to i
   attribute vec2 position;
 - attribute vec4 color;
   uniform vec2 resolution;
-  
+
 - varying vec4 vColor;
-- 
+-
   #define M_PI 3.1415926535897932384626433832795
-  
+
   void main() {
       vec2 transformedPosition = position / resolution * 2.0 - 1.0;
       gl_PointSize = 2.0;
       gl_Position = vec4(transformedPosition, 0, 1);
-- 
+-
 -     vColor = color;
   }
 
 ```
 📄 src/week-1.js
 ```diff
-  
+
   import { createRect } from './shape-helpers';
-  
-- 
+
+-
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   gl.useProgram(program);
-  
+
   const positionLocation = gl.getAttribLocation(program, 'position');
 - const colorLocation = gl.getAttribLocation(program, 'color');
-- 
+-
   const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
-  
+
   gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
-  
+
 - const rainbowColors = [
 -     [255, 0.0, 0.0, 255], // red
 -     [255, 165, 0.0, 255], // orange
@@ -2490,30 +2490,30 @@ Since we're no longer using color attribute, we can drop everyhting related to i
 -     [0.0, 0.0, 255, 255], // blue,
 -     [128, 0.0, 128, 255], // purple
 - ];
-- 
+-
   const triangles = createRect(0, 0, canvas.height, canvas.height);
-  
+
 - function fillWithColors(segmentsCount) {
 -     const colors = [];
-- 
+-
 -     for (let i = 0; i < segmentsCount; i++) {
 -         for (let j = 0; j < 3; j++) {
 -             colors.push(...rainbowColors[i]);
 -         }
 -     }
-- 
+-
 -     return colors;
 - }
-- 
+-
   const vertexData = new Float32Array(triangles);
   const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
-  
+
   gl.enableVertexAttribArray(positionLocation);
   gl.vertexAttribPointer(positionLocation, attributeSize, type, nomralized, stride, offset);
-  
+
 - // gl.enableVertexAttribArray(colorLocation);
 - // gl.vertexAttribPointer(colorLocation, 4, type, nomralized, stride, 8);
-- 
+-
   gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2585,7 +2585,7 @@ Get the webgl context
 ```diff
   import vShaderSource from './shaders/texture.v.glsl';
   import fShaderSource from './shaders/texture.f.glsl';
-+ 
++
 + const canvas = document.querySelector('canvas');
 + const gl = canvas.getContext('webgl');
 
@@ -2597,13 +2597,13 @@ Create shaders
   import vShaderSource from './shaders/texture.v.glsl';
   import fShaderSource from './shaders/texture.f.glsl';
 + import { compileShader } from './gl-helpers';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-+ 
++
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
 
@@ -2612,15 +2612,15 @@ and program
 
 📄 src/texture.js
 ```diff
-  
+
   compileShader(gl, vShader, vShaderSource);
   compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
 
@@ -2633,17 +2633,17 @@ Create a vertex position buffer and fill it with data
   import fShaderSource from './shaders/texture.f.glsl';
   import { compileShader } from './gl-helpers';
 + import { createRect } from './shape-helpers';
-+ 
-  
++
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   gl.linkProgram(program);
   gl.useProgram(program);
-+ 
++
 + const vertexPosition = new Float32Array(createRect(-1, -1, 2, 2));
 + const vertexPositionBuffer = gl.createBuffer();
-+ 
++
 + gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
 
@@ -2652,14 +2652,14 @@ Setup position attribute
 
 📄 src/texture.js
 ```diff
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
-+ 
++
 + const attributeLocations = {
 +     position: gl.getAttribLocation(program, 'position'),
 + };
-+ 
++
 + gl.enableVertexAttribArray(attributeLocations.position);
 + gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
@@ -2668,13 +2668,13 @@ setup index buffer
 
 📄 src/texture.js
 ```diff
-  
+
   gl.enableVertexAttribArray(attributeLocations.position);
   gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-+ 
++
 + const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
 + const indexBuffer = gl.createBuffer();
-+ 
++
 + gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 + gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 
@@ -2683,10 +2683,10 @@ and issue a draw call
 
 📄 src/texture.js
 ```diff
-  
+
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
-+ 
++
 + gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2701,19 +2701,19 @@ Let's make a helper to load images
           throw new Error(log);
       }
   }
-+ 
++
 + export async function loadImage(src) {
 +     const img = new Image();
-+ 
++
 +     let _resolve;
 +     const p = new Promise((resolve) => _resolve = resolve);
-+ 
++
 +     img.onload = () => {
 +         _resolve(img);
 +     }
-+ 
++
 +     img.src = src;
-+ 
++
 +     return p;
 + }
 
@@ -2727,18 +2727,18 @@ Load image and create webgl texture
 - import { compileShader } from './gl-helpers';
 + import { compileShader, loadImage } from './gl-helpers';
   import { createRect } from './shape-helpers';
-  
+
 + import textureImageSrc from '../assets/images/texture.jpg';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
-  
+
 - gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 + loadImage(textureImageSrc).then((textureImg) => {
 +     const texture = gl.createTexture();
-+ 
++
 +     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 + });
 
@@ -2767,14 +2767,14 @@ we also need an appropriate webpack loader
                   test: /\.glsl$/,
                   use: 'raw-loader',
               },
-+ 
++
 +             {
 +                 test: /\.jpg$/,
 +                 use: 'url-loader',
 +             },
           ],
       },
-  
+
 
 ```
 to operate with textures we need to do the same as with buffers – bind it
@@ -2783,9 +2783,9 @@ to operate with textures we need to do the same as with buffers – bind it
 ```diff
   loadImage(textureImageSrc).then((textureImg) => {
       const texture = gl.createTexture();
-  
+
 +     gl.bindTexture(gl.TEXTURE_2D, texture);
-+ 
++
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -2794,13 +2794,13 @@ and upload image to a bound texture
 
 📄 src/texture.js
 ```diff
-  
+
       gl.bindTexture(gl.TEXTURE_2D, texture);
-  
+
 +     gl.texImage2D(
 +         gl.TEXTURE_2D,
 +     );
-+ 
++
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -2809,12 +2809,12 @@ Let's ignore the 2nd argument for now, we'll speak about it later
 
 📄 src/texture.js
 ```diff
-  
+
       gl.texImage2D(
           gl.TEXTURE_2D,
 +         0,
       );
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2828,7 +2828,7 @@ the 3rd and the 4th argumetns specify internal texture format and source (image)
 +         gl.RGBA,
 +         gl.RGBA,
       );
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2841,7 +2841,7 @@ next argument specifies source type (0..255 is UNSIGNED_BYTE)
           gl.RGBA,
 +         gl.UNSIGNED_BYTE,
       );
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2854,7 +2854,7 @@ and image itself
           gl.UNSIGNED_BYTE,
 +         textureImg,
       );
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -2864,12 +2864,12 @@ We also need to specify different parameters of texture. We'll talk about this p
 ```diff
           textureImg,
       );
-  
+
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-+ 
++
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -2879,9 +2879,9 @@ To be able to work with texture in shader we need to specify a uniform of `sampl
 📄 src/shaders/texture.f.glsl
 ```diff
   precision mediump float;
-  
+
 + uniform sampler2D texture;
-+ 
++
   void main() {
       gl_FragColor = vec4(1, 0, 0, 1);
   }
@@ -2893,20 +2893,20 @@ and specify the value of this uniform. There is a way to use multiple textures, 
 ```diff
       position: gl.getAttribLocation(program, 'position'),
   };
-  
+
 + const uniformLocations = {
 +     texture: gl.getUniformLocation(program, 'texture'),
 + };
-+ 
++
   gl.enableVertexAttribArray(attributeLocations.position);
   gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  
+
 +     gl.activeTexture(gl.TEXTURE0);
 +     gl.uniform1i(uniformLocations.texture, 0);
-+ 
++
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -2916,28 +2916,28 @@ Let's also pass canvas resolution to a shader
 📄 src/shaders/texture.f.glsl
 ```diff
   precision mediump float;
-  
+
   uniform sampler2D texture;
 + uniform vec2 resolution;
-  
+
   void main() {
       gl_FragColor = vec4(1, 0, 0, 1);
 
 ```
 📄 src/texture.js
 ```diff
-  
+
   const uniformLocations = {
       texture: gl.getUniformLocation(program, 'texture'),
 +     resolution: gl.getUniformLocation(program, 'resolution'),
   };
-  
+
   gl.enableVertexAttribArray(attributeLocations.position);
       gl.activeTexture(gl.TEXTURE0);
       gl.uniform1i(uniformLocations.texture, 0);
-  
+
 +     gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
-+ 
++
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -2947,7 +2947,7 @@ There is a special `gl_FragCoord` variable which contains coordinate of each pix
 📄 src/shaders/texture.f.glsl
 ```diff
   uniform vec2 resolution;
-  
+
   void main() {
 +     vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = vec4(1, 0, 0, 1);
@@ -2958,7 +2958,7 @@ and use `texture2D` to render the whole image.
 
 📄 src/shaders/texture.f.glsl
 ```diff
-  
+
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
 -     gl_FragColor = vec4(1, 0, 0, 1);
@@ -3017,11 +3017,11 @@ You can also define other functions apart of `void main` in glsl pretty much lik
 ```diff
   uniform sampler2D texture;
   uniform vec2 resolution;
-  
+
 + vec4 inverse(vec4 color) {
 +     return abs(vec4(color.rgb - 1.0, color.a));
 + }
-+ 
++
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = texture2D(texture, texCoord);
@@ -3034,7 +3034,7 @@ and let's actually use it
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = texture2D(texture, texCoord);
-+ 
++
 +     gl_FragColor = inverse(gl_FragColor);
   }
 
@@ -3064,15 +3064,15 @@ Ok, let's try to implement this
 ```diff
       return abs(vec4(color.rgb - 1.0, color.a));
   }
-  
+
 + vec4 blackAndWhite(vec4 color) {
 +     return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
 + }
-+ 
++
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = texture2D(texture, texCoord);
-  
+
 -     gl_FragColor = inverse(gl_FragColor);
 +     gl_FragColor = blackAndWhite(gl_FragColor);
   }
@@ -3096,11 +3096,11 @@ Let's define `sepia` function and color
 ```diff
       return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
   }
-  
+
 + vec4 sepia(vec4 color) {
 +     vec3 sepiaColor = vec3(112, 66, 20) / 255.0;
 + }
-+ 
++
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = texture2D(texture, texCoord);
@@ -3110,7 +3110,7 @@ A naive and simple implementation will be to interpolate original color with sep
 
 📄 src/shaders/texture.f.glsl
 ```diff
-  
+
   vec4 sepia(vec4 color) {
       vec3 sepiaColor = vec3(112, 66, 20) / 255.0;
 +     return vec4(
@@ -3118,11 +3118,11 @@ A naive and simple implementation will be to interpolate original color with sep
 +         color.a
 +     );
   }
-  
+
   void main() {
       vec2 texCoord = gl_FragCoord.xy / resolution;
       gl_FragColor = texture2D(texture, texCoord);
-  
+
 -     gl_FragColor = blackAndWhite(gl_FragColor);
 +     gl_FragColor = sepia(gl_FragColor);
   }
@@ -3177,11 +3177,11 @@ First we need to define another `sampler2D` in fragment shader
 📄 src/shaders/texture.f.glsl
 ```diff
   precision mediump float;
-  
+
   uniform sampler2D texture;
 + uniform sampler2D otherTexture;
   uniform vec2 resolution;
-  
+
   vec4 inverse(vec4 color) {
 
 ```
@@ -3191,30 +3191,30 @@ And render 2 rectangles instead of a single one. Left rectangle will use already
 ```diff
   gl.linkProgram(program);
   gl.useProgram(program);
-  
+
 - const vertexPosition = new Float32Array(createRect(-1, -1, 2, 2));
 + const vertexPosition = new Float32Array([
 +     ...createRect(-1, -1, 1, 2), // left rect
 +     ...createRect(-1, 0, 1, 2), // right rect
 + ]);
   const vertexPositionBuffer = gl.createBuffer();
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.enableVertexAttribArray(attributeLocations.position);
   gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
 - const vertexIndices = new Uint8Array([0, 1, 2, 1, 2, 3]);
 + const vertexIndices = new Uint8Array([
 +     // left rect
-+     0, 1, 2, 
-+     1, 2, 3, 
-+     
++     0, 1, 2,
++     1, 2, 3,
++
 +     // right rect
-+     4, 5, 6, 
++     4, 5, 6,
 +     5, 6, 7,
 + ]);
   const indexBuffer = gl.createBuffer();
-  
+
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 
 ```
@@ -3224,7 +3224,7 @@ We'll also need a way to specify texture coordinates for each rectangle, as we c
 ```diff
   attribute vec2 position;
 + attribute vec2 texCoord;
-  
+
   void main() {
       gl_Position = vec4(position, 0, 1);
 
@@ -3235,16 +3235,16 @@ The content of this attribute should be coordinates of 2 rectangles. Top left is
 ```diff
   gl.linkProgram(program);
   gl.useProgram(program);
-  
+
 + const texCoords = new Float32Array([
 +     ...createRect(0, 0, 1, 1), // left rect
 +     ...createRect(0, 0, 1, 1), // right rect
 + ]);
 + const texCoordsBuffer = gl.createBuffer();
-+ 
++
 + gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-+ 
++
   const vertexPosition = new Float32Array([
       ...createRect(-1, -1, 1, 2), // left rect
       ...createRect(-1, 0, 1, 2), // right rect
@@ -3254,24 +3254,24 @@ We also need to setup texCoord attribute in JS
 
 📄 src/texture.js
 ```diff
-  
+
   const attributeLocations = {
       position: gl.getAttribLocation(program, 'position'),
 +     texCoord: gl.getAttribLocation(program, 'texCoord'),
   };
-  
+
   const uniformLocations = {
   gl.enableVertexAttribArray(attributeLocations.position);
   gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
 + gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
-+ 
++
 + gl.enableVertexAttribArray(attributeLocations.texCoord);
 + gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-+ 
++
   const vertexIndices = new Uint8Array([
       // left rect
-      0, 1, 2, 
+      0, 1, 2,
 
 ```
 and pass this data to fragment shader via varying
@@ -3280,14 +3280,14 @@ and pass this data to fragment shader via varying
 ```diff
       );
   }
-  
+
 + varying vec2 vTexCoord;
-+ 
++
   void main() {
 -     vec2 texCoord = gl_FragCoord.xy / resolution;
 +     vec2 texCoord = vTexCoord;
       gl_FragColor = texture2D(texture, texCoord);
-  
+
       gl_FragColor = sepia(gl_FragColor);
 
 ```
@@ -3295,12 +3295,12 @@ and pass this data to fragment shader via varying
 ```diff
   attribute vec2 position;
   attribute vec2 texCoord;
-  
+
 + varying vec2 vTexCoord;
-+ 
++
   void main() {
       gl_Position = vec4(position, 0, 1);
-+ 
++
 +     vTexCoord = texCoord;
   }
 
@@ -3312,13 +3312,13 @@ Ok, we rendered two rectangles, but they use the same texture. Let's add one mor
   attribute vec2 position;
   attribute vec2 texCoord;
 + attribute float texIndex;
-  
+
   varying vec2 vTexCoord;
 + varying float vTexIndex;
-  
+
   void main() {
       gl_Position = vec4(position, 0, 1);
-  
+
       vTexCoord = texCoord;
 +     vTexIndex = texIndex;
   }
@@ -3331,14 +3331,14 @@ So now fragment shader will know which texture to use
 📄 src/shaders/texture.f.glsl
 ```diff
   }
-  
+
   varying vec2 vTexCoord;
 + varying float vTexIndex;
-  
+
   void main() {
       vec2 texCoord = vTexCoord;
 -     gl_FragColor = texture2D(texture, texCoord);
-  
+
 -     gl_FragColor = sepia(gl_FragColor);
 +     if (vTexIndex == 0.0) {
 +         gl_FragColor = texture2D(texture, texCoord);
@@ -3354,16 +3354,16 @@ tex indices are 0 for the left rectangle and 1 for the right
 ```diff
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-  
+
 + const texIndicies = new Float32Array([
 +     ...Array.from({ length: 4 }).fill(0), // left rect
 +     ...Array.from({ length: 4 }).fill(1), // right rect
 + ]);
 + const texIndiciesBuffer = gl.createBuffer();
-+ 
++
 + gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
 + gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
-+ 
++
   const vertexPosition = new Float32Array([
       ...createRect(-1, -1, 1, 2), // left rect
       ...createRect(-1, 0, 1, 2), // right rect
@@ -3378,19 +3378,19 @@ and again, we need to setup vertex attribute
       texCoord: gl.getAttribLocation(program, 'texCoord'),
 +     texIndex: gl.getAttribLocation(program, 'texIndex'),
   };
-  
+
   const uniformLocations = {
   gl.enableVertexAttribArray(attributeLocations.texCoord);
   gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-  
+
 + gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
-+ 
++
 + gl.enableVertexAttribArray(attributeLocations.texIndex);
 + gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
-+ 
++
   const vertexIndices = new Uint8Array([
       // left rect
-      0, 1, 2, 
+      0, 1, 2,
 
 ```
 Now let's load our second texture image
@@ -3398,22 +3398,22 @@ Now let's load our second texture image
 📄 src/texture.js
 ```diff
   import { createRect } from './shape-helpers';
-  
+
   import textureImageSrc from '../assets/images/texture.jpg';
 + import textureGreenImageSrc from '../assets/images/texture-green.jpg';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
-  
+
 - loadImage(textureImageSrc).then((textureImg) => {
 + Promise.all([
 +     loadImage(textureImageSrc),
 +     loadImage(textureGreenImageSrc),
 + ]).then(([textureImg, textureGreenImg]) => {
       const texture = gl.createTexture();
-  
+
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
 ```
@@ -3421,26 +3421,26 @@ As we'll have to create another texture – we'll need to extract some common co
 
 📄 src/gl-helpers.js
 ```diff
-  
+
       return p;
   }
-+ 
++
 + export function createTexture(gl) {
 +     const texture = gl.createTexture();
-+     
++
 +     gl.bindTexture(gl.TEXTURE_2D, texture);
-+     
++
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 +     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-+ 
++
 +     return texture;
 + }
-+ 
++
 + export function setImage(gl, texture, img) {
 +     gl.bindTexture(gl.TEXTURE_2D, texture);
-+ 
++
 +     gl.texImage2D(
 +         gl.TEXTURE_2D,
 +         0,
@@ -3458,9 +3458,9 @@ As we'll have to create another texture – we'll need to extract some common co
       loadImage(textureGreenImageSrc),
   ]).then(([textureImg, textureGreenImg]) => {
 -     const texture = gl.createTexture();
-- 
+-
 -     gl.bindTexture(gl.TEXTURE_2D, texture);
-- 
+-
 -     gl.texImage2D(
 -         gl.TEXTURE_2D,
 -         0,
@@ -3469,13 +3469,13 @@ As we'll have to create another texture – we'll need to extract some common co
 -         gl.UNSIGNED_BYTE,
 -         textureImg,
 -     );
-- 
+-
 -     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 -     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 -     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 -     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-+ 
-  
++
+
       gl.activeTexture(gl.TEXTURE0);
       gl.uniform1i(uniformLocations.texture, 0);
 
@@ -3489,17 +3489,17 @@ Now let's use our newely created helpers
 - import { compileShader, loadImage } from './gl-helpers';
 + import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
   import { createRect } from './shape-helpers';
-  
+
   import textureImageSrc from '../assets/images/texture.jpg';
       loadImage(textureImageSrc),
       loadImage(textureGreenImageSrc),
   ]).then(([textureImg, textureGreenImg]) => {
 +     const texture = createTexture(gl);
 +     setImage(gl, texture, textureImg);
-  
+
 +     const otherTexture = createTexture(gl);
 +     setImage(gl, otherTexture, textureGreenImg);
-  
+
       gl.activeTexture(gl.TEXTURE0);
       gl.uniform1i(uniformLocations.texture, 0);
 
@@ -3508,13 +3508,13 @@ get uniform location
 
 📄 src/texture.js
 ```diff
-  
+
   const uniformLocations = {
       texture: gl.getUniformLocation(program, 'texture'),
 +     otherTexture: gl.getUniformLocation(program, 'otherTexture'),
       resolution: gl.getUniformLocation(program, 'resolution'),
   };
-  
+
 
 ```
 and set necessary textures to necessary uniforms
@@ -3528,17 +3528,17 @@ to set a texture to a uniform you should specify
 📄 src/texture.js
 ```diff
       setImage(gl, otherTexture, textureGreenImg);
-  
+
       gl.activeTexture(gl.TEXTURE0);
 +     gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.uniform1i(uniformLocations.texture, 0);
-  
+
 +     gl.activeTexture(gl.TEXTURE1);
 +     gl.bindTexture(gl.TEXTURE_2D, otherTexture);
 +     gl.uniform1i(uniformLocations.otherTexture, 1);
-+ 
++
       gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -3603,16 +3603,16 @@ Now let's create a helper function which will get all references to attributes a
 📄 src/gl-helpers.js
 ```diff
 + import extract from 'glsl-extract-sync';
-+ 
++
   export function compileShader(gl, shader, source) {
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
           img,
       );
   }
-+ 
++
 + export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
-+ 
++
 + }
 
 ```
@@ -3621,9 +3621,9 @@ We need to extract info about both vertex and fragment shaders
 📄 src/gl-helpers.js
 ```diff
   }
-  
+
   export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
-- 
+-
 +     const vShaderInfo = extract(vShaderSource);
 +     const fShaderInfo = extract(fShaderSource);
   }
@@ -3636,13 +3636,13 @@ We need to extract info about both vertex and fragment shaders
 - import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
 + import { compileShader, loadImage, createTexture, setImage, setupShaderInput } from './gl-helpers';
   import { createRect } from './shape-helpers';
-  
+
   import textureImageSrc from '../assets/images/texture.jpg';
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
-  
+
 + console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
-+ 
++
   const attributeLocations = {
       position: gl.getAttribLocation(program, 'position'),
       texCoord: gl.getAttribLocation(program, 'texCoord'),
@@ -3655,7 +3655,7 @@ Only vertex shader might have attributes, but uniforms may be defined in both sh
   export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
       const vShaderInfo = extract(vShaderSource);
       const fShaderInfo = extract(fShaderSource);
-+ 
++
 +     const attributes = vShaderInfo.attributes;
 +     const uniforms = [
 +         ...vShaderInfo.uniforms,
@@ -3671,7 +3671,7 @@ Now we can get all attribute locations
           ...vShaderInfo.uniforms,
           ...fShaderInfo.uniforms,
       ];
-+ 
++
 +     const attributeLocations = attributes.reduce((attrsMap, attr) => {
 +         attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
 +         return attrsMap;
@@ -3686,7 +3686,7 @@ and enable all attributes
           attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
           return attrsMap;
       }, {});
-+ 
++
 +     attributes.forEach((attr) => {
 +         gl.enableVertexAttribArray(attributeLocations[attr.name]);
 +     });
@@ -3700,7 +3700,7 @@ We should also get all uniform locations
       attributes.forEach((attr) => {
           gl.enableVertexAttribArray(attributeLocations[attr.name]);
       });
-+ 
++
 +     const uniformLocations = uniforms.reduce((uniformsMap, uniform) => {
 +         uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
 +         return uniformsMap;
@@ -3715,7 +3715,7 @@ and finally return attribute and uniform locations
           uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
           return uniformsMap;
       }, {});
-+ 
++
 +     return {
 +         attributeLocations,
 +         uniformLocations,
@@ -3729,54 +3729,54 @@ Ok, let's get advantage of our new sweet helper
 ```diff
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
-  
+
 - console.log(setupShaderInput(gl, program, vShaderSource, fShaderSource));
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const attributeLocations = {
 -     position: gl.getAttribLocation(program, 'position'),
 -     texCoord: gl.getAttribLocation(program, 'texCoord'),
 -     texIndex: gl.getAttribLocation(program, 'texIndex'),
 - };
-- 
+-
 - const uniformLocations = {
 -     texture: gl.getUniformLocation(program, 'texture'),
 -     otherTexture: gl.getUniformLocation(program, 'otherTexture'),
 -     resolution: gl.getUniformLocation(program, 'resolution'),
 - };
-- 
+-
 - gl.enableVertexAttribArray(attributeLocations.position);
 - gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
-- 
+-
 - gl.enableVertexAttribArray(attributeLocations.texCoord);
 - gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 + gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
-- 
+-
 - gl.enableVertexAttribArray(attributeLocations.texIndex);
 - gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
 + gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
-  
+
   const vertexIndices = new Uint8Array([
       // left rect
-  
+
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, texture);
 -     gl.uniform1i(uniformLocations.texture, 0);
 +     gl.uniform1i(programInfo.uniformLocations.texture, 0);
-  
+
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, otherTexture);
 -     gl.uniform1i(uniformLocations.otherTexture, 1);
 +     gl.uniform1i(programInfo.uniformLocations.otherTexture, 1);
-  
+
 -     gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
 +     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
       gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -3802,7 +3802,7 @@ We'll need data, buffer target and actual gl buffer, so let's assign everything 
 ```diff
   export class GLBuffer {
       constructor(gl, target, data) {
-- 
+-
 +         this.target = target;
 +         this.data = data;
 +         this.glBuffer = gl.createBuffer();
@@ -3820,7 +3820,7 @@ Let's implement an alternative to a `gl.bindBuffer`
           this.data = data;
           this.glBuffer = gl.createBuffer();
       }
-+ 
++
 +     bind(gl) {
 +         gl.bindBuffer(this.target, this.glBuffer);
 +     }
@@ -3834,7 +3834,7 @@ and a convenient way to set buffer data
       bind(gl) {
           gl.bindBuffer(this.target, this.glBuffer);
       }
-+ 
++
 +     setData(gl, data, usage) {
 +         this.data = data;
 +         this.bind(gl);
@@ -3853,12 +3853,12 @@ Now let's make a `data` argument of constructor and add a `usage` argument to be
           this.target = target;
           this.data = data;
           this.glBuffer = gl.createBuffer();
-+ 
++
 +         if (typeof data !== 'undefined') {
 +             this.setData(gl, data, usage);
 +         }
       }
-  
+
       bind(gl) {
 
 ```
@@ -3866,36 +3866,36 @@ Cool, now we can replace texCoords buffer with our thin wrapper
 
 📄 src/texture.js
 ```diff
-  
+
   import textureImageSrc from '../assets/images/texture.jpg';
   import textureGreenImageSrc from '../assets/images/texture-green.jpg';
 + import { GLBuffer } from './GLBuffer';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.linkProgram(program);
   gl.useProgram(program);
-  
+
 - const texCoords = new Float32Array([
 + const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
       ...createRect(0, 0, 1, 1), // left rect
       ...createRect(0, 0, 1, 1), // right rect
 - ]);
 - const texCoordsBuffer = gl.createBuffer();
-- 
+-
 - gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
 + ]), gl.STATIC_DRAW);
-  
+
   const texIndicies = new Float32Array([
       ...Array.from({ length: 4 }).fill(0), // left rect
-  
+
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
 - gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
 + texCoordsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-  
+
   gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
 
 ```
@@ -3905,27 +3905,27 @@ Do the same for texIndices buffer
 ```diff
       ...createRect(0, 0, 1, 1), // right rect
   ]), gl.STATIC_DRAW);
-  
+
 - const texIndicies = new Float32Array([
 + const texIndiciesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
       ...Array.from({ length: 4 }).fill(0), // left rect
       ...Array.from({ length: 4 }).fill(1), // right rect
 - ]);
 - const texIndiciesBuffer = gl.createBuffer();
-- 
+-
 - gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
 + ]), gl.STATIC_DRAW);
-  
+
   const vertexPosition = new Float32Array([
       ...createRect(-1, -1, 1, 2), // left rect
   texCoordsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-  
+
 - gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
 + texIndiciesBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
-  
+
   const vertexIndices = new Uint8Array([
 
 ```
@@ -3935,7 +3935,7 @@ vertex positions
 ```diff
       ...Array.from({ length: 4 }).fill(1), // right rect
   ]), gl.STATIC_DRAW);
-  
+
 - const vertexPosition = new Float32Array([
 + const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
       ...createRect(-1, -1, 1, 2), // left rect
@@ -3943,15 +3943,15 @@ vertex positions
 - ]);
 - const vertexPositionBuffer = gl.createBuffer();
 + ]), gl.STATIC_DRAW);
-  
+
 - gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 - gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 + vertexPositionBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-  
+
   texCoordsBuffer.bind(gl);
 
 ```
@@ -3961,27 +3961,27 @@ and index buffer
 ```diff
   texIndiciesBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
-  
+
 - const vertexIndices = new Uint8Array([
 + const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
       // left rect
-      0, 1, 2, 
-      1, 2, 3, 
+      0, 1, 2,
+      1, 2, 3,
       // right rect
-      4, 5, 6, 
+      4, 5, 6,
       5, 6, 7,
 - ]);
 - const indexBuffer = gl.createBuffer();
-- 
+-
 - gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 - gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 + ]), gl.STATIC_DRAW);
-  
+
   Promise.all([
       loadImage(textureImageSrc),
-  
+
       gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
 -     gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
   });
@@ -4035,12 +4035,12 @@ We'll need to tune a bit of css first to make body fill the screen
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta http-equiv="X-UA-Compatible" content="ie=edge" />
       <title>WebGL Month</title>
-+ 
++
 +     <style>
 +     html, body {
 +       height: 100%;
 +     }
-+ 
++
 +     body {
 +       margin: 0;
 +     }
@@ -4056,13 +4056,13 @@ Now we can read body dimensions
 ```diff
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
 + const width = document.body.offsetWidth;
 + const height = document.body.offsetHeight;
-+ 
++
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 
 ```
 And set canvas dimensions
@@ -4071,13 +4071,13 @@ And set canvas dimensions
 ```diff
   const width = document.body.offsetWidth;
   const height = document.body.offsetHeight;
-  
+
 + canvas.width = width;
 + canvas.height = height;
-+ 
++
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 
 ```
 Ok, canvas size changed, but our picture isn't full screen, why?
@@ -4087,11 +4087,11 @@ Turns out that changing canvas size isn't enought, we also need to specify a viw
 
 📄 src/texture.js
 ```diff
-  
+
       gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
 +     gl.viewport(0, 0, canvas.width, canvas.height);
-+ 
++
       gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -4105,12 +4105,12 @@ Modern displays fit higher amount of actual pixels in a physical pixel size (app
 ```diff
   const width = document.body.offsetWidth;
   const height = document.body.offsetHeight;
-  
+
 - canvas.width = width;
 - canvas.height = height;
 + canvas.width = width * devicePixelRatio;
 + canvas.height = height * devicePixelRatio;
-  
+
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -4122,13 +4122,13 @@ We can downscale canvas to a physical size with css `width` and `height` propert
 ```diff
   canvas.width = width * devicePixelRatio;
   canvas.height = height * devicePixelRatio;
-  
+
 + canvas.style.width = `${width}px`;
 + canvas.style.height = `${height}px`;
-+ 
++
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 
 ```
 Just to summarize, `width` and `height` attributes of canvas specify actual size in pixels, but in order to make picture sharp on highdpi displays we need to multiply width and hegiht on `devicePixelRatio` and downscale canvas back with css
@@ -4138,21 +4138,21 @@ Now we can alos make our canvas resizable
 
 📄 src/texture.js
 ```diff
-  
+
       gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
   });
-+ 
-+ 
++
++
 + window.addEventListener('resize', () => {
 +     const width = document.body.offsetWidth;
 +     const height = document.body.offsetHeight;
-+ 
++
 +     canvas.width = width * devicePixelRatio;
 +     canvas.height = height * devicePixelRatio;
-+ 
++
 +     canvas.style.width = `${width}px`;
 +     canvas.style.height = `${height}px`;
-+ 
++
 +     gl.viewport(0, 0, canvas.width, canvas.height);
 + });
 
@@ -4162,9 +4162,9 @@ Oops, canvas clears after resize. Turns out that modification of `width` or `hei
 📄 src/texture.js
 ```diff
       canvas.style.height = `${height}px`;
-  
+
       gl.viewport(0, 0, canvas.width, canvas.height);
-+ 
++
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
   });
 
@@ -4251,7 +4251,7 @@ import fShaderSource from './shaders/rotating-square.f.glsl';
           'texture': './src/texture.js',
 +         'rotating-square': './src/rotating-square.js',
       },
-  
+
       output: {
 
 ```
@@ -4261,10 +4261,10 @@ Get WebGL context
 ```diff
   import vShaderSource from './shaders/rotating-square.v.glsl';
   import fShaderSource from './shaders/rotating-square.f.glsl';
-+ 
++
 + const canvas = document.querySelector('canvas');
 + const gl = canvas.getContext('webgl');
-+ 
++
 
 ```
 Make canvas fullscreen
@@ -4273,13 +4273,13 @@ Make canvas fullscreen
 ```diff
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
 + const width = document.body.offsetWidth;
 + const height = document.body.offsetHeight;
-+ 
++
 + canvas.width = width * devicePixelRatio;
 + canvas.height = height * devicePixelRatio;
-+ 
++
 + canvas.style.width = `${width}px`;
 + canvas.style.height = `${height}px`;
 
@@ -4291,16 +4291,16 @@ Create shaders
   import vShaderSource from './shaders/rotating-square.v.glsl';
   import fShaderSource from './shaders/rotating-square.f.glsl';
 + import { compileShader } from './gl-helpers';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
-+ 
++
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
 
@@ -4309,15 +4309,15 @@ Create program
 
 📄 src/rotating-square.js
 ```diff
-  
+
   compileShader(gl, vShader, vShaderSource);
   compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
 
@@ -4330,13 +4330,13 @@ Get attribute and uniform locations
   import fShaderSource from './shaders/rotating-square.f.glsl';
 - import { compileShader } from './gl-helpers';
 + import { setupShaderInput, compileShader } from './gl-helpers';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   gl.linkProgram(program);
   gl.useProgram(program);
-+ 
++
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 ```
@@ -4349,15 +4349,15 @@ Create vertices to draw a square
   import { setupShaderInput, compileShader } from './gl-helpers';
 + import { createRect } from './shape-helpers';
 + import { GLBuffer } from './GLBuffer';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.useProgram(program);
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-+ 
++
 + const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
-+     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
++     ...createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200)
 + ]), gl.STATIC_DRAW);
 
 ```
@@ -4366,9 +4366,9 @@ Setup attribute pointer
 📄 src/rotating-square.js
 ```diff
   const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
-      ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
+      ...createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200),
   ]), gl.STATIC_DRAW);
-+ 
++
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
 ```
@@ -4377,12 +4377,12 @@ Create index buffer
 📄 src/rotating-square.js
 ```diff
   ]), gl.STATIC_DRAW);
-  
+
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-+ 
++
 + const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
-+     0, 1, 2, 
-+     1, 2, 3, 
++     0, 1, 2,
++     1, 2, 3,
 + ]), gl.STATIC_DRAW);
 
 ```
@@ -4390,12 +4390,12 @@ Pass resolution and setup viewport
 
 📄 src/rotating-square.js
 ```diff
-      0, 1, 2, 
-      1, 2, 3, 
+      0, 1, 2,
+      1, 2, 3,
   ]), gl.STATIC_DRAW);
-+ 
++
 + gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-+ 
++
 + gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -4404,7 +4404,7 @@ And finally issue a draw call
 📄 src/rotating-square.js
 ```diff
   gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 + gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
@@ -4421,12 +4421,12 @@ Let's refactor our createRect helper to take angle into account
 📄 src/rotating-square.js
 ```diff
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
   const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
--     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200),
-+     ...createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, 0),
+-     ...createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200),
++     ...createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200, 0),
   ]), gl.STATIC_DRAW);
-  
+
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
 ```
@@ -4434,25 +4434,25 @@ Let's refactor our createRect helper to take angle into account
 ```diff
 - export function createRect(top, left, width, height) {
 + const Pi_4 = Math.PI / 4;
-+ 
++
 + export function createRect(top, left, width, height, angle = 0) {
 +     const centerX = width / 2;
 +     const centerY = height / 2;
-+ 
++
 +     const diagonalLength = Math.sqrt(centerX ** 2 + centerY ** 2);
-+ 
++
 +     const x1 = centerX + diagonalLength * Math.cos(angle + Pi_4);
 +     const y1 = centerY + diagonalLength * Math.sin(angle + Pi_4);
-+ 
++
 +     const x2 = centerX + diagonalLength * Math.cos(angle + Pi_4 * 3);
 +     const y2 = centerY + diagonalLength * Math.sin(angle + Pi_4 * 3);
-+ 
++
 +     const x3 = centerX + diagonalLength * Math.cos(angle - Pi_4);
 +     const y3 = centerY + diagonalLength * Math.sin(angle - Pi_4);
-+ 
++
 +     const x4 = centerX + diagonalLength * Math.cos(angle - Pi_4 * 3);
 +     const y4 = centerY + diagonalLength * Math.sin(angle - Pi_4 * 3);
-+ 
++
       return [
 -         left, top, // x1 y1
 -         left + width, top, // x2 y2
@@ -4464,7 +4464,7 @@ Let's refactor our createRect helper to take angle into account
 +         x4 + left, y4 + top,
       ];
   }
-  
+
 
 ```
 Now we need to define initial angle
@@ -4472,10 +4472,10 @@ Now we need to define initial angle
 📄 src/rotating-square.js
 ```diff
   gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 - gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
-+ 
++
 + let angle = 0;
 
 ```
@@ -4484,13 +4484,13 @@ and a function which will be called each frame
 📄 src/rotating-square.js
 ```diff
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   let angle = 0;
-+ 
++
 + function frame() {
 +     requestAnimationFrame(frame);
 + }
-+ 
++
 + frame();
 
 ```
@@ -4499,19 +4499,19 @@ Each frame WebGL just goes through vertex data and renders it. In order to make 
 📄 src/rotating-square.js
 ```diff
   let angle = 0;
-  
+
   function frame() {
 +     vertexPositionBuffer.setData(
-+         gl, 
++         gl,
 +         new Float32Array(
-+             createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
-+         ), 
++             createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200, angle)
++         ),
 +         gl.STATIC_DRAW,
 +     );
-+ 
++
       requestAnimationFrame(frame);
   }
-  
+
 
 ```
 We also need to update rotation angle each frame
@@ -4520,25 +4520,25 @@ We also need to update rotation angle each frame
 ```diff
           gl.STATIC_DRAW,
       );
-  
+
 +     angle += Math.PI / 60;
-+ 
++
       requestAnimationFrame(frame);
   }
-  
+
 
 ```
 and issue a draw call
 
 📄 src/rotating-square.js
 ```diff
-  
+
       angle += Math.PI / 60;
-  
+
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
       requestAnimationFrame(frame);
   }
-  
+
 
 ```
 Cool! We now have a rotating square! 🎉
@@ -4568,9 +4568,9 @@ We'll need to define a rotation matrix uniform
 ```diff
   attribute vec2 position;
   uniform vec2 resolution;
-  
+
 + uniform mat2 rotationMatrix;
-+ 
++
   void main() {
       gl_Position = vec4(position / resolution * 2.0 - 1.0, 0, 1);
   }
@@ -4581,7 +4581,7 @@ And multiply vertex positions
 📄 src/shaders/rotating-square.v.glsl
 ```diff
   uniform mat2 rotationMatrix;
-  
+
   void main() {
 -     gl_Position = vec4(position / resolution * 2.0 - 1.0, 0, 1);
 +     gl_Position = vec4((position / resolution * 2.0 - 1.0) * rotationMatrix, 0, 1);
@@ -4596,26 +4596,26 @@ Now we can get rid of vertex position updates
   import { createRect } from './shape-helpers';
   import { GLBuffer } from './GLBuffer';
 + import { mat2 } from 'gl-matrix';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - let angle = 0;
 + const rotationMatrix = mat2.create();
-  
+
   function frame() {
 -     vertexPositionBuffer.setData(
--         gl, 
+-         gl,
 -         new Float32Array(
--             createRect(canvas.width / 2 - 100, canvas.height / 2 - 100, 200, 200, angle)
--         ), 
+-             createRect(canvas.height / 2 - 100, canvas.width / 2 - 100, 200, 200, angle)
+-         ),
 -         gl.STATIC_DRAW,
 -     );
-- 
+-
 -     angle += Math.PI / 60;
-  
+
       gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
       requestAnimationFrame(frame);
 
@@ -4625,12 +4625,12 @@ and use rotation matrix instead
 📄 src/rotating-square.js
 ```diff
   const rotationMatrix = mat2.create();
-  
+
   function frame() {
 +     gl.uniformMatrix2fv(programInfo.uniformLocations.rotationMatrix, false, rotationMatrix);
-+ 
++
 +     mat2.rotate(rotationMatrix, rotationMatrix, -Math.PI / 60);
-  
+
       gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
       requestAnimationFrame(frame);
 
@@ -4785,7 +4785,7 @@ console.log('Hello 3d!');
           'rotating-square': './src/rotating-square.js',
 +         '3d': './src/3d.js',
       },
-  
+
       output: {
 
 ```
@@ -4817,33 +4817,33 @@ We'll also need a familiar from previous tutorials boilerplate for our WebGL pro
 + import vShaderSource from './shaders/3d.v.glsl';
 + import fShaderSource from './shaders/3d.f.glsl';
 + import { compileShader, setupShaderInput } from './gl-helpers';
-+ 
++
 + const canvas = document.querySelector('canvas');
 + const gl = canvas.getContext('webgl');
-+ 
++
 + const width = document.body.offsetWidth;
 + const height = document.body.offsetHeight;
-+ 
++
 + canvas.width = width * devicePixelRatio;
 + canvas.height = height * devicePixelRatio;
-+ 
++
 + canvas.style.width = `${width}px`;
 + canvas.style.height = `${height}px`;
-+ 
++
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
-+ 
++
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 ```
@@ -4852,9 +4852,9 @@ Now let's define cube vertices for each face. We'll start with front face
 📄 src/3d.js
 ```diff
   gl.useProgram(program);
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-+ 
++
 + const cubeVertices = new Float32Array([
 +     // Front face
 +     -1.0, -1.0, 1.0,
@@ -4871,7 +4871,7 @@ back face
       1.0, -1.0, 1.0,
       1.0, 1.0, 1.0,
       -1.0, 1.0, 1.0,
-+ 
++
 +     // Back face
 +     -1.0, -1.0, -1.0,
 +     -1.0, 1.0, -1.0,
@@ -4887,7 +4887,7 @@ top face
       -1.0, 1.0, -1.0,
       1.0, 1.0, -1.0,
       1.0, -1.0, -1.0,
-+ 
++
 +     // Top face
 +     -1.0, 1.0, -1.0,
 +     -1.0, 1.0, 1.0,
@@ -4903,7 +4903,7 @@ bottom face
       -1.0, 1.0, 1.0,
       1.0, 1.0, 1.0,
       1.0, 1.0, -1.0,
-+ 
++
 +     // Bottom face
 +     -1.0, -1.0, -1.0,
 +     1.0, -1.0, -1.0,
@@ -4919,7 +4919,7 @@ right face
       1.0, -1.0, -1.0,
       1.0, -1.0, 1.0,
       -1.0, -1.0, 1.0,
-+ 
++
 +     // Right face
 +     1.0, -1.0, -1.0,
 +     1.0, 1.0, -1.0,
@@ -4935,7 +4935,7 @@ left face
       1.0, 1.0, -1.0,
       1.0, 1.0, 1.0,
       1.0, -1.0, 1.0,
-+ 
++
 +     // Left face
 +     -1.0, -1.0, -1.0,
 +     -1.0, -1.0, 1.0,
@@ -4951,7 +4951,7 @@ Now we need to define vertex indices
       -1.0, 1.0, 1.0,
       -1.0, 1.0, -1.0,
   ]);
-+ 
++
 + const indices = new Uint8Array([
 +     0, 1, 2, 0, 2, 3,       // front
 +     4, 5, 6, 4, 6, 7,       // back
@@ -4970,13 +4970,13 @@ and create gl buffers
   import fShaderSource from './shaders/3d.f.glsl';
   import { compileShader, setupShaderInput } from './gl-helpers';
 + import { GLBuffer } from './GLBuffer';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
       16, 17, 18, 16, 18, 19, // right
       20, 21, 22, 20, 22, 23, // left
   ]);
-+ 
++
 + const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 + const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
 
@@ -4985,10 +4985,10 @@ Setup vertex attribute pointer
 
 📄 src/3d.js
 ```diff
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
   const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-+ 
++
 + vertexBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
 
@@ -4997,10 +4997,10 @@ setup viewport
 
 📄 src/3d.js
 ```diff
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-+ 
++
 + gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5009,9 +5009,9 @@ and issue a draw call
 📄 src/3d.js
 ```diff
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-+ 
++
 + gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -5023,11 +5023,11 @@ Let's define uniforms for each matrix
 📄 src/shaders/3d.v.glsl
 ```diff
   attribute vec3 position;
-  
+
 + uniform mat4 modelMatrix;
 + uniform mat4 viewMatrix;
 + uniform mat4 projectionMatrix;
-+ 
++
   void main() {
       gl_Position = vec4(position, 1.0);
   }
@@ -5038,7 +5038,7 @@ and multiply every matrix.
 📄 src/shaders/3d.v.glsl
 ```diff
   uniform mat4 projectionMatrix;
-  
+
   void main() {
 -     gl_Position = vec4(position, 1.0);
 +     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
@@ -5050,19 +5050,19 @@ Now we need to define JS representations of the same matrices
 📄 src/3d.js
 ```diff
 + import { mat4 } from 'gl-matrix';
-+ 
++
   import vShaderSource from './shaders/3d.v.glsl';
   import fShaderSource from './shaders/3d.f.glsl';
   import { compileShader, setupShaderInput } from './gl-helpers';
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
 + const modelMatrix = mat4.create();
 + const viewMatrix = mat4.create();
 + const projectionMatrix = mat4.create();
-+ 
++
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -5075,13 +5075,13 @@ We'll use `lookAt` method to setup `viewMatrix`
 ```diff
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
-  
+
 + mat4.lookAt(
 +     viewMatrix,
 + );
-+ 
++
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -5089,12 +5089,12 @@ The 2nd argument is a position of a viewer. Let's place this point on top and in
 
 📄 src/3d.js
 ```diff
-  
+
   mat4.lookAt(
       viewMatrix,
 +     [0, 7, -7],
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5107,7 +5107,7 @@ The 3rd argument is a point where we want to look at. Coordinate of our cube is 
       [0, 7, -7],
 +     [0, 0, 0],
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5120,7 +5120,7 @@ The last argument is up vector. We can setup a view matrix in a way that any vec
       [0, 0, 0],
 +     [0, 1, 0],
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5130,13 +5130,13 @@ To setup projection matrix we'll use perspective method
 ```diff
       [0, 1, 0],
   );
-  
+
 + mat4.perspective(
 +     projectionMatrix,
 + );
-+ 
++
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -5147,12 +5147,12 @@ The 2nd argument of `perspective` method is a `field of view` (how wide is camer
 
 📄 src/3d.js
 ```diff
-  
+
   mat4.perspective(
       projectionMatrix,
 +     Math.PI / 360 * 90,
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5165,7 +5165,7 @@ Next argument is aspect ration of a canvas. It could be calculated by a simple d
       Math.PI / 360 * 90,
 +     canvas.width / canvas.height,
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5179,7 +5179,7 @@ The 4th and 5th argumnts setup a distance to objects which are visible by camera
 +     0.01,
 +     100,
   );
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -5189,13 +5189,13 @@ and finally we need to pass matrices to shader
 ```diff
       100,
   );
-  
+
 + gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 + gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 + gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-+ 
++
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 
 ```
@@ -5209,15 +5209,15 @@ Now let's implement a rotation animation with help of model matrix and rotate me
 📄 src/3d.js
 ```diff
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
-+ 
++
 + function frame() {
 +     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-+ 
++
 +     requestAnimationFrame(frame);
 + }
-+ 
++
 + frame();
 
 ```
@@ -5227,12 +5227,12 @@ We also need to update a uniform
 ```diff
   function frame() {
       mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-  
+
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
-+ 
++
       requestAnimationFrame(frame);
   }
-  
+
 
 ```
 and issue a draw call
@@ -5240,10 +5240,10 @@ and issue a draw call
 📄 src/3d.js
 ```diff
       mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-  
+
       gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
-  
+
       requestAnimationFrame(frame);
   }
 
@@ -5297,7 +5297,7 @@ Let's define face colors
 ```diff
       20, 21, 22, 20, 22, 23, // left
   ]);
-  
+
 + const faceColors = [
 +     [1.0, 1.0, 1.0, 1.0], // Front face: white
 +     [1.0, 0.0, 0.0, 1.0], // Back face: red
@@ -5306,10 +5306,10 @@ Let's define face colors
 +     [1.0, 1.0, 0.0, 1.0], // Right face: yellow
 +     [1.0, 0.0, 1.0, 1.0], // Left face: purple
 + ];
-+ 
++
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
   const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
 
 ```
 Now we need to repeat face colors for each face vertex
@@ -5318,9 +5318,9 @@ Now we need to repeat face colors for each face vertex
 ```diff
       [1.0, 0.0, 1.0, 1.0], // Left face: purple
   ];
-  
+
 + const colors = [];
-+ 
++
 + for (var j = 0; j < faceColors.length; ++j) {
 +     const c = faceColors[j];
 +     colors.push(
@@ -5330,23 +5330,23 @@ Now we need to repeat face colors for each face vertex
 +         ...c, // vertex 4
 +     );
 + }
-+ 
-+ 
++
++
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
   const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
 
 ```
 and create a webgl buffer
 
 📄 src/3d.js
 ```diff
-  
-  
+
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 + const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
   vertexBuffer.bind(gl);
 
 ```
@@ -5356,13 +5356,13 @@ Next we need to define an attribute to pass color from js to vertex shader, and 
 ```diff
   attribute vec3 position;
 + attribute vec4 color;
-  
+
   uniform mat4 modelMatrix;
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
-  
+
 + varying vec4 vColor;
-+ 
++
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 +     vColor = color;
@@ -5374,9 +5374,9 @@ and use it instead of hardcoded red in fragment shader
 📄 src/shaders/3d.f.glsl
 ```diff
   precision mediump float;
-  
+
 + varying vec4 vColor;
-+ 
++
   void main() {
 -     gl_FragColor = vec4(1, 0, 0, 1);
 +     gl_FragColor = vColor;
@@ -5389,10 +5389,10 @@ and finally setup vertex attribute in js
 ```diff
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
 + colorsBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.color, 4, gl.FLOAT, false, 0, 0);
-+ 
++
   const modelMatrix = mat4.create();
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
@@ -5428,11 +5428,11 @@ How do we fix it?
 ```diff
   gl.linkProgram(program);
   gl.useProgram(program);
-  
+
 + gl.enable(gl.DEPTH_TEST);
-+ 
++
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
   const cubeVertices = new Float32Array([
 
 ```
@@ -5455,7 +5455,7 @@ Let's drop color attrbiute and introduce a colorIndex instead
   attribute vec3 position;
 - attribute vec4 color;
 + attribute float colorIndex;
-  
+
   uniform mat4 modelMatrix;
   uniform mat4 viewMatrix;
 
@@ -5468,9 +5468,9 @@ Shaders support "arrays" of uniforms, so we can pass our color palette to this a
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
 + uniform vec4 colors[6];
-  
+
   varying vec4 vColor;
-  
+
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 -     vColor = color;
@@ -5483,7 +5483,7 @@ We need to make appropriate changes to setup color index attribute
 📄 src/3d.js
 ```diff
   const colors = [];
-  
+
   for (var j = 0; j < faceColors.length; ++j) {
 -     const c = faceColors[j];
 -     colors.push(
@@ -5494,14 +5494,14 @@ We need to make appropriate changes to setup color index attribute
 -     );
 +     colors.push(j, j, j, j);
   }
-  
-  
+
+
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
   colorsBuffer.bind(gl);
 - gl.vertexAttribPointer(programInfo.attributeLocations.color, 4, gl.FLOAT, false, 0, 0);
 + gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
-  
+
   const modelMatrix = mat4.create();
   const viewMatrix = mat4.create();
 
@@ -5521,11 +5521,11 @@ Obviously this can be done in a loop.
 ```diff
       colors.push(j, j, j, j);
   }
-  
+
 + faceColors.forEach((color, index) => {
 +     gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
 + });
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
   const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
@@ -5691,7 +5691,7 @@ Now let's load .obj file with raw loader
   import { compileShader, setupShaderInput } from './gl-helpers';
   import { GLBuffer } from './GLBuffer';
 + import cubeObj from '../assets/objects/cube.obj';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
 
@@ -5705,62 +5705,62 @@ Now let's load .obj file with raw loader
 +                 test: /\.(glsl|obj)$/,
                   use: 'raw-loader',
               },
-  
+
 
 ```
 and implement parser to get vertices and vertex indices
 
 📄 src/3d.js
 ```diff
-  
+
   import vShaderSource from './shaders/3d.v.glsl';
   import fShaderSource from './shaders/3d.f.glsl';
 - import { compileShader, setupShaderInput } from './gl-helpers';
 + import { compileShader, setupShaderInput, parseObj } from './gl-helpers';
   import { GLBuffer } from './GLBuffer';
   import cubeObj from '../assets/objects/cube.obj';
-  
-  
+
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const cubeVertices = new Float32Array([
 -     // Front face
 -     -1.0, -1.0, 1.0,
 -     1.0, -1.0, 1.0,
 -     1.0, 1.0, 1.0,
 -     -1.0, 1.0, 1.0,
-- 
+-
 -     // Back face
 -     -1.0, -1.0, -1.0,
 -     -1.0, 1.0, -1.0,
 -     1.0, 1.0, -1.0,
 -     1.0, -1.0, -1.0,
-- 
+-
 -     // Top face
 -     -1.0, 1.0, -1.0,
 -     -1.0, 1.0, 1.0,
 -     1.0, 1.0, 1.0,
 -     1.0, 1.0, -1.0,
-- 
+-
 -     // Bottom face
 -     -1.0, -1.0, -1.0,
 -     1.0, -1.0, -1.0,
 -     1.0, -1.0, 1.0,
 -     -1.0, -1.0, 1.0,
-- 
+-
 -     // Right face
 -     1.0, -1.0, -1.0,
 -     1.0, 1.0, -1.0,
 -     1.0, 1.0, 1.0,
 -     1.0, -1.0, 1.0,
-- 
+-
 -     // Left face
 -     -1.0, -1.0, -1.0,
 -     -1.0, -1.0, 1.0,
 -     -1.0, 1.0, 1.0,
 -     -1.0, 1.0, -1.0,
 - ]);
-- 
+-
 - const indices = new Uint8Array([
 -     0, 1, 2, 0, 2, 3,       // front
 -     4, 5, 6, 4, 6, 7,       // back
@@ -5770,17 +5770,17 @@ and implement parser to get vertices and vertex indices
 -     20, 21, 22, 20, 22, 23, // left
 - ]);
 + const { vertices, indices } = parseObj(cubeObj);
-  
+
   const faceColors = [
       [1.0, 1.0, 1.0, 1.0], // Front face: white
       gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
   });
-  
+
 - const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cubeVertices, gl.STATIC_DRAW);
 + const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
   const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
 
 ```
 📄 src/gl-helpers.js
@@ -5788,11 +5788,11 @@ and implement parser to get vertices and vertex indices
           uniformLocations,
       }
   }
-+ 
++
 + export function parseObj(objSource) {
 +     const vertices = [];
 +     const indices = [];
-+ 
++
 +     return { vertices, indices };
 + }
 
@@ -5803,21 +5803,21 @@ We can iterate over each line and search for those starting with `v` to get vert
 ```diff
       }
   }
-  
+
 + export function parseVec(string, prefix) {
 +     return string.replace(prefix, '').split(' ').map(Number);
 + }
-+ 
++
   export function parseObj(objSource) {
       const vertices = [];
       const indices = [];
-  
+
 +     objSource.split('\n').forEach(line => {
 +         if (line.startsWith('v ')) {
 +             vertices.push(...parseVec(line, 'v '));
 +         }
 +     });
-+ 
++
       return { vertices, indices };
   }
 
@@ -5828,25 +5828,25 @@ and do the same with faces
 ```diff
       return string.replace(prefix, '').split(' ').map(Number);
   }
-  
+
 + export function parseFace(string) {
 +     return string.replace('f ', '').split(' ').map(chunk => {
 +         return chunk.split('/').map(Number);
 +     })
 + }
-+ 
++
   export function parseObj(objSource) {
       const vertices = [];
       const indices = [];
           if (line.startsWith('v ')) {
               vertices.push(...parseVec(line, 'v '));
           }
-+ 
++
 +         if (line.startsWith('f ')) {
 +             indices.push(...parseFace(line).map(face => face[0]));
 +         }
       });
-  
+
       return { vertices, indices };
 
 ```
@@ -5856,10 +5856,10 @@ Let's also return typed arrays
 ```diff
           }
       });
-  
+
 -     return { vertices, indices };
-+     return { 
-+         vertices: new Float32Array(vertices), 
++     return {
++         vertices: new Float32Array(vertices),
 +         indices: new Uint8Array(indices),
 +     };
   }
@@ -5876,29 +5876,29 @@ That's because indices in .obj file starts with `1`, so we need to decrement eac
 📄 src/gl-helpers.js
 ```diff
           }
-  
+
           if (line.startsWith('f ')) {
 -             indices.push(...parseFace(line).map(face => face[0]));
 +             indices.push(...parseFace(line).map(face => face[0] - 1));
           }
       });
-  
+
 
 ```
 Let's also change the way we colorize our faces, just to make it possible to render any object with any amount of faces with random colors
 
 📄 src/3d.js
 ```diff
-  
+
   const colors = [];
-  
+
 - for (var j = 0; j < faceColors.length; ++j) {
 -     colors.push(j, j, j, j);
 + for (var j = 0; j < indices.length / 3; ++j) {
 +     const randomColorIndex = Math.floor(Math.random() * faceColors.length);
 +     colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
   }
-  
+
   faceColors.forEach((color, index) => {
 
 ```
@@ -5906,28 +5906,28 @@ One more issue with existing code, is that we use `gl.UNSIGNED_BYTE`, so index b
 
 📄 src/3d.js
 ```diff
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 + gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
-  
+
   function frame() {
       mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-  
+
       gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 -     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
-  
+
       requestAnimationFrame(frame);
   }
 
 ```
 📄 src/gl-helpers.js
 ```diff
-  
-      return { 
-          vertices: new Float32Array(vertices), 
+
+      return {
+          vertices: new Float32Array(vertices),
 -         indices: new Uint8Array(indices),
 +         indices: new Uint16Array(indices),
       };
@@ -5943,18 +5943,18 @@ Now let's render different object, for example monkey
   import { GLBuffer } from './GLBuffer';
 - import cubeObj from '../assets/objects/cube.obj';
 + import monkeyObj from '../assets/objects/monkey.obj';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const { vertices, indices } = parseObj(cubeObj);
 + const { vertices, indices } = parseObj(monkeyObj);
-  
+
   const faceColors = [
       [1.0, 1.0, 1.0, 1.0], // Front face: white
-  
+
   mat4.lookAt(
       viewMatrix,
 -     [0, 7, -7],
@@ -6023,7 +6023,7 @@ Let's change the way our object is colorized and make all faces the same color t
 📄 src/3d.js
 ```diff
   const { vertices, indices } = parseObj(monkeyObj);
-  
+
   const faceColors = [
 -     [1.0, 1.0, 1.0, 1.0], // Front face: white
 -     [1.0, 0.0, 0.0, 1.0], // Back face: red
@@ -6033,15 +6033,15 @@ Let's change the way our object is colorized and make all faces the same color t
 -     [1.0, 0.0, 1.0, 1.0], // Left face: purple
 +     [0.5, 0.5, 0.5, 1.0]
   ];
-  
+
   const colors = [];
-  
+
   for (var j = 0; j < indices.length / 3; ++j) {
 -     const randomColorIndex = Math.floor(Math.random() * faceColors.length);
 -     colors.push(randomColorIndex, randomColorIndex, randomColorIndex);
 +     colors.push(0, 0, 0, 0);
   }
-  
+
   faceColors.forEach((color, index) => {
 
 ```
@@ -6049,43 +6049,43 @@ We'll also need to extract normals from our object and use `drawArrays` instead 
 
 📄 src/3d.js
 ```diff
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const { vertices, indices } = parseObj(monkeyObj);
 + const { vertices, normals } = parseObj(monkeyObj);
-  
+
   const faceColors = [
       [0.5, 0.5, 0.5, 1.0]
-  
+
   const colors = [];
-  
+
 - for (var j = 0; j < indices.length / 3; ++j) {
 + for (var j = 0; j < vertices.length / 3; ++j) {
       colors.push(0, 0, 0, 0);
   }
-  
-  
+
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
   const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 - const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
 + gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-  
+
   function frame() {
       mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-  
+
       gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 -     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_SHORT, 0);
-+ 
++
 +     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-  
+
       requestAnimationFrame(frame);
   }
 
@@ -6093,7 +6093,7 @@ We'll also need to extract normals from our object and use `drawArrays` instead 
 📄 src/gl-helpers.js
 ```diff
   }
-  
+
   export function parseObj(objSource) {
 -     const vertices = [];
 -     const indices = [];
@@ -6101,44 +6101,44 @@ We'll also need to extract normals from our object and use `drawArrays` instead 
 +     const _normals = [];
 +     const vertexIndices = [];
 +     const normalIndices = [];
-  
+
       objSource.split('\n').forEach(line => {
           if (line.startsWith('v ')) {
 -             vertices.push(...parseVec(line, 'v '));
 +             _vertices.push(parseVec(line, 'v '));
 +         }
-+ 
++
 +         if (line.startsWith('vn ')) {
 +             _normals.push(parseVec(line, 'vn '));
           }
-  
+
           if (line.startsWith('f ')) {
 -             indices.push(...parseFace(line).map(face => face[0] - 1));
 +             const parsedFace = parseFace(line);
-+ 
++
 +             vertexIndices.push(...parsedFace.map(face => face[0] - 1));
 +             normalIndices.push(...parsedFace.map(face => face[2] - 1));
           }
       });
-  
+
 +     const vertices = [];
 +     const normals = [];
-+ 
++
 +     for (let i = 0; i < vertexIndices.length; i++) {
 +         const vertexIndex = vertexIndices[i];
 +         const normalIndex = normalIndices[i];
-+ 
++
 +         const vertex = _vertices[vertexIndex];
 +         const normal = _normals[normalIndex];
-+ 
++
 +         vertices.push(...vertex);
 +         normals.push(...normal);
 +     }
-+ 
-      return { 
-          vertices: new Float32Array(vertices), 
++
+      return {
+          vertices: new Float32Array(vertices),
 -         indices: new Uint16Array(indices),
-+         normals: new Float32Array(normals), 
++         normals: new Float32Array(normals),
       };
   }
 
@@ -6147,19 +6147,19 @@ Define normal attribute
 
 📄 src/3d.js
 ```diff
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
   const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 + const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
   colorsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
-  
+
 + normalsBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
-+ 
++
   const modelMatrix = mat4.create();
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
@@ -6170,7 +6170,7 @@ Define normal attribute
   attribute vec3 position;
 + attribute vec3 normal;
   attribute float colorIndex;
-  
+
   uniform mat4 modelMatrix;
 
 ```
@@ -6180,11 +6180,11 @@ Let's also define a position of light and pass it to shader via uniform
 ```diff
   gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
 + gl.uniform3fv(programInfo.uniformLocations.directionalLightVector, [0, 0, -7]);
-+ 
++
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 
 ```
@@ -6194,22 +6194,22 @@ Let's also define a position of light and pass it to shader via uniform
   uniform mat4 projectionMatrix;
   uniform vec4 colors[6];
 + uniform vec3 directionalLightVector;
-  
+
   varying vec4 vColor;
-  
+
 
 ```
 Now we can use normal vector and directional light vector to calculate light "intensity" and multiply initial color
 
 📄 src/shaders/3d.v.glsl
 ```diff
-  
+
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 -     vColor = colors[int(colorIndex)];
-+ 
++
 +     float intensity = dot(normal, directionalLightVector);
-+ 
++
 +     vColor = colors[int(colorIndex)] * intensity;
   }
 
@@ -6224,10 +6224,10 @@ One issue with current implementation is that we're using "non-normalized" vecto
 ```diff
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-  
+
 -     float intensity = dot(normal, directionalLightVector);
 +     float intensity = dot(normal, normalize(directionalLightVector));
-  
+
       vColor = colors[int(colorIndex)] * intensity;
   }
 
@@ -6242,16 +6242,16 @@ This is because we also multiply `alpha` component of the color by our intensity
 ```diff
 - import { mat4 } from 'gl-matrix';
 + import { mat4, vec3 } from 'gl-matrix';
-  
+
   import vShaderSource from './shaders/3d.v.glsl';
   import fShaderSource from './shaders/3d.f.glsl';
 
 ```
 📄 src/shaders/3d.v.glsl
 ```diff
-  
+
       float intensity = dot(normal, normalize(directionalLightVector));
-  
+
 -     vColor = colors[int(colorIndex)] * intensity;
 +     vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
 +     vColor.a = 1.0;
@@ -6276,20 +6276,20 @@ It seems like the light source rotates together with object. This happens becaus
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
 + const normalMatrix = mat4.create();
-  
+
   mat4.lookAt(
       viewMatrix,
   function frame() {
       mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-  
+
 +     mat4.invert(normalMatrix, modelMatrix);
 +     mat4.transpose(normalMatrix, normalMatrix);
-+ 
++
       gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
-  
+
       gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-  
+
 
 ```
 📄 src/shaders/3d.v.glsl
@@ -6300,14 +6300,14 @@ It seems like the light source rotates together with object. This happens becaus
 + uniform mat4 normalMatrix;
   uniform vec4 colors[6];
   uniform vec3 directionalLightVector;
-  
+
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-  
+
 -     float intensity = dot(normal, normalize(directionalLightVector));
 +     vec3 transformedNormal = (normalMatrix * vec4(normal, 1.0)).xyz;
 +     float intensity = dot(transformedNormal, normalize(directionalLightVector));
-  
+
       vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
       vColor.a = 1.0;
 
@@ -6363,37 +6363,37 @@ Since we're rendering objects with a solid color, let's get rid of colorIndex at
 
 📄 src/3d.js
 ```diff
-  
+
   const { vertices, normals } = parseObj(monkeyObj);
-  
+
 - const faceColors = [
 -     [0.5, 0.5, 0.5, 1.0]
 - ];
-- 
+-
 - const colors = [];
-- 
+-
 - for (var j = 0; j < vertices.length / 3; ++j) {
 -     colors.push(0, 0, 0, 0);
 - }
-- 
+-
 - faceColors.forEach((color, index) => {
 -     gl.uniform4fv(programInfo.uniformLocations[`colors[${index}]`], color);
 - });
 + gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 - const colorsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
   const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-  
+
 - colorsBuffer.bind(gl);
 - gl.vertexAttribPointer(programInfo.attributeLocations.colorIndex, 1, gl.FLOAT, false, 0, 0);
-- 
+-
   normalsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
-  
+
 
 ```
 📄 src/shaders/3d.v.glsl
@@ -6401,7 +6401,7 @@ Since we're rendering objects with a solid color, let's get rid of colorIndex at
   attribute vec3 position;
   attribute vec3 normal;
 - attribute float colorIndex;
-  
+
   uniform mat4 modelMatrix;
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
@@ -6409,11 +6409,11 @@ Since we're rendering objects with a solid color, let's get rid of colorIndex at
 - uniform vec4 colors[6];
 + uniform vec3 color;
   uniform vec3 directionalLightVector;
-  
+
   varying vec4 vColor;
       vec3 transformedNormal = (normalMatrix * vec4(normal, 1.0)).xyz;
       float intensity = dot(transformedNormal, normalize(directionalLightVector));
-  
+
 -     vColor.rgb = vec3(0.3, 0.3, 0.3) + colors[int(colorIndex)].rgb * intensity;
 +     vColor.rgb = vec3(0.3, 0.3, 0.3) + color * intensity;
       vColor.a = 1.0;
@@ -6426,8 +6426,8 @@ We'll need a helper class to store object related info
 ```js
 export class Object3D {
     constructor() {
-        
-    } 
+
+    }
 }
 
 ```
@@ -6436,14 +6436,14 @@ Each object should contain it's own vertices and normals
 📄 src/Object3D.js
 ```diff
 + import { parseObj } from "./gl-helpers";
-+ 
++
   export class Object3D {
 -     constructor() {
--         
--     } 
+-
+-     }
 +     constructor(source) {
 +         const { vertices, normals } = parseObj(source);
-+ 
++
 +         this.vertices = vertices;
 +         this.normals = normals;
 +     }
@@ -6456,13 +6456,13 @@ As well as a model matrix to store object transform
 ```diff
   import { parseObj } from "./gl-helpers";
 + import { mat4 } from "gl-matrix";
-  
+
   export class Object3D {
       constructor(source) {
-  
+
           this.vertices = vertices;
           this.normals = normals;
-+ 
++
 +         this.modelMatrix = mat4.create();
       }
   }
@@ -6473,15 +6473,15 @@ Since normal matrix is computable from model matrix it makes sense to define a g
 📄 src/Object3D.js
 ```diff
           this.normals = normals;
-  
+
           this.modelMatrix = mat4.create();
 +         this._normalMatrix = mat4.create();
 +     }
-+ 
++
 +     get normalMatrix () {
 +         mat4.invert(this._normalMatrix, this.modelMatrix);
 +         mat4.transpose(this._normalMatrix, this._normalMatrix);
-+ 
++
 +         return this._normalMatrix;
       }
   }
@@ -6495,60 +6495,60 @@ Now we can refactor our code and use new helper class
   import { GLBuffer } from './GLBuffer';
   import monkeyObj from '../assets/objects/monkey.obj';
 + import { Object3D } from './Object3D';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const { vertices, normals } = parseObj(monkeyObj);
 + const monkey = new Object3D(monkeyObj);
-  
+
   gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
-  
+
 - const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 - const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 + const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
 + const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
   normalsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.normal, 3, gl.FLOAT, false, 0, 0);
-  
+
 - const modelMatrix = mat4.create();
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
 - const normalMatrix = mat4.create();
-  
+
   mat4.lookAt(
       viewMatrix,
       100,
   );
-  
+
 - gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
   gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
-  
+
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-- 
+-
   function frame() {
 -     mat4.rotateY(modelMatrix, modelMatrix, Math.PI / 180);
-- 
+-
 -     mat4.invert(normalMatrix, modelMatrix);
 -     mat4.transpose(normalMatrix, normalMatrix);
 +     mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
-  
+
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, modelMatrix);
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, normalMatrix);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
-  
+
       gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-  
+
 
 ```
 Now let's import more objects
@@ -6560,18 +6560,18 @@ Now let's import more objects
   import monkeyObj from '../assets/objects/monkey.obj';
 + import torusObj from '../assets/objects/torus.obj';
 + import coneObj from '../assets/objects/cone.obj';
-+ 
++
   import { Object3D } from './Object3D';
-  
+
   const canvas = document.querySelector('canvas');
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
   const monkey = new Object3D(monkeyObj);
 + const torus = new Object3D(torusObj);
 + const cone = new Object3D(coneObj);
-  
+
   gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
-  
+
 
 ```
 and store them in a collection
@@ -6580,15 +6580,15 @@ and store them in a collection
 ```diff
   const torus = new Object3D(torusObj);
   const cone = new Object3D(coneObj);
-  
+
 + const objects = [
 +     monkey,
 +     torus,
 +     cone,
 + ];
-+ 
++
   gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
 
 ```
@@ -6597,21 +6597,21 @@ and instead of issuing a draw call for just a monkey, we'll iterate over collect
 📄 src/3d.js
 ```diff
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   function frame() {
 -     mat4.rotateY(monkey.modelMatrix, monkey.modelMatrix, Math.PI / 180);
 +     objects.forEach((object) => {
 +         mat4.rotateY(object.modelMatrix, object.modelMatrix, Math.PI / 180);
-  
+
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, monkey.modelMatrix);
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, monkey.normalMatrix);
 +         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
 +         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
-  
+
 -     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 +         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 +     });
-  
+
       requestAnimationFrame(frame);
   }
 
@@ -6625,13 +6625,13 @@ No wonder, vertex and normals buffer stays the same, so we just render the same 
 ```diff
           gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
           gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
-  
+
 +         vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
 +         normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
-+ 
++
           gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
       });
-  
+
 
 ```
 ![Multiple objects 1](https://git-tutor-assets.s3.eu-west-2.amazonaws.com/multiple-objects-1.gif)
@@ -6643,16 +6643,16 @@ Each object will have a property storing a position in space
 
 📄 src/3d.js
 ```diff
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const monkey = new Object3D(monkeyObj);
 - const torus = new Object3D(torusObj);
 - const cone = new Object3D(coneObj);
 + const monkey = new Object3D(monkeyObj, [0, 0, 0]);
 + const torus = new Object3D(torusObj, [-3, 0, 0]);
 + const cone = new Object3D(coneObj, [3, 0, 0]);
-  
+
   const objects = [
       monkey,
 
@@ -6660,16 +6660,16 @@ Each object will have a property storing a position in space
 📄 src/Object3D.js
 ```diff
   import { mat4 } from "gl-matrix";
-  
+
   export class Object3D {
 -     constructor(source) {
 +     constructor(source, position) {
           const { vertices, normals } = parseObj(source);
-  
+
           this.vertices = vertices;
           this.normals = normals;
 +         this.position = position;
-  
+
           this.modelMatrix = mat4.create();
           this._normalMatrix = mat4.create();
 
@@ -6679,65 +6679,65 @@ and this position should be respected by model matrix
 📄 src/Object3D.js
 ```diff
           this.position = position;
-  
+
           this.modelMatrix = mat4.create();
 +         mat4.fromTranslation(this.modelMatrix, position);
           this._normalMatrix = mat4.create();
       }
-  
+
 
 ```
 And one more thing. We can also define a color specific to each object
 
 📄 src/3d.js
 ```diff
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 - const monkey = new Object3D(monkeyObj, [0, 0, 0]);
 - const torus = new Object3D(torusObj, [-3, 0, 0]);
 - const cone = new Object3D(coneObj, [3, 0, 0]);
 + const monkey = new Object3D(monkeyObj, [0, 0, 0], [1, 0, 0]);
 + const torus = new Object3D(torusObj, [-3, 0, 0], [0, 1, 0]);
 + const cone = new Object3D(coneObj, [3, 0, 0], [0, 0, 1]);
-  
+
   const objects = [
       monkey,
       cone,
   ];
-  
+
 - gl.uniform3fv(programInfo.uniformLocations.color, [0.5, 0.5, 0.5]);
-- 
+-
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.vertices, gl.STATIC_DRAW);
   const normalsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, monkey.normals, gl.STATIC_DRAW);
-  
+
           gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, object.modelMatrix);
           gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, object.normalMatrix);
-  
+
 +         gl.uniform3fv(programInfo.uniformLocations.color, object.color);
-+ 
++
           vertexBuffer.setData(gl, object.vertices, gl.STATIC_DRAW);
           normalsBuffer.setData(gl, object.normals, gl.STATIC_DRAW);
-  
+
 
 ```
 📄 src/Object3D.js
 ```diff
   import { mat4 } from "gl-matrix";
-  
+
   export class Object3D {
 -     constructor(source, position) {
 +     constructor(source, position, color) {
           const { vertices, normals } = parseObj(source);
-  
+
           this.vertices = vertices;
           this.modelMatrix = mat4.create();
           mat4.fromTranslation(this.modelMatrix, position);
           this._normalMatrix = mat4.create();
-+ 
++
 +         this.color = color;
       }
-  
+
       get normalMatrix () {
 
 ```
@@ -6808,7 +6808,7 @@ console.log('Hello textures');
           '3d': './src/3d.js',
 +         '3d-textured': './src/3d-textured.js',
       },
-  
+
       output: {
 
 ```
@@ -6843,13 +6843,13 @@ We'll need a canvas, webgl context and make canvas fullscreen
 - console.log('Hello textures');
 + const canvas = document.querySelector('canvas');
 + const gl = canvas.getContext('webgl');
-+ 
++
 + const width = document.body.offsetWidth;
 + const height = document.body.offsetHeight;
-+ 
++
 + canvas.width = width * devicePixelRatio;
 + canvas.height = height * devicePixelRatio;
-+ 
++
 + canvas.style.width = `${width}px`;
 + canvas.style.height = `${height}px`;
 
@@ -6861,17 +6861,17 @@ Create and compile shaders. [Learn more here](https://dev.to/lesnitsky/shaders-a
 + import vShaderSource from './shaders/3d-textured.v.glsl';
 + import fShaderSource from './shaders/3d-textured.f.glsl';
 + import { compileShader } from './gl-helpers';
-+ 
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
-  
+
+
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
-+ 
++
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
 
@@ -6880,15 +6880,15 @@ Create, link and use webgl program
 
 📄 src/3d-textured.js
 ```diff
-  
+
   compileShader(gl, vShader, vShaderSource);
   compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
 
@@ -6897,10 +6897,10 @@ Enable depth test since we're rendering 3d. [Learn more here](https://dev.to/les
 
 📄 src/3d-textured.js
 ```diff
-  
+
   gl.linkProgram(program);
   gl.useProgram(program);
-+ 
++
 + gl.enable(gl.DEPTH_TEST);
 
 ```
@@ -6912,13 +6912,13 @@ Setup shader input. [Learn more here](https://dev.to/lesnitsky/webgl-month-day-1
   import fShaderSource from './shaders/3d-textured.f.glsl';
 - import { compileShader } from './gl-helpers';
 + import { compileShader, setupShaderInput } from './gl-helpers';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.useProgram(program);
-  
+
   gl.enable(gl.DEPTH_TEST);
-+ 
++
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 ```
@@ -6973,13 +6973,13 @@ Now let's import our cube and create an object. [Learn here about this helper cl
   import { compileShader, setupShaderInput } from './gl-helpers';
 + import cubeObj from '../assets/objects/textured-cube.obj';
 + import { Object3D } from './Object3D';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.enable(gl.DEPTH_TEST);
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-+ 
++
 + const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
 
 ```
@@ -7009,55 +7009,55 @@ so we need to update our parser to support texture coordinates
       const _vertices = [];
       const _normals = [];
 +     const _texCoords = [];
-+ 
++
       const vertexIndices = [];
       const normalIndices = [];
 +     const texCoordIndices = [];
-  
+
       objSource.split('\n').forEach(line => {
           if (line.startsWith('v ')) {
               _normals.push(parseVec(line, 'vn '));
           }
-  
+
 +         if (line.startsWith('vt ')) {
 +             _texCoords.push(parseVec(line, 'vt '));
 +         }
-+ 
++
           if (line.startsWith('f ')) {
               const parsedFace = parseFace(line);
-  
+
               vertexIndices.push(...parsedFace.map(face => face[0] - 1));
 +             texCoordIndices.push(...parsedFace.map(face => face[1] - 1));
               normalIndices.push(...parsedFace.map(face => face[2] - 1));
           }
       });
-  
+
       const vertices = [];
       const normals = [];
 +     const texCoords = [];
-  
+
       for (let i = 0; i < vertexIndices.length; i++) {
           const vertexIndex = vertexIndices[i];
           const normalIndex = normalIndices[i];
 +         const texCoordIndex = texCoordIndices[i];
-  
+
           const vertex = _vertices[vertexIndex];
           const normal = _normals[normalIndex];
 +         const texCoord = _texCoords[texCoordIndex];
-  
+
           vertices.push(...vertex);
           normals.push(...normal);
-+ 
++
 +         if (texCoord) {
 +             texCoords.push(...texCoord);
 +         }
       }
-  
-      return { 
-          vertices: new Float32Array(vertices), 
--         normals: new Float32Array(normals), 
+
+      return {
+          vertices: new Float32Array(vertices),
+-         normals: new Float32Array(normals),
 +         normals: new Float32Array(normals),
-+         texCoords: new Float32Array(texCoords), 
++         texCoords: new Float32Array(texCoords),
       };
   }
 
@@ -7066,17 +7066,17 @@ and add this property to Object3D
 
 📄 src/Object3D.js
 ```diff
-  
+
   export class Object3D {
       constructor(source, position, color) {
 -         const { vertices, normals } = parseObj(source);
 +         const { vertices, normals, texCoords } = parseObj(source);
-  
+
           this.vertices = vertices;
           this.normals = normals;
           this.position = position;
 +         this.texCoords = texCoords;
-  
+
           this.modelMatrix = mat4.create();
           mat4.fromTranslation(this.modelMatrix, position);
 
@@ -7089,13 +7089,13 @@ Now we need to define gl buffers. [Learn more about this helper class here](http
   import cubeObj from '../assets/objects/textured-cube.obj';
   import { Object3D } from './Object3D';
 + import { GLBuffer } from './GLBuffer';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
   const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
-+ 
++
 + const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
 + const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
 
@@ -7106,7 +7106,7 @@ We also need to define an attribute to pass tex coords to the vertex shader
 ```diff
   attribute vec3 position;
 + attribute vec2 texCoord;
-  
+
   uniform mat4 modelMatrix;
   uniform mat4 viewMatrix;
 
@@ -7116,9 +7116,9 @@ and varying to pass texture coordinate to the fragment shader. [Learn more here]
 📄 src/shaders/3d-textured.f.glsl
 ```diff
   precision mediump float;
-  
+
 + varying vec2 vTexCoord;
-+ 
++
   void main() {
       gl_FragColor = vec4(1, 0, 0, 1);
   }
@@ -7128,12 +7128,12 @@ and varying to pass texture coordinate to the fragment shader. [Learn more here]
 ```diff
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
-  
+
 + varying vec2 vTexCoord;
-+ 
++
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-+ 
++
 +     vTexCoord = texCoord;
   }
 
@@ -7142,13 +7142,13 @@ Let's setup attributes
 
 📄 src/3d-textured.js
 ```diff
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
   const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.texCoords, gl.STATIC_DRAW);
-+ 
++
 + vertexBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-+ 
++
 + texCoordsBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
@@ -7158,24 +7158,24 @@ Create and setup view and projection matrix. [Learn more here](https://dev.to/le
 📄 src/3d-textured.js
 ```diff
 + import { mat4 } from 'gl-matrix';
-+ 
++
   import vShaderSource from './shaders/3d-textured.v.glsl';
   import fShaderSource from './shaders/3d-textured.f.glsl';
   import { compileShader, setupShaderInput } from './gl-helpers';
-  
+
   texCoordsBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
-+ 
++
 + const viewMatrix = mat4.create();
 + const projectionMatrix = mat4.create();
-+ 
++
 + mat4.lookAt(
 +     viewMatrix,
 +     [0, 0, -7],
 +     [0, 0, 0],
 +     [0, 1, 0],
 + );
-+ 
++
 + mat4.perspective(
 +     projectionMatrix,
 +     Math.PI / 360 * 90,
@@ -7192,7 +7192,7 @@ Pass view and projection matrices to shader via uniforms
       0.01,
       100,
   );
-+ 
++
 + gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 + gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
 
@@ -7201,10 +7201,10 @@ Setup viewport
 
 📄 src/3d-textured.js
 ```diff
-  
+
   gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-+ 
++
 + gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -7213,20 +7213,20 @@ and finally render our cube
 📄 src/3d-textured.js
 ```diff
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-+ 
++
 + function frame() {
 +     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
-+ 
++
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
-+ 
++
 +     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-+ 
++
 +     requestAnimationFrame(frame);
 + }
-+ 
++
 + frame();
 
 ```
@@ -7234,7 +7234,7 @@ but before rendering the cube we need to load our texture image. [Learn more abo
 
 📄 src/3d-textured.js
 ```diff
-  
+
   import vShaderSource from './shaders/3d-textured.v.glsl';
   import fShaderSource from './shaders/3d-textured.f.glsl';
 - import { compileShader, setupShaderInput } from './gl-helpers';
@@ -7243,12 +7243,12 @@ but before rendering the cube we need to load our texture image. [Learn more abo
   import { Object3D } from './Object3D';
   import { GLBuffer } from './GLBuffer';
 + import textureSource from '../assets/images/cube-texture.png';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
       requestAnimationFrame(frame);
   }
-  
+
 - frame();
 + loadImage(textureSource).then((image) => {
 +     frame();
@@ -7258,7 +7258,7 @@ but before rendering the cube we need to load our texture image. [Learn more abo
 📄 webpack.config.js
 ```diff
               },
-  
+
               {
 -                 test: /\.jpg$/,
 +                 test: /\.(jpg|png)$/,
@@ -7271,7 +7271,7 @@ and create webgl texture. [Learn more here](https://dev.to/lesnitsky/webgl-month
 
 📄 src/3d-textured.js
 ```diff
-  
+
   import vShaderSource from './shaders/3d-textured.v.glsl';
   import fShaderSource from './shaders/3d-textured.f.glsl';
 - import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
@@ -7280,11 +7280,11 @@ and create webgl texture. [Learn more here](https://dev.to/lesnitsky/webgl-month
   import { Object3D } from './Object3D';
   import { GLBuffer } from './GLBuffer';
   }
-  
+
   loadImage(textureSource).then((image) => {
 +     const texture = createTexture(gl);
 +     setImage(gl, texture, image);
-+ 
++
       frame();
   });
 
@@ -7295,9 +7295,9 @@ and read fragment colors from texture
 ```diff
   precision mediump float;
 + uniform sampler2D texture;
-  
+
   varying vec2 vTexCoord;
-  
+
   void main() {
 -     gl_FragColor = vec4(1, 0, 0, 1);
 +     gl_FragColor = texture2D(texture, vTexCoord);
@@ -7308,7 +7308,7 @@ Let's move camera a bit to top to see the "grass" side
 
 📄 src/3d-textured.js
 ```diff
-  
+
   mat4.lookAt(
       viewMatrix,
 -     [0, 0, -7],
@@ -7328,7 +7328,7 @@ Turns out that image is flipped when read by GPU, so we need to flip it back
 📄 src/shaders/3d-textured.f.glsl
 ```diff
   varying vec2 vTexCoord;
-  
+
   void main() {
 -     gl_FragColor = texture2D(texture, vTexCoord);
 +     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
@@ -7383,32 +7383,32 @@ We'll need to store each block position in separate transform matrix
 
 📄 src/3d-textured.js
 ```diff
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 + const matrices = [];
-+ 
++
   function frame() {
       mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
-  
+
 
 ```
 Now let's create 10k blocks iteration over x and z axis from -50 to 50
 
 📄 src/3d-textured.js
 ```diff
-  
+
   const matrices = [];
-  
+
 + for (let i = -50; i < 50; i++) {
 +     for (let j = -50; j < 50; j++) {
 +         const matrix = mat4.create();
 +     }
 + }
-+ 
++
   function frame() {
       mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
-  
+
 
 ```
 Each block is a size of 2 (vertex coordinates are in [-1..1] range) so positions should be divisible by two
@@ -7418,11 +7418,11 @@ Each block is a size of 2 (vertex coordinates are in [-1..1] range) so positions
   for (let i = -50; i < 50; i++) {
       for (let j = -50; j < 50; j++) {
           const matrix = mat4.create();
-+ 
++
 +         const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
       }
   }
-  
+
 
 ```
 Now we need to create a transform matrix. Let's use `ma4.fromTranslation`
@@ -7430,12 +7430,12 @@ Now we need to create a transform matrix. Let's use `ma4.fromTranslation`
 📄 src/3d-textured.js
 ```diff
           const matrix = mat4.create();
-  
+
           const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
 +         mat4.fromTranslation(matrix, position);
       }
   }
-  
+
 
 ```
 Let's also rotate each block around Y axis to make terrain look more random
@@ -7443,35 +7443,35 @@ Let's also rotate each block around Y axis to make terrain look more random
 📄 src/3d-textured.js
 ```diff
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   const matrices = [];
 + const rotationMatrix = mat4.create();
-  
+
   for (let i = -50; i < 50; i++) {
       for (let j = -50; j < 50; j++) {
-  
+
           const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
           mat4.fromTranslation(matrix, position);
-+ 
++
 +         mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
 +         mat4.multiply(matrix, matrix, rotationMatrix);
       }
   }
-  
+
 
 ```
 and finally push matrix of each block to matrices collection
 
 📄 src/3d-textured.js
 ```diff
-  
+
           mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
           mat4.multiply(matrix, matrix, rotationMatrix);
-+ 
++
 +         matrices.push(matrix);
       }
   }
-  
+
 
 ```
 Since our blocks are static, we don't need a rotation transform in each frame
@@ -7479,13 +7479,13 @@ Since our blocks are static, we don't need a rotation transform in each frame
 📄 src/3d-textured.js
 ```diff
   }
-  
+
   function frame() {
 -     mat4.rotateY(cube.modelMatrix, cube.modelMatrix, Math.PI / 180);
-- 
+-
       gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
       gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
-  
+
 
 ```
 Now we'll need to iterate over matrices collection and issue a draw call for each cube with its transform matrix passed to uniform
@@ -7493,18 +7493,18 @@ Now we'll need to iterate over matrices collection and issue a draw call for eac
 📄 src/3d-textured.js
 ```diff
   }
-  
+
   function frame() {
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, cube.modelMatrix);
 -     gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
 +     matrices.forEach((matrix) => {
 +         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
 +         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
-  
+
 -     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 +         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 +     });
-  
+
       requestAnimationFrame(frame);
   }
 
@@ -7515,11 +7515,11 @@ Now let's create an animation of rotating camera. Camera has a position and a po
 ```diff
   const viewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
-  
+
 - mat4.lookAt(viewMatrix, [0, 4, -7], [0, 0, 0], [0, 1, 0]);
-- 
+-
   mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
-  
+
   gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 
 ```
@@ -7529,18 +7529,18 @@ Define camera position, camera focus point vector and focus point transform matr
 ```diff
 - import { mat4 } from 'gl-matrix';
 + import { mat4, vec3 } from 'gl-matrix';
-  
+
   import vShaderSource from './shaders/3d-textured.v.glsl';
   import fShaderSource from './shaders/3d-textured.f.glsl';
       }
   }
-  
+
 + const cameraPosition = [0, 10, 0];
 + const cameraFocusPoint = vec3.fromValues(30, 0, 0);
 + const cameraFocusPointMatrix = mat4.create();
-+ 
++
 + mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-+ 
++
   function frame() {
       matrices.forEach((matrix) => {
           gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
@@ -7551,12 +7551,12 @@ Our camera is located in 0.0.0, so we need to translate camera focus point to 0.
 📄 src/3d-textured.js
 ```diff
   mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-  
+
   function frame() {
 +     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [-30, 0, 0]);
 +     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
 +     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
-+ 
++
       matrices.forEach((matrix) => {
           gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
           gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
@@ -7568,16 +7568,16 @@ Final step – update view matrix uniform
 ```diff
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [30, 0, 0]);
-  
+
 +     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
-+ 
++
 +     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
-+ 
++
       matrices.forEach((matrix) => {
           gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
 -         gl.uniformMatrix4fv(programInfo.uniformLocations.normalMatrix, false, cube.normalMatrix);
-  
+
           gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
       });
 
@@ -7631,26 +7631,26 @@ These technique is called WebGL instancing. Our cubes share the same vertex and 
   attribute vec3 position;
   attribute vec2 texCoord;
 + attribute mat4 modelMatrix;
-  
+
 - uniform mat4 modelMatrix;
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
-  
+
 
 ```
 Matrix attributes are actually a number of `vec4` attributes, so if `mat4` attribute location is `0`, we'll have 4 separate attributes with locations `0`, `1`, `2`, `3`. Our `setupShaderInput` helper doesn't support these, so we'll need to enable each attribute manually
 
 📄 src/3d-textured.js
 ```diff
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-  
+
 + for (let i = 0; i < 4; i++) {
 +     gl.enableVertexAttribArray(programInfo.attributeLocations.modelMatrix + i);
 + }
-+ 
++
   const cube = new Object3D(cubeObj, [0, 0, 0], [1, 0, 0]);
-  
+
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
 
 ```
@@ -7658,13 +7658,13 @@ Now we need to define a Float32Array for matrices data. The size is `100 * 100` 
 
 📄 src/3d-textured.js
 ```diff
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - const matrices = [];
 + const matrices = new Float32Array(100 * 100 * 4 * 4);
   const rotationMatrix = mat4.create();
-  
+
   for (let i = -50; i < 50; i++) {
 
 ```
@@ -7673,23 +7673,23 @@ To save resources we can use a single model matrix for all cubes while filling m
 📄 src/3d-textured.js
 ```diff
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
   const matrices = new Float32Array(100 * 100 * 4 * 4);
 + const modelMatrix = mat4.create();
   const rotationMatrix = mat4.create();
-  
+
   for (let i = -50; i < 50; i++) {
       for (let j = -50; j < 50; j++) {
 -         const matrix = mat4.create();
-- 
+-
           const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
 -         mat4.fromTranslation(matrix, position);
 +         mat4.fromTranslation(modelMatrix, position);
-  
+
           mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
 -         mat4.multiply(matrix, matrix, rotationMatrix);
 +         mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
-  
+
           matrices.push(matrix);
       }
 
@@ -7700,24 +7700,24 @@ We'll also need a counter to know the offset at the matrices Float32Array to wri
 ```diff
   const modelMatrix = mat4.create();
   const rotationMatrix = mat4.create();
-  
+
 + let cubeIndex = 0;
-+ 
++
   for (let i = -50; i < 50; i++) {
       for (let j = -50; j < 50; j++) {
           const position = [i * 2, (Math.floor(Math.random() * 2) - 1) * 2, j * 2];
           mat4.fromRotation(rotationMatrix, Math.PI * Math.round(Math.random() * 4), [0, 1, 0]);
           mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
-  
+
 -         matrices.push(matrix);
 +         modelMatrix.forEach((value, index) => {
 +             matrices[cubeIndex * 4 * 4 + index] = value;
 +         });
-+ 
++
 +         cubeIndex++;
       }
   }
-  
+
 
 ```
 Next we need a matrices gl buffer
@@ -7726,9 +7726,9 @@ Next we need a matrices gl buffer
 ```diff
       }
   }
-  
+
 + const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
-+ 
++
   const cameraPosition = [0, 10, 0];
   const cameraFocusPoint = vec3.fromValues(30, 0, 0);
   const cameraFocusPointMatrix = mat4.create();
@@ -7738,16 +7738,16 @@ and setup attribute pointer using stride and offset, since our buffer is interle
 
 📄 src/3d-textured.js
 ```diff
-  
+
   const matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
-  
+
 + const offset = 4 * 4; // 4 floats 4 bytes each
 + const stride = offset * 4; // 4 rows of 4 floats
-+ 
++
 + for (let i = 0; i < 4; i++) {
 +     gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
 + }
-+ 
++
   const cameraPosition = [0, 10, 0];
   const cameraFocusPoint = vec3.fromValues(30, 0, 0);
   const cameraFocusPointMatrix = mat4.create();
@@ -7759,9 +7759,9 @@ Instancing itself isn't supported be webgl 1 out of the box, but available via e
 ```diff
   const offset = 4 * 4; // 4 floats 4 bytes each
   const stride = offset * 4; // 4 rows of 4 floats
-  
+
 + const ext = gl.getExtension('ANGLE_instanced_arrays');
-+ 
++
   for (let i = 0; i < 4; i++) {
       gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
   }
@@ -7778,12 +7778,12 @@ In our case it is `1`.
 
 📄 src/3d-textured.js
 ```diff
-  
+
   for (let i = 0; i < 4; i++) {
       gl.vertexAttribPointer(programInfo.attributeLocations.modelMatrix + i, 4, gl.FLOAT, false, stride, i * offset);
 +     ext.vertexAttribDivisorANGLE(programInfo.attributeLocations.modelMatrix + i, 1);
   }
-  
+
   const cameraPosition = [0, 10, 0];
 
 ```
@@ -7793,14 +7793,14 @@ Finally we can get read of iteration over all matrices, and use a single  call. 
 ```diff
       mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
       gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
-  
+
 -     matrices.forEach((matrix) => {
 -         gl.uniformMatrix4fv(programInfo.uniformLocations.modelMatrix, false, matrix);
-- 
+-
 -         gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
 -     });
 +     ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, vertexBuffer.data.length / 3, 100 * 100);
-  
+
       requestAnimationFrame(frame);
   }
 
@@ -7879,9 +7879,9 @@ If our cube vertices coordinates are in `[-1..1]` range, we can use this coordin
 📄 src/shaders/skybox.v.glsl
 ```diff
   uniform mat4 viewMatrix;
-  
+
   void main() {
-- 
+-
 +     vTexCoord = position;
   }
 
@@ -7890,7 +7890,7 @@ And to calculate position of transformed vertex we need to multiply vertex posit
 
 📄 src/shaders/skybox.v.glsl
 ```diff
-  
+
   void main() {
       vTexCoord = position;
 +     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
@@ -7915,12 +7915,12 @@ and a special type of texture – sampler cube
 📄 src/shaders/skybox.f.glsl
 ```diff
   precision mediump float;
-  
+
   varying vec3 vTexCoord;
 + uniform samplerCube skybox;
-  
+
   void main() {
-- 
+-
   }
 
 ```
@@ -7929,7 +7929,7 @@ and all we need to calculate fragment color is to read color from cubemap textur
 📄 src/shaders/skybox.f.glsl
 ```diff
   uniform samplerCube skybox;
-  
+
   void main() {
 +     gl_FragColor = textureCube(skybox, vTexCoord);
   }
@@ -7958,30 +7958,30 @@ Setup webgl program
 ```diff
 + import vShaderSource from './shaders/skybox.v.glsl';
 + import fShaderSource from './shaders/skybox.f.glsl';
-+ 
++
 + import { compileShader, setupShaderInput } from './gl-helpers';
-+ 
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
-  
+
+
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
-+ 
++
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
-+ 
++
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
 ```
@@ -7990,19 +7990,19 @@ Create cube object and setup buffer for vertex positions
 📄 src/skybox.js
 ```diff
   import fShaderSource from './shaders/skybox.f.glsl';
-  
+
   import { compileShader, setupShaderInput } from './gl-helpers';
 + import { Object3D } from './Object3D';
 + import { GLBuffer } from './GLBuffer';
-+ 
++
 + import cubeObj from '../assets/objects/cube.obj';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
   gl.useProgram(program);
-  
+
   const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-+ 
++
 + const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
 + const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
 
@@ -8011,10 +8011,10 @@ Setup position attribute
 
 📄 src/skybox.js
 ```diff
-  
+
   const cube = new Object3D(cubeObj, [0, 0, 0], [0, 0, 0]);
   const vertexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, cube.vertices, gl.STATIC_DRAW);
-+ 
++
 + vertexBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
 
@@ -8024,26 +8024,26 @@ Setup view, projection matrices, pass values to uniforms and set viewport
 📄 src/skybox.js
 ```diff
   import { GLBuffer } from './GLBuffer';
-  
+
   import cubeObj from '../assets/objects/cube.obj';
 + import { mat4 } from 'gl-matrix';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   vertexBuffer.bind(gl);
   gl.vertexAttribPointer(programInfo.attributeLocations.position, 3, gl.FLOAT, false, 0, 0);
-+ 
++
 + const viewMatrix = mat4.create();
 + const projectionMatrix = mat4.create();
-+ 
++
 + mat4.lookAt(viewMatrix, [0, 0, 0], [0, 0, -1], [0, 1, 0]);
-+ 
++
 + mat4.perspective(projectionMatrix, (Math.PI / 360) * 90, canvas.width / canvas.height, 0.01, 100);
-+ 
++
 + gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
 + gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-+ 
++
 + gl.viewport(0, 0, canvas.width, canvas.height);
 
 ```
@@ -8052,12 +8052,12 @@ And define a function which will render our scene
 📄 src/skybox.js
 ```diff
   gl.uniformMatrix4fv(programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-+ 
++
 + function frame() {
 +     gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-+ 
++
 +     requestAnimationFrame(frame);
 + }
 
@@ -8068,29 +8068,29 @@ Now the fun part. Texture for each side of the cube should be stored in separate
 ```diff
   import vShaderSource from './shaders/skybox.v.glsl';
   import fShaderSource from './shaders/skybox.f.glsl';
-  
+
 - import { compileShader, setupShaderInput } from './gl-helpers';
 + import { compileShader, setupShaderInput, loadImage } from './gl-helpers';
   import { Object3D } from './Object3D';
   import { GLBuffer } from './GLBuffer';
-  
+
   import cubeObj from '../assets/objects/cube.obj';
   import { mat4 } from 'gl-matrix';
-  
+
 + import rightTexture from '../assets/images/skybox/right.JPG';
 + import leftTexture from '../assets/images/skybox/left.JPG';
 + import upTexture from '../assets/images/skybox/up.JPG';
 + import downTexture from '../assets/images/skybox/down.JPG';
 + import backTexture from '../assets/images/skybox/back.JPG';
 + import frontTexture from '../assets/images/skybox/front.JPG';
-+ 
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
-  
+
+
       requestAnimationFrame(frame);
   }
-+ 
++
 + Promise.all([
 +     loadImage(rightTexture),
 +     loadImage(leftTexture),
@@ -8111,7 +8111,7 @@ Now we need to create a webgl texture
       loadImage(frontTexture),
   ]).then((images) => {
 +     const texture = gl.createTexture();
-+ 
++
       frame();
   });
 
@@ -8124,7 +8124,7 @@ And pass a special texture type to bind method – `gl.TEXTURE_CUBE_MAP`
   ]).then((images) => {
       const texture = gl.createTexture();
 +     gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
-  
+
       frame();
   });
 
@@ -8135,12 +8135,12 @@ Then we need to setup texture
 ```diff
       const texture = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_CUBE_MAP, texture);
-  
+
 +     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 +     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 +     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 +     gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-+ 
++
       frame();
   });
 
@@ -8162,11 +8162,11 @@ Since all these values are integers, we can iterate over all images and add imag
 ```diff
       gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  
+
 +     images.forEach((image, index) => {
 +         gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + index, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 +     });
-+ 
++
       frame();
   });
 
@@ -8176,34 +8176,34 @@ and finally let's reuse the code from [previous tutorial](https://dev.to/lesnits
 📄 src/skybox.js
 ```diff
   import { GLBuffer } from './GLBuffer';
-  
+
   import cubeObj from '../assets/objects/cube.obj';
 - import { mat4 } from 'gl-matrix';
 + import { mat4, vec3 } from 'gl-matrix';
-  
+
   import rightTexture from '../assets/images/skybox/right.JPG';
   import leftTexture from '../assets/images/skybox/left.JPG';
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 + const cameraPosition = [0, 0, 0];
 + const cameraFocusPoint = vec3.fromValues(0, 0, 1);
 + const cameraFocusPointMatrix = mat4.create();
-+ 
++
 + mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-+ 
++
   function frame() {
 +     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -1]);
 +     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
 +     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 1]);
-+ 
++
 +     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
-+ 
++
 +     mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
 +     gl.uniformMatrix4fv(programInfo.uniformLocations.viewMatrix, false, viewMatrix);
-+ 
++
       gl.drawArrays(gl.TRIANGLES, 0, vertexBuffer.data.length / 3);
-  
+
       requestAnimationFrame(frame);
 
 ```
@@ -8565,9 +8565,9 @@ Don't worry, you don't need to generate such a sequence for all your textures, t
 
 📄 src/minecraft-terrain.js
 ```diff
-  
+
   const State = {};
-  
+
 + /**
 +  *
 +  * @param {WebGLRenderingContext} gl
@@ -8578,10 +8578,10 @@ Don't worry, you don't need to generate such a sequence for all your textures, t
       await loadImage(textureSource).then((image) => {
           const texture = createTexture(gl);
           setImage(gl, texture, image);
-+ 
++
 +         gl.generateMipmap(gl.TEXTURE_2D);
       });
-  
+
       setupAttributes(gl);
 
 ```
@@ -8590,11 +8590,11 @@ And in order to make GPU read a pixel color from mipmap, we need to specify `TEX
 📄 src/minecraft-terrain.js
 ```diff
           setImage(gl, texture, image);
-  
+
           gl.generateMipmap(gl.TEXTURE_2D);
 +         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
       });
-  
+
       setupAttributes(gl);
 
 ```
@@ -8655,11 +8655,11 @@ To create a framebuffer we need to call `gl.createFramebuffer`
 
 📄 src/minecraft.js
 ```diff
-  
+
   mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-  
+
 + const framebuffer = gl.createFramebuffer();
-+ 
++
   function render() {
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
@@ -8671,18 +8671,18 @@ To render colors we'll need a texture
 
 📄 src/minecraft.js
 ```diff
-  
+
   const framebuffer = gl.createFramebuffer();
-  
+
 + const texture = gl.createTexture();
-+ 
++
 + gl.bindTexture(gl.TEXTURE_2D, texture);
 + gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-+ 
++
 + gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 + gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 + gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-+ 
++
   function render() {
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
@@ -8694,10 +8694,10 @@ Now we need to bind a framebuffer and setup a color attachment
 ```diff
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  
+
 + gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 + gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-+ 
++
   function render() {
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
@@ -8740,49 +8740,49 @@ Now we need to go through a program setup routine
 ```diff
   import { prepare as prepareSkybox, render as renderSkybox } from './skybox';
   import { prepare as prepareTerrain, render as renderTerrain } from './minecraft-terrain';
-  
+
 + import vShaderSource from './shaders/filter.v.glsl';
 + import fShaderSource from './shaders/filter.f.glsl';
 + import { setupShaderInput, compileShader } from './gl-helpers';
 + import { GLBuffer } from './GLBuffer';
 + import { createRect } from './shape-helpers';
-+ 
++
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-  
+
 + const vShader = gl.createShader(gl.VERTEX_SHADER);
 + const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-+ 
++
 + compileShader(gl, vShader, vShaderSource);
 + compileShader(gl, fShader, fShaderSource);
-+ 
++
 + const program = gl.createProgram();
-+ 
++
 + gl.attachShader(program, vShader);
 + gl.attachShader(program, fShader);
-+ 
++
 + gl.linkProgram(program);
 + gl.useProgram(program);
-+ 
++
 + const vertexPositionBuffer = new GLBuffer(
 +     gl,
 +     gl.ARRAY_BUFFER,
 +     new Float32Array([...createRect(-1, -1, 2, 2)]),
 +     gl.STATIC_DRAW
 + );
-+ 
++
 + const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([0, 1, 2, 1, 2, 3]), gl.STATIC_DRAW);
-+ 
++
 + const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
-+ 
++
 + vertexPositionBuffer.bind(gl);
 + gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-+ 
++
 + gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-+ 
++
   function render() {
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
@@ -8793,10 +8793,10 @@ In the beginning of each frame we need to bind a framebuffer to tell webgl to re
 📄 src/minecraft.js
 ```diff
   gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
   function render() {
 +     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-+ 
++
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
@@ -8808,43 +8808,43 @@ and after we rendered the scene to texture, we need to use our new program
 ```diff
       renderSkybox(gl, viewMatrix, projectionMatrix);
       renderTerrain(gl, viewMatrix, projectionMatrix);
-  
+
 +     gl.useProgram(program);
-+ 
++
       requestAnimationFrame(render);
   }
-  
+
 
 ```
 Setup program attributes and uniforms
 
 📄 src/minecraft.js
 ```diff
-  
+
       gl.useProgram(program);
-  
+
 +     vertexPositionBuffer.bind(gl);
 +     gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
-+ 
++
 +     gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-+ 
++
       requestAnimationFrame(render);
   }
-  
+
 
 ```
 Bind null framebuffer (this will make webgl render to canvas)
 
 📄 src/minecraft.js
 ```diff
-  
+
       gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
 +     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-+ 
++
       requestAnimationFrame(render);
   }
-  
+
 
 ```
 Bind texture to use it as a source of color data
@@ -8852,10 +8852,10 @@ Bind texture to use it as a source of color data
 📄 src/minecraft.js
 ```diff
       gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 +     gl.bindTexture(gl.TEXTURE_2D, texture);
-  
+
       requestAnimationFrame(render);
   }
 
@@ -8866,46 +8866,46 @@ And issue a draw call
 ```diff
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.bindTexture(gl.TEXTURE_2D, texture);
-  
+
 +     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
-+ 
++
       requestAnimationFrame(render);
   }
-  
+
 
 ```
 Since we're binding different texture after we render terrain and skybox, we need to re-bind textures in terrain and skybox programs
 
 📄 src/minecraft-terrain.js
 ```diff
-  
+
       await loadImage(textureSource).then((image) => {
           const texture = createTexture(gl);
 +         State.texture = texture;
-+ 
++
           setImage(gl, texture, image);
-  
+
           gl.generateMipmap(gl.TEXTURE_2D);
-  
+
       setupAttributes(gl);
-  
+
 +     gl.bindTexture(gl.TEXTURE_2D, State.texture);
-+ 
++
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
 
 ```
 📄 src/skybox.js
 ```diff
   export function render(gl, viewMatrix, projectionMatrix) {
       gl.useProgram(State.program);
-  
+
 +     gl.bindTexture(gl.TEXTURE_CUBE_MAP, State.texture);
-+ 
++
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
 
 ```
 We need to create a depth buffer. Depth buffer is a render buffer (object which contains a data which came from fragmnt shader output)
@@ -8914,13 +8914,13 @@ We need to create a depth buffer. Depth buffer is a render buffer (object which 
 ```diff
   gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
   gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-  
+
 + const depthBuffer = gl.createRenderbuffer();
 + gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
-+ 
++
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 
 ```
 and setup renderbuffer to store depth info
@@ -8929,13 +8929,13 @@ and setup renderbuffer to store depth info
 ```diff
   const depthBuffer = gl.createRenderbuffer();
   gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
-  
+
 + gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, canvas.width, canvas.height);
 + gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
-+ 
++
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
-  
+
 
 ```
 Now scene looks better, but only for a single frame, others seem to be drawn on top of previous. This happens because texture is
@@ -8948,9 +8948,9 @@ We need to call a `gl.clear` to clear the texture (clears currently bound frameb
 ```diff
   function render() {
       gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-  
+
 +     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-+ 
++
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
@@ -8965,11 +8965,11 @@ Now we can reuse our filter function from previous tutorial to make the whole sc
 ```diff
   uniform sampler2D texture;
   uniform vec2 resolution;
-  
+
 + vec4 blackAndWhite(vec4 color) {
 +     return vec4(vec3(1.0, 1.0, 1.0) * (color.r + color.g + color.b) / 3.0, color.a);
 + }
-+ 
++
   void main() {
 -     gl_FragColor = texture2D(texture, gl_FragCoord.xy / resolution);
 +     gl_FragColor = blackAndWhite(texture2D(texture, gl_FragCoord.xy / resolution));
@@ -9044,14 +9044,14 @@ Setup framebuffer and color texture
       constructor(gl) {
           this.framebuffer = gl.createFramebuffer();
           this.texture = gl.createTexture();
-+ 
++
 +         gl.bindTexture(gl.TEXTURE_2D, this.texture);
 +         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.canvas.width, gl.canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-+ 
++
 +         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 +         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 +         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-+ 
++
 +         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
 +         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
       }
@@ -9062,13 +9062,13 @@ Setup depth buffer
 
 📄 src/RenderBuffer.js
 ```diff
-  
+
           gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
           gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
-+ 
++
 +         this.depthBuffer = gl.createRenderbuffer();
 +         gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
-+ 
++
 +         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
 +         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
       }
@@ -9082,7 +9082,7 @@ Implement bind method
           gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.canvas.width, gl.canvas.height);
           gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.depthBuffer);
       }
-+ 
++
 +     bind(gl) {
 +         gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
 +     }
@@ -9096,7 +9096,7 @@ and clear
       bind(gl) {
           gl.bindFramebuffer(gl.FRAMEBUFFER, this.framebuffer);
       }
-+ 
++
 +     clear(gl) {
 +         this.bind(gl);
 +         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -9112,53 +9112,53 @@ Use new helper class
   import { GLBuffer } from './GLBuffer';
   import { createRect } from './shape-helpers';
 + import { RenderBuffer } from './RenderBuffer';
-  
+
   const canvas = document.querySelector('canvas');
   const gl = canvas.getContext('webgl');
-  
+
   mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-  
+
 - const framebuffer = gl.createFramebuffer();
-- 
+-
 - const texture = gl.createTexture();
-- 
+-
 - gl.bindTexture(gl.TEXTURE_2D, texture);
 - gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-- 
+-
 - gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 - gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 - gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-- 
+-
 - gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
 - gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-- 
+-
 - const depthBuffer = gl.createRenderbuffer();
 - gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer);
-- 
+-
 - gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, canvas.width, canvas.height);
 - gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer);
 + const offscreenRenderBuffer = new RenderBuffer(gl);
-  
+
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
   gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
   function render() {
 -     gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-- 
+-
 -     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 +     offscreenRenderBuffer.clear(gl);
-  
+
       mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
       mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
       gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 -     gl.bindTexture(gl.TEXTURE_2D, texture);
 +     gl.bindTexture(gl.TEXTURE_2D, offscreenRenderBuffer.texture);
-  
+
       gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
-  
+
 
 ```
 Instead of passing the whole unique color of the object, which is a vec3, we can pass only object index
@@ -9169,7 +9169,7 @@ Instead of passing the whole unique color of the object, which is a vec3, we can
   attribute vec2 texCoord;
   attribute mat4 modelMatrix;
 + attribute float index;
-  
+
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
 
@@ -9178,19 +9178,19 @@ and convert this float to a color right in the shader
 
 📄 src/shaders/3d-textured.v.glsl
 ```diff
-  
+
   varying vec2 vTexCoord;
-  
+
 + vec3 encodeObject(float id) {
 +     int b = int(mod(id, 255.0));
 +     int r = int(id) / 255 / 255;
 +     int g = (int(id) - b - r * 255 * 255) / 255;
 +     return vec3(r, g, b) / 255.0;
 + }
-+ 
++
   void main() {
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-  
+
 
 ```
 Now we need to pass the color to a fragment shader via varying
@@ -9198,10 +9198,10 @@ Now we need to pass the color to a fragment shader via varying
 📄 src/shaders/3d-textured.f.glsl
 ```diff
   uniform sampler2D texture;
-  
+
   varying vec2 vTexCoord;
 + varying vec3 vColor;
-  
+
   void main() {
       gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
 
@@ -9209,14 +9209,14 @@ Now we need to pass the color to a fragment shader via varying
 📄 src/shaders/3d-textured.v.glsl
 ```diff
   uniform mat4 projectionMatrix;
-  
+
   varying vec2 vTexCoord;
 + varying vec3 vColor;
-  
+
   vec3 encodeObject(float id) {
       int b = int(mod(id, 255.0));
       gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-  
+
       vTexCoord = texCoord;
 +     vColor = encodeObject(index);
   }
@@ -9228,12 +9228,12 @@ We also need to specify what do we want to render: textured object or colored, s
 ```diff
   varying vec2 vTexCoord;
   varying vec3 vColor;
-  
+
 + uniform float renderIndices;
-+ 
++
   void main() {
       gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
-+ 
++
 +     if (renderIndices == 1.0) {
 +         gl_FragColor.rgb = vColor;
 +     }
@@ -9246,11 +9246,11 @@ Now let's create indices array
 ```diff
       State.modelMatrix = mat4.create();
       State.rotationMatrix = mat4.create();
-  
+
 +     const indices = new Float32Array(100 * 100);
-+ 
++
       let cubeIndex = 0;
-  
+
       for (let i = -50; i < 50; i++) {
 
 ```
@@ -9260,16 +9260,16 @@ Fill it with data and setup a GLBuffer
 ```diff
                   matrices[cubeIndex * 4 * 4 + index] = value;
               });
-  
+
 +             indices[cubeIndex] = cubeIndex;
-+ 
++
               cubeIndex++;
           }
       }
-  
+
       State.matricesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, matrices, gl.STATIC_DRAW);
 +     State.indexBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, indices, gl.STATIC_DRAW);
-  
+
       State.offset = 4 * 4; // 4 floats 4 bytes each
       State.stride = State.offset * 4; // 4 rows of 4 floats
 
@@ -9278,23 +9278,23 @@ Since we have a new attribute, we need to update setupAttribute and resetDivisor
 
 📄 src/minecraft-terrain.js
 ```diff
-  
+
           State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 1);
       }
-+ 
++
 +     State.indexBuffer.bind(gl);
 +     gl.vertexAttribPointer(State.programInfo.attributeLocations.index, 1, gl.FLOAT, false, 0, 0);
 +     State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 1);
   }
-  
+
   function resetDivisorAngles() {
       for (let i = 0; i < 4; i++) {
           State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.modelMatrix + i, 0);
       }
-+ 
++
 +     State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
   }
-  
+
   export function render(gl, viewMatrix, projectionMatrix) {
 
 ```
@@ -9304,23 +9304,23 @@ And finally we need another argument of a render function to distinguish between
 ```diff
       State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
   }
-  
+
 - export function render(gl, viewMatrix, projectionMatrix) {
 + export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
       gl.useProgram(State.program);
-  
+
       setupAttributes(gl);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
 +     if (renderIndices) {
 +         gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);
 +     } else {
 +         gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 0);
 +     }
-+ 
++
       State.ext.drawArraysInstancedANGLE(gl.TRIANGLES, 0, State.vertexBuffer.data.length / 3, 100 * 100);
-  
+
       resetDivisorAngles();
 
 ```
@@ -9329,10 +9329,10 @@ Now we need another render buffer to render colored cubes to
 📄 src/minecraft.js
 ```diff
   mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
-  
+
   const offscreenRenderBuffer = new RenderBuffer(gl);
 + const coloredCubesRenderBuffer = new RenderBuffer(gl);
-  
+
   const vShader = gl.createShader(gl.VERTEX_SHADER);
   const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -9343,11 +9343,11 @@ Now let's add a click listeneer
 ```diff
       requestAnimationFrame(render);
   }
-  
+
 + document.body.addEventListener('click', () => {
 +     coloredCubesRenderBuffer.bind(gl);
 + });
-+ 
++
   (async () => {
       await prepareSkybox(gl);
       await prepareTerrain(gl);
@@ -9357,13 +9357,13 @@ and render colored cubes to a texture each time user clicks on a canvas
 
 📄 src/minecraft.js
 ```diff
-  
+
   document.body.addEventListener('click', () => {
       coloredCubesRenderBuffer.bind(gl);
-+ 
++
 +     renderTerrain(gl, viewMatrix, projectionMatrix, true);
   });
-  
+
   (async () => {
 
 ```
@@ -9372,12 +9372,12 @@ Now we need a storage to read pixel colors to
 📄 src/minecraft.js
 ```diff
       coloredCubesRenderBuffer.bind(gl);
-  
+
       renderTerrain(gl, viewMatrix, projectionMatrix, true);
-+ 
++
 +     const pixels = new Uint8Array(canvas.width * canvas.height * 4);
   });
-  
+
   (async () => {
 
 ```
@@ -9386,11 +9386,11 @@ and actually read pixel colors
 📄 src/minecraft.js
 ```diff
       renderTerrain(gl, viewMatrix, projectionMatrix, true);
-  
+
       const pixels = new Uint8Array(canvas.width * canvas.height * 4);
 +     gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
   });
-  
+
   (async () => {
 
 ```
@@ -9442,20 +9442,20 @@ Yesterday we've rendered our minecraft terrain to a offscreen texture, where eac
 ```diff
       requestAnimationFrame(render);
   }
-  
+
 - document.body.addEventListener('click', () => {
 + document.body.addEventListener('click', (e) => {
       coloredCubesRenderBuffer.bind(gl);
-  
+
       renderTerrain(gl, viewMatrix, projectionMatrix, true);
-  
+
       const pixels = new Uint8Array(canvas.width * canvas.height * 4);
       gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-+ 
++
 +     const x = e.clientX * devicePixelRatio;
 +     const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
   });
-  
+
   (async () => {
 
 ```
@@ -9463,13 +9463,13 @@ We need to skip `y` rows (`y * canvas.width`) multiplied by 4 (4 integers per pi
 
 📄 src/minecraft.js
 ```diff
-  
+
       const x = e.clientX * devicePixelRatio;
       const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
-+ 
++
 +     const rowsToSkip = y * canvas.width * 4;
   });
-  
+
   (async () => {
 
 ```
@@ -9478,11 +9478,11 @@ Horizontal coordinate is `x * 4` (coordinate multiplied by number of integers pe
 📄 src/minecraft.js
 ```diff
       const y = (canvas.offsetHeight - e.clientY) * devicePixelRatio;
-  
+
       const rowsToSkip = y * canvas.width * 4;
 +     const col = x * 4;
   });
-  
+
   (async () => {
 
 ```
@@ -9490,13 +9490,13 @@ So the final index of pixel is rowsToSkip + col
 
 📄 src/minecraft.js
 ```diff
-  
+
       const rowsToSkip = y * canvas.width * 4;
       const col = x * 4;
-+ 
++
 +     const pixelIndex = rowsToSkip + col;
   });
-  
+
   (async () => {
 
 ```
@@ -9505,15 +9505,15 @@ Now we need to read each pixel color component
 📄 src/minecraft.js
 ```diff
       const col = x * 4;
-  
+
       const pixelIndex = rowsToSkip + col;
-+ 
++
 +     const r = pixels[pixelIndex];
 +     const g = pixels[pixelIndex + 1];
 +     const b = pixels[pixelIndex + 2];
 +     const a = pixels[pixelIndex + 3];
   });
-  
+
   (async () => {
 
 ```
@@ -9523,14 +9523,14 @@ Now we need to convert back to integer from r g b
 ```diff
       requestAnimationFrame(render);
   }
-  
+
 + function rgbToInt(r, g, b) {
 +     return b + g * 255 + r * 255 ** 2;
 + }
-+ 
++
   document.body.addEventListener('click', (e) => {
       coloredCubesRenderBuffer.bind(gl);
-  
+
 
 ```
 Let's drop camera rotation code to make scene static
@@ -9539,25 +9539,25 @@ Let's drop camera rotation code to make scene static
 ```diff
   function render() {
       offscreenRenderBuffer.clear(gl);
-  
+
 -     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, -30]);
 -     mat4.rotateY(cameraFocusPointMatrix, cameraFocusPointMatrix, Math.PI / 360);
 -     mat4.translate(cameraFocusPointMatrix, cameraFocusPointMatrix, [0, 0, 30]);
-- 
+-
 -     mat4.getTranslation(cameraFocusPoint, cameraFocusPointMatrix);
-- 
+-
       mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
-  
+
       renderSkybox(gl, viewMatrix, projectionMatrix);
       const g = pixels[pixelIndex + 1];
       const b = pixels[pixelIndex + 2];
       const a = pixels[pixelIndex + 3];
-+ 
++
 +     const index = rgbToInt(r, g, b);
-+ 
++
 +     console.log(index);
   });
-  
+
   (async () => {
 
 ```
@@ -9565,15 +9565,15 @@ and update initial camera position to see the scene better
 
 📄 src/minecraft.js
 ```diff
-  
+
   gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 - const cameraPosition = [0, 5, 0];
 - const cameraFocusPoint = vec3.fromValues(0, 0, 30);
 + const cameraPosition = [0, 10, 0];
 + const cameraFocusPoint = vec3.fromValues(30, 0, 30);
   const cameraFocusPointMatrix = mat4.create();
-  
+
   mat4.fromTranslation(cameraFocusPointMatrix, cameraFocusPoint);
 
 ```
@@ -9581,11 +9581,11 @@ Next let's pass selected color index into vertex shader as varying
 
 📄 src/shaders/3d-textured.v.glsl
 ```diff
-  
+
   uniform mat4 viewMatrix;
   uniform mat4 projectionMatrix;
 + uniform float selectedObjectIndex;
-  
+
   varying vec2 vTexCoord;
   varying vec3 vColor;
 
@@ -9595,31 +9595,31 @@ And multiply object color if its index matches selected object index
 📄 src/shaders/3d-textured.f.glsl
 ```diff
   varying vec3 vColor;
-  
+
   uniform float renderIndices;
 + varying vec4 vColorMultiplier;
-  
+
   void main() {
 -     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1));
 +     gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
-  
+
       if (renderIndices == 1.0) {
           gl_FragColor.rgb = vColor;
 
 ```
 📄 src/shaders/3d-textured.v.glsl
 ```diff
-  
+
   varying vec2 vTexCoord;
   varying vec3 vColor;
 + varying vec4 vColorMultiplier;
-  
+
   vec3 encodeObject(float id) {
       int b = int(mod(id, 255.0));
-  
+
       vTexCoord = texCoord;
       vColor = encodeObject(index);
-+     
++
 +     if (selectedObjectIndex == index) {
 +         vColorMultiplier = vec4(1.5, 1.5, 1.5, 1.0);
 +     } else {
@@ -9634,17 +9634,17 @@ and reflect shader changes in js
 ```diff
       State.ext.vertexAttribDivisorANGLE(State.programInfo.attributeLocations.index, 0);
   }
-  
+
 - export function render(gl, viewMatrix, projectionMatrix, renderIndices) {
 + export function render(gl, viewMatrix, projectionMatrix, renderIndices, selectedObjectIndex) {
       gl.useProgram(State.program);
-  
+
       setupAttributes(gl);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.viewMatrix, false, viewMatrix);
       gl.uniformMatrix4fv(State.programInfo.uniformLocations.projectionMatrix, false, projectionMatrix);
-  
+
 +     gl.uniform1f(State.programInfo.uniformLocations.selectedObjectIndex, selectedObjectIndex);
-+ 
++
       if (renderIndices) {
           gl.uniform1f(State.programInfo.uniformLocations.renderIndices, 1);
       } else {
@@ -9652,29 +9652,29 @@ and reflect shader changes in js
 ```
 📄 src/minecraft.js
 ```diff
-  
+
   gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-  
+
 + let selectedObjectIndex = -1;
-+ 
++
   function render() {
       offscreenRenderBuffer.clear(gl);
-  
+
       mat4.lookAt(viewMatrix, cameraPosition, cameraFocusPoint, [0, 1, 0]);
-  
+
       renderSkybox(gl, viewMatrix, projectionMatrix);
 -     renderTerrain(gl, viewMatrix, projectionMatrix);
 +     renderTerrain(gl, viewMatrix, projectionMatrix, false, selectedObjectIndex);
-  
+
       gl.useProgram(program);
-  
-  
+
+
       const index = rgbToInt(r, g, b);
-  
+
 -     console.log(index);
 +     selectedObjectIndex = index;
   });
-  
+
   (async () => {
 
 ```
@@ -9727,13 +9727,13 @@ To calculate relative distance between camera position and some point, we need t
 📄 src/shaders/3d-textured.v.glsl
 ```diff
   }
-  
+
   void main() {
 -     gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 +     mat4 modelView = viewMatrix * modelMatrix;
-+ 
++
 +     gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
-  
+
       vTexCoord = texCoord;
       vColor = encodeObject(index);
 
@@ -9742,26 +9742,26 @@ Since our camera looks in a negative direction of Z axis, we need to get `z` coo
 
 📄 src/shaders/3d-textured.v.glsl
 ```diff
-  
+
       gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
-  
+
 +     float depth = (modelView * vec4(position, 1.0)).z;
-+ 
++
       vTexCoord = texCoord;
       vColor = encodeObject(index);
-      
+
 
 ```
 But this value will be negative, while we need a positive value, so let's just negate it
 
 📄 src/shaders/3d-textured.v.glsl
 ```diff
-  
+
       gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
-  
+
 -     float depth = (modelView * vec4(position, 1.0)).z;
 +     float depth = -(modelView * vec4(position, 1.0)).z;
-  
+
       vTexCoord = texCoord;
       vColor = encodeObject(index);
 
@@ -9790,14 +9790,14 @@ We'll need the final value of `fogAmount` in fragment shader, so this should be 
   varying vec3 vColor;
   varying vec4 vColorMultiplier;
 + varying float vFogAmount;
-  
+
   vec3 encodeObject(float id) {
       int b = int(mod(id, 255.0));
       gl_Position = projectionMatrix * modelView * vec4(position, 1.0);
-  
+
       float depth = -(modelView * vec4(position, 1.0)).z;
 +     vFogAmount = smoothstep(60.0, 100.0, depth) * 0.9;
-  
+
       vTexCoord = texCoord;
       vColor = encodeObject(index);
 
@@ -9806,11 +9806,11 @@ Let's define this varying in fragment shader
 
 📄 src/shaders/3d-textured.f.glsl
 ```diff
-  
+
   uniform float renderIndices;
   varying vec4 vColorMultiplier;
 + varying float vFogAmount;
-  
+
   void main() {
       gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
 
@@ -9821,9 +9821,9 @@ Now let's define a color of the fog (white). We can also pass this color to a un
 ```diff
   void main() {
       gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
-  
+
 +     vec3 fogColor = vec3(1.0, 1.0, 1.0);
-+ 
++
       if (renderIndices == 1.0) {
           gl_FragColor.rgb = vColor;
       }
@@ -9834,10 +9834,10 @@ and finally we need to mix original color of the pixel with the fog. We can use 
 📄 src/shaders/3d-textured.f.glsl
 ```diff
       gl_FragColor = texture2D(texture, vTexCoord * vec2(1, -1) + vec2(0, 1)) * vColorMultiplier;
-  
+
       vec3 fogColor = vec3(1.0, 1.0, 1.0);
 +     gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, vFogAmount);
-  
+
       if (renderIndices == 1.0) {
           gl_FragColor.rgb = vColor;
 
